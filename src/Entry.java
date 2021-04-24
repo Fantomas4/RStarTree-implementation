@@ -1,29 +1,21 @@
 import java.io.Serializable;
 
 public class Entry implements Serializable {
-    private static long idCount = 0;
-
-    private final long entryId;
-    private Rectangle rectangle;
+    private BoundingBox rectangle;
 
     // use blockId or nodeId?
-    private long childBlockId;
+    private long childNodeId;
 
-    public Entry(Rectangle rectangle, long blockId) {
+    public Entry(BoundingBox rectangle, long childNodeId) {
         this.rectangle = rectangle;
-        this.childBlockId = blockId;
-        entryId = idCount ++;
+        this.childNodeId = childNodeId;
     }
 
-    public long getEntryId() {
-        return entryId;
-    }
-
-    public Rectangle getRectangle() {
+    public BoundingBox getRectangle() {
         return rectangle;
     }
 
-    public long getChildBlockId() {
-        return childBlockId;
+    public long getChildNodeId() {
+        return childNodeId;
     }
 }
