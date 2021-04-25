@@ -1,6 +1,5 @@
 import java.io.Serializable;
 
-import static java.lang.Math.abs;
 
 public class BoundingBox implements Serializable {
     private double[] lowerLeftPoint; // The bottom left point of the rectangle
@@ -29,7 +28,7 @@ public class BoundingBox implements Serializable {
     public double getMargin() {
         double sum = 0;
         for (int i = 0; i < dimensions; i ++) {
-            sum += abs(upperRightPoint[i] - lowerLeftPoint[i]);
+            sum += Math.abs(upperRightPoint[i] - lowerLeftPoint[i]);
         }
         return sum;
     }
@@ -39,7 +38,7 @@ public class BoundingBox implements Serializable {
         for (int i = 0; i < dimensions; i ++) {
             product *= upperRightPoint[i] - lowerLeftPoint[i];
         }
-        return abs(product);
+        return Math.abs(product);
     }
 
     public boolean checkOverlap(BoundingBox otherBB) {
@@ -54,7 +53,18 @@ public class BoundingBox implements Serializable {
         return true;
     }
 
-    public double calculateOverlap(BoundingBox otherBoundingBox) {
+    public double calculateOverlap(BoundingBox otherBB) {
+        double overlapProduct = 1;
+        for (int i = 0; i < dimensions; i ++) {
+            double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
+                    - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
 
+            if (overlapDiff <= 0) {
+                return 0;
+            } else {
+                overlapProduct *= overlapDiff;
+            }
+        }
+        return overlapProduct;
     }
 }
