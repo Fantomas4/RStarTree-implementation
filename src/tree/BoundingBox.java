@@ -1,4 +1,7 @@
+package tree;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 public class BoundingBox implements Serializable {
@@ -23,6 +26,10 @@ public class BoundingBox implements Serializable {
 
     public double[] getUpperRightPoint() {
         return upperRightPoint;
+    }
+
+    public int getDimensions() {
+        return dimensions;
     }
 
     public double getMargin() {
@@ -66,5 +73,27 @@ public class BoundingBox implements Serializable {
             }
         }
         return overlapProduct;
+    }
+
+    // Class used to calculate minimum bounding rectangles
+    public static BoundingBox calculateMBR(ArrayList<BoundingBox> boundingBoxes) {
+        BoundingBox primerBoundingBox = boundingBoxes.remove(0);
+        int dimensions = primerBoundingBox.getDimensions();
+        double[] minLowerLeft = primerBoundingBox.getLowerLeftPoint();
+        double[] maxUpperRight = primerBoundingBox.getUpperRightPoint();
+
+        for (BoundingBox boundingBox : boundingBoxes) {
+            for (int j = 0; j < dimensions; j++) {
+                if (minLowerLeft[j] > boundingBox.getLowerLeftPoint()[j]) {
+                    minLowerLeft[j] = boundingBox.getLowerLeftPoint()[j];
+                }
+
+                if (maxUpperRight[j] < boundingBox.getUpperRightPoint()[j]) {
+                    maxUpperRight[j] = boundingBox.getUpperRightPoint()[j];
+                }
+            }
+        }
+
+        return new BoundingBox(minLowerLeft, maxUpperRight);
     }
 }
