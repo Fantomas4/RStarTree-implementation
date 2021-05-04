@@ -2,6 +2,7 @@ package tree;
 
 import utils.EntryComparator;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +39,16 @@ public class Node {
     }
 
     private class AxisDistributions {
-        ArrayList<Distribution> distributions;
-        double marginSum = 0;
-
-        public AxisDistributions() {
-            distributions = new ArrayList<>();
-        }
+        private final ArrayList<Distribution> distributions = new ArrayList<>();
+        private double marginSum = 0;
 
         public void addDistribution(Distribution newDistribution, double marginValue) {
             distributions.add(newDistribution);
             marginSum += marginValue;
+        }
+
+        public double getMarginSum() {
+            return  marginSum;
         }
     }
 
@@ -68,31 +69,54 @@ public class Node {
             return entriesGroupB;
         }
 
+        public double getDistributionMargin() {
+            List<BoundingBox> boundingBoxesA = new ArrayList<>();
+            for (Entry entry : entriesGroupA) {
+                boundingBoxesA.add(entry.getBoundingBox());
+            }
+
+            List<BoundingBox> boundingBoxesB = new ArrayList<>();
+            for (Entry entry : entriesGroupB) {
+                boundingBoxesB.add(entry.getBoundingBox());
+            }
+
+            double marginA = BoundingBox.calculateMBR(boundingBoxesA).getMargin();
+            double marginB = BoundingBox.calculateMBR(boundingBoxesB).getMargin();
+            return marginA + marginB;
+        }
     }
 
-    private void chooseSplitAxis() {
+    private AxisDistributions chooseSplitAxis() {
+        double minMarginSum = Double.MAX_VALUE;
+        AxisDistributions minAxisDistributions = null;
+
         for (int d = 0; d < DIMENSIONS; d++) {
-            ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
+            List<Entry> sortedByLowerValue = new ArrayList<>(entries);
             entries.sort(new EntryComparator.LowerValueComparator(DIMENSIONS));
-            ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
+            List<Entry> sortedByUpperValue = new ArrayList<>(entries);
             entries.sort(new EntryComparator.UpperValueComparator(DIMENSIONS));
 
-            ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
+            List<List<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);
             sortedValueLists.add(sortedByUpperValue);
 
-            double sumOfMargins = 0;
-            for (ArrayList<Entry> sortedValueList : sortedValueLists) {
-
+            AxisDistributions axisDistributions = new AxisDistributions();
+            for (List<Entry> sortedValueList : sortedValueLists) {
                 for (int k = 0; k < MAX_ENTRIES - 2 * MIN_ENTRIES + 2; k++) {
                     List<Entry> groupA = sortedValueList.subList(0, MIN_ENTRIES - 1 + k);
                     List<Entry> groupB = sortedValueList.subList(MIN_ENTRIES - 1 + k, sortedValueList.size());
-
-                    
+                    Distribution distribution = new Distribution(groupA, groupB);
+                    axisDistributions.addDistribution(distribution, distribution.getDistributionMargin());
                 }
             }
 
+            if (axisDistributions.getMarginSum() < minMarginSum) {
+                minMarginSum = axisDistributions.getMarginSum();
+                minAxisDistributions = axisDistributions;
+            }
         }
+
+        return minAxisDistributions;
     }
 
 

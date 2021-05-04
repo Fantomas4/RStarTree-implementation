@@ -1,7 +1,7 @@
 package tree;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class BoundingBox implements Serializable {
@@ -76,7 +76,7 @@ public class BoundingBox implements Serializable {
     }
 
     // Class used to calculate minimum bounding rectangles
-    public static BoundingBox calculateMBR(ArrayList<BoundingBox> boundingBoxes) {
+    public static BoundingBox calculateMBR(List<BoundingBox> boundingBoxes) {
         BoundingBox primerBoundingBox = boundingBoxes.remove(0);
         int dimensions = primerBoundingBox.getDimensions();
         double[] minLowerLeft = primerBoundingBox.getLowerLeftPoint();
