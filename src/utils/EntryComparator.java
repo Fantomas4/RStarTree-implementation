@@ -122,4 +122,37 @@ public class EntryComparator {
             }
         }
     }
+
+    public static class UpperValueComparator implements Comparator<Entry> {
+        private final int targetDimension;
+
+        public UpperValueComparator(int targetDimension) {
+            this.targetDimension = targetDimension;
+        }
+
+        @Override
+        public int compare(Entry a, Entry b) {
+            double[] upperValueA = a.getBoundingBox().getUpperRightPoint();
+            double[] upperValueB = b.getBoundingBox().getUpperRightPoint();
+
+            return Double.compare(upperValueA[targetDimension], upperValueB[targetDimension]);
+        }
+    }
+
+    public static class LowerValueComparator implements Comparator<Entry> {
+        private final int targetDimension;
+
+        public LowerValueComparator(int targetDimension) {
+            this.targetDimension = targetDimension;
+        }
+
+        @Override
+        public int compare(Entry a, Entry b) {
+            double[] lowerDimensionA = a.getBoundingBox().getLowerLeftPoint();
+            double[] lowerDimensionB = b.getBoundingBox().getLowerLeftPoint();
+
+            return Double.compare(lowerDimensionA[targetDimension], lowerDimensionB[targetDimension]);
+        }
+
+    }
 }

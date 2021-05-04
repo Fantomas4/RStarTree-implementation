@@ -26,7 +26,7 @@ public class RStarTree {
             long nextNodeId = optimalEntry.getChildNodeId();
             // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId())
             Node nextNode;
-            chooseSubTree(newEntry, nextNode, ++currentLevel);
+            return chooseSubTree(newEntry, nextNode, ++currentLevel);
         } else {
             // The childpointers in currentNode do not point to leaves, so the
             // minimum area cost is calculated.
@@ -36,10 +36,8 @@ public class RStarTree {
             long nextNodeId = optimalEntry.getChildNodeId();
             // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId())
             Node nextNode;
-            chooseSubTree(newEntry, nextNode, ++currentLevel)
+            return chooseSubTree(newEntry, nextNode, ++currentLevel);
         }
-
-
     }
 
     private void insertRecord() {
@@ -47,7 +45,7 @@ public class RStarTree {
     }
 
     private void insert() {
-
+        // R* Tree paper reference: I1 - Insert
     }
 
     private void overflowTreatment() {
