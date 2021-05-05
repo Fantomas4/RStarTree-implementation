@@ -13,16 +13,10 @@ public class Node {
     static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
 
     private long nodeId; //TODO: Determine how nodeIds are distributed and set.
-
     private ArrayList<Entry> entries;
 
-    public Node(long nodeId) {
-        this.nodeId = nodeId;
-        entries = new ArrayList<>();
-    }
 
-    public Node(long nodeId, ArrayList<Entry> entries) {
-        this.nodeId = nodeId;
+    public Node(ArrayList<Entry> entries) {
         this.entries = entries;
     }
 
@@ -34,8 +28,20 @@ public class Node {
         return nodeId;
     }
 
-    private void splitNode() {
+
+    public void setId(long nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    private ArrayList<Node> splitNode() {
+        AxisDistributions axisDistributions = chooseSplitAxis();
+        Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
         
+        ArrayList<Node> resultNodes = new ArrayList<>();
+        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA()));
+        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB()));
+
+        return resultNodes;
     }
 
     private class AxisDistributions {
@@ -47,35 +53,39 @@ public class Node {
             marginSum += marginValue;
         }
 
+        public ArrayList<Distribution> getDistributions() {
+            return distributions;
+        }
+
         public double getMarginSum() {
             return  marginSum;
         }
     }
 
     private class Distribution {
-        private final List<Entry> entriesGroupA;
-        private final List<Entry> entriesGroupB;
+        private final ArrayList<Entry> entriesGroupA;
+        private final ArrayList<Entry> entriesGroupB;
 
-        public Distribution(List<Entry> entriesGroupA, List<Entry> entriesGroupB) {
+        public Distribution(ArrayList<Entry> entriesGroupA, ArrayList<Entry> entriesGroupB) {
             this.entriesGroupA = entriesGroupA;
             this.entriesGroupB = entriesGroupB;
         }
 
-        public List<Entry> getEntriesGroupA() {
+        public ArrayList<Entry> getEntriesGroupA() {
             return entriesGroupA;
         }
 
-        public List<Entry> getEntriesGroupB() {
+        public ArrayList<Entry> getEntriesGroupB() {
             return entriesGroupB;
         }
-
+        //TODO: Replace duplicate code with a method/optimize?
         public double getDistributionMargin() {
-            List<BoundingBox> boundingBoxesA = new ArrayList<>();
+            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
             for (Entry entry : entriesGroupA) {
                 boundingBoxesA.add(entry.getBoundingBox());
             }
 
-            List<BoundingBox> boundingBoxesB = new ArrayList<>();
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
             for (Entry entry : entriesGroupB) {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
@@ -84,6 +94,37 @@ public class Node {
             double marginB = BoundingBox.calculateMBR(boundingBoxesB).getMargin();
             return marginA + marginB;
         }
+
+        public double getDistributionOverlap() {
+            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+
+            for (Entry entry : entriesGroupA) {
+                boundingBoxesA.add(entry.getBoundingBox());
+            }
+
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+            for (Entry entry : entriesGroupB) {
+                boundingBoxesB.add(entry.getBoundingBox());
+            }
+            return BoundingBox.calculateMBR(boundingBoxesA).calculateOverlap(BoundingBox.calculateMBR(boundingBoxesB));
+        }
+
+        public double getDistributionArea() {
+            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+
+            for (Entry entry : entriesGroupA) {
+                boundingBoxesA.add(entry.getBoundingBox());
+            }
+
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+            for (Entry entry : entriesGroupB) {
+                boundingBoxesB.add(entry.getBoundingBox());
+            }
+
+            double areaA = BoundingBox.calculateMBR(boundingBoxesA).getArea();
+            double areaB = BoundingBox.calculateMBR(boundingBoxesB).getArea();
+            return areaA + areaB;
+        }
     }
 
     private AxisDistributions chooseSplitAxis() {
@@ -91,27 +132,28 @@ public class Node {
         AxisDistributions minAxisDistributions = null;
 
         for (int d = 0; d < DIMENSIONS; d++) {
-            List<Entry> sortedByLowerValue = new ArrayList<>(entries);
+            ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
             entries.sort(new EntryComparator.LowerValueComparator(DIMENSIONS));
-            List<Entry> sortedByUpperValue = new ArrayList<>(entries);
+            ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
             entries.sort(new EntryComparator.UpperValueComparator(DIMENSIONS));
 
-            List<List<Entry>> sortedValueLists = new ArrayList<>();
+            ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);
             sortedValueLists.add(sortedByUpperValue);
 
             AxisDistributions axisDistributions = new AxisDistributions();
-            for (List<Entry> sortedValueList : sortedValueLists) {
+            for (ArrayList<Entry> sortedValueList : sortedValueLists) {
                 for (int k = 0; k < MAX_ENTRIES - 2 * MIN_ENTRIES + 2; k++) {
                     List<Entry> groupA = sortedValueList.subList(0, MIN_ENTRIES - 1 + k);
                     List<Entry> groupB = sortedValueList.subList(MIN_ENTRIES - 1 + k, sortedValueList.size());
-                    Distribution distribution = new Distribution(groupA, groupB);
+                    Distribution distribution = new Distribution(new ArrayList<>(groupA), new ArrayList<>(groupB));
                     axisDistributions.addDistribution(distribution, distribution.getDistributionMargin());
                 }
             }
 
-            if (axisDistributions.getMarginSum() < minMarginSum) {
-                minMarginSum = axisDistributions.getMarginSum();
+            double axisMarginSum = axisDistributions.getMarginSum();
+            if (axisMarginSum < minMarginSum) {
+                minMarginSum = axisMarginSum;
                 minAxisDistributions = axisDistributions;
             }
         }
@@ -120,8 +162,31 @@ public class Node {
     }
 
 
-    private void chooseSplitIndex() {
+    private Distribution chooseSplitIndex(AxisDistributions chosenAxisDistributions) {
+        ArrayList<Distribution> distributions = chosenAxisDistributions.getDistributions();
+        int minIndex = 0;
+        double minOverlapValue = distributions.get(minIndex).getDistributionOverlap();
 
+        for (int i = 1; i < distributions.size(); i++) {
+            Distribution distribution = distributions.get(i);
+
+            double distributionOverlap = distribution.getDistributionOverlap();
+            if (distributionOverlap < minOverlapValue) {
+                // Choose the distribution with the minimum overlap-value.
+                minOverlapValue = distributionOverlap;
+                minIndex = i;
+            } else if (distributionOverlap == minOverlapValue) {
+                // Resole ties by choosing the distribution with minimum area-value.
+                double minDistributionArea = distributions.get(minIndex).getDistributionArea();
+                double currentDistributionArea = distribution.getDistributionArea();
+
+                if (currentDistributionArea < minDistributionArea) {
+                    minIndex = i;
+                }
+            }
+        }
+
+        return distributions.get(minIndex);
     }
 
     //TODO: Could return fixed array instead of ArrayList?
