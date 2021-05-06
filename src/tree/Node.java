@@ -7,30 +7,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    static final int DIMENSIONS = 3;
-    static final int MAX_ENTRIES = 10; //TODO: Get max entries per node from filehelper
-    static final double MIN_LOAD_FACTOR = 0.3;
-    static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
+    private static final int DIMENSIONS = 3;
+    private static final int MAX_ENTRIES = 10; //TODO: Get max entries per node from filehelper
+    private static final double MIN_LOAD_FACTOR = 0.3;
+    private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
 
     private long nodeId; //TODO: Determine how nodeIds are distributed and set.
     private ArrayList<Entry> entries;
+    private int level;
 
 
-    public Node(ArrayList<Entry> entries) {
+    public Node(ArrayList<Entry> entries, int level) {
         this.entries = entries;
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public void addEntry(Entry newEntry) {
         entries.add(newEntry);
     }
 
+    public boolean isOverflowed() {
+        return entries.size() > MAX_ENTRIES;
+    }
+
     public long getId() {
         return nodeId;
     }
 
-
     public void setId(long nodeId) {
         this.nodeId = nodeId;
+    }
+
+    public static int getMaxEntriesLimit() {
+        return MAX_ENTRIES;
     }
 
     private ArrayList<Node> splitNode() {
@@ -38,8 +55,8 @@ public class Node {
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
 
         ArrayList<Node> resultNodes = new ArrayList<>();
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA()));
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB()));
+        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level));
+        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level));
 
         return resultNodes;
     }

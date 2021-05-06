@@ -48,6 +48,15 @@ public class BoundingBox implements Serializable {
         return Math.abs(product);
     }
 
+    public double[] getCenter() {
+        double[] centerCoordinates = new double[dimensions];
+
+        for (int d = 0; d < dimensions; d++) {
+            centerCoordinates[d] = (upperRightPoint[d] - lowerLeftPoint[d]) / 2;
+        }
+        return centerCoordinates;
+    }
+
     public boolean checkOverlap(BoundingBox otherBB) {
         for (int i = 0; i < dimensions; i ++) {
             double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])

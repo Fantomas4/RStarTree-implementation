@@ -153,6 +153,37 @@ public class EntryComparator {
 
             return Double.compare(lowerDimensionA[targetDimension], lowerDimensionB[targetDimension]);
         }
+    }
 
+    public static class BBCenterDistanceComparator implements Comparator<Entry> {
+        BoundingBox targetBoundingBox;
+
+        public BBCenterDistanceComparator(BoundingBox targetBoundingBox) {
+            this.targetBoundingBox = targetBoundingBox;
+        }
+
+        private double calculateDistance(double[] pointA, double[] pointB) {
+            int dimensions = pointA.length; // pointA and pointB have the same number of dimensions.
+
+            // Calculate the Euclidean distance between point A and point B.
+            double sum = 0;
+            for (int d = 0; d < dimensions; d++) {
+                sum += Math.pow(pointA[d] - pointB[d], 2);
+            }
+
+            return Math.sqrt(sum);
+        }
+
+        @Override
+        public int compare(Entry a, Entry b) {
+            double[] centerTargetBB = targetBoundingBox.getCenter();
+            double[] centerA = a.getBoundingBox().getCenter();
+            double[] centerB = b.getBoundingBox().getCenter();
+
+            double distanceA = calculateDistance(centerA, centerTargetBB);
+            double distanceB = calculateDistance(centerB, centerTargetBB);
+
+            return Double.compare(distanceA, distanceB);
+        }
     }
 }
