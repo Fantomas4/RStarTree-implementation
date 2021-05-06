@@ -44,8 +44,10 @@ public class RStarTree {
         // R* Tree paper reference: ID1 - InsertData
     }
 
-    private void insert() {
+    private void insert(Entry newEntry, int level) {
         // R* Tree paper reference: I1 - Insert
+        Node insertionNode = chooseSubTree(newEntry, )
+
     }
 
     private void overflowTreatment() {

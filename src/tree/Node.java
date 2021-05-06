@@ -36,7 +36,7 @@ public class Node {
     private ArrayList<Node> splitNode() {
         AxisDistributions axisDistributions = chooseSplitAxis();
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
-        
+
         ArrayList<Node> resultNodes = new ArrayList<>();
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupA()));
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupB()));
