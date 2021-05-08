@@ -20,6 +20,13 @@ public class Node {
     public Node(ArrayList<Entry> entries, int level) {
         this.entries = entries;
         this.level = level;
+        this.nodeId = -1; // The node id has not been set
+    }
+
+    public Node(ArrayList<Entry> entries, int level, int nodeId) {
+        this.entries = entries;
+        this.level = level;
+        this.nodeId = nodeId;
     }
 
     public int getLevel() {
@@ -32,6 +39,15 @@ public class Node {
 
     public void addEntry(Entry newEntry) {
         entries.add(newEntry);
+    }
+
+    //TODO: Could return fixed array instead of ArrayList?
+    public ArrayList<Entry> getEntries() {
+        return entries;
+    }
+
+    public void setEntries(ArrayList<Entry> entries) {
+        this.entries = entries;
     }
 
     public boolean isOverflowed() {
@@ -50,11 +66,12 @@ public class Node {
         return MAX_ENTRIES;
     }
 
-    private ArrayList<Node> splitNode() {
+    public ArrayList<Node> splitNode() {
         AxisDistributions axisDistributions = chooseSplitAxis();
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
 
         ArrayList<Node> resultNodes = new ArrayList<>();
+        // TODO: Set Node IDs for split nodes!
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level));
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level));
 
@@ -205,10 +222,4 @@ public class Node {
 
         return distributions.get(minIndex);
     }
-
-    //TODO: Could return fixed array instead of ArrayList?
-    public ArrayList<Entry> getEntries() {
-        return entries;
-    }
-
 }

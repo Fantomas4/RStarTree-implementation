@@ -20,7 +20,15 @@ public class Entry implements Serializable {
         return boundingBox;
     }
 
+    public void adjustBoundingBox(Node updatedChildNode) {
+        boundingBox = BoundingBox.calculateMBR(updatedChildNode.getEntries());
+    }
+
     public long getChildNodeId() {
         return childNodeId;
+    }
+
+    public void setChildNodeId(long childNodeId) {
+        this.childNodeId = childNodeId;
     }
 }

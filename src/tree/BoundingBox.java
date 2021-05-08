@@ -1,6 +1,7 @@
 package tree;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -104,5 +105,15 @@ public class BoundingBox implements Serializable {
         }
 
         return new BoundingBox(minLowerLeft, maxUpperRight);
+    }
+
+    public static BoundingBox calculateMBR(ArrayList<Entry> entries) {
+        ArrayList<BoundingBox> boundingBoxes = new ArrayList<>();
+
+        for (Entry entry : entries) {
+            boundingBoxes.add(entry.getBoundingBox());
+        }
+
+        return calculateMBR(boundingBoxes);
     }
 }

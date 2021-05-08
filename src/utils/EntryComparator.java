@@ -23,6 +23,7 @@ public class EntryComparator {
                 mbrBoundingBoxes.add(candidateEntry.getBoundingBox());
                 mbrBoundingBoxes.add(targetEntry.getBoundingBox());
                 BoundingBox enlargedBB = BoundingBox.calculateMBR(mbrBoundingBoxes);
+
                 double overlapAfter = calculateOverlap(enlargedBB);
                 double overlapDiff = overlapAfter - overlapBefore;
 

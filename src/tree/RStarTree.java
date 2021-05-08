@@ -2,6 +2,7 @@ package tree;
 
 import utils.EntryComparator;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -11,73 +12,152 @@ public class RStarTree {
 
     private long rootNodeId;
     private int leafLevel;
-
+    //    // Contains a list of entries that correspond to the insertion path
+//    // of the last entry chooseSubTree() was called for. The list starts
+//    // with the root entry and ends at the entry that has a child node
+//    // at the target level chooseSubTree was called with.
+//    private ArrayList<Entry> insertionPathEntries;
     public RStarTree() {
         leafLevel = 0;
     }
 
-    private Node chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
-        if (currentNode.getLevel() == targetLevel) {
-            // currentNode is the target node (is located at the target level)
-            return currentNode;
-        } else if (currentNode.getLevel() + 1 == targetLevel) {
+    // Returns the bottom-up Entry path that represents the optimal insertion sub-tree. The first Entry
+    // of the list returned represents the Entry in the child node of which the new Entry is to be inserted.
+    private ArrayList<Entry> chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
+        if (currentNode.getLevel() + 1 == targetLevel) {
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
             Entry optimalEntry = Collections.min(candidateEntries,
                     new EntryComparator.OverlapEnlargementComparator(candidateEntries, newEntry));
-            long nextNodeId = optimalEntry.getChildNodeId();
-            // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId())
-            Node nextNode;
-            return chooseSubTree(newEntry, nextNode, targetLevel);
+            ArrayList<Entry> entriesPath = new ArrayList<>();
+            entriesPath.add(optimalEntry);
+            return entriesPath;
         } else {
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
             Entry optimalEntry = Collections.min(candidateEntries,
                     new EntryComparator.AreaEnlargementComparator(candidateEntries, newEntry));
+            // Get the next Node from the File Handler.
             long nextNodeId = optimalEntry.getChildNodeId();
             // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId())
             Node nextNode;
-            return chooseSubTree(newEntry, nextNode, targetLevel);
+            ArrayList<Entry> entriesPath = chooseSubTree(newEntry, nextNode, targetLevel);
+            entriesPath.add(optimalEntry);
+            return entriesPath;
         }
     }
 
-    private void insertRecord() {
+    private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
+        // Reset the level overflow call status list.
+        // (A boolean array indicating whether Overflow Treatment has been called
+        // for a specific level of the RStar Tree during the insertion of a new
+        // Record).
         boolean[] levelOverflowCalled = new boolean[leafLevel];
 
+        // Create a new LeafEntry for the record
+        BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
+        LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
+
+        // Insert the new Leaf Entry into the tree
+        insert(leafEntry, levelOverflowCalled, leafLevel);
+
     }
 
-    private void insert(Entry newEntry, int targetLevel, boolean[] levelOverflowCalled) {
+    private void insert(Entry newEntry, boolean[] levelOverflowCalled, int targetLevel) {
         // R* Tree paper reference: I1 - Insert
+        // Get the root node from File Handler
+        Node rootNode; // TODO: Get the root node from File Handler using rootNodeId
 
-        Node rootNode; // TODO: Add call to FileHandler method to get the root node
-        Node insertionNode = chooseSubTree(newEntry, rootNode, targetLevel);
-        insertionNode.addEntry(newEntry); // Try adding the new Entry to the insertion Node.
+        ArrayList<Entry> bottomUpPathEntries = chooseSubTree(newEntry, rootNode, targetLevel);
+        for (int i = 0; i < bottomUpPathEntries.size(); i++) {
+            Entry parentEntry = bottomUpPathEntries.get(i);
+            Node parentNode;
+            if (i == bottomUpPathEntries.size() - 1) {
+                // The current iteration processes the root node, so there is no parent node.
+                parentNode = null;
+            } else {
+                // If the current iteration does not process the root node.
+                parentNode; // TODO: Get the parent node from File Handler using bottomUpPathEntries.get(i + 1).getChildNodeId()
+            }
+            Node childNode; // TODO: Get the child node from File Handler using parentEntry.getChildNodeId();
+            if (childNode.getLevel() == targetLevel) {
+                // If the child Node is the insertion node
+                childNode.addEntry(newEntry);
+            }
 
-        if (insertionNode.isOverflowed()) {
-            // After the insertion, the node contains M + 1 entries and is overflowed,
-            // so OverFlowTreatment is called.
-            overflowTreatment(insertionNode, levelOverflowCalled[insertionNode.getLevel()]);
+            if (childNode.isOverflowed()) {
+                // Invoke Overflow Treatment
+                ArrayList<Node> overflowTreatmentResult = overflowTreatment(childNode, levelOverflowCalled);
+                if (overflowTreatmentResult != null) {
+                    // Overflow Treatment caused a node split
+                    Node nodeA = overflowTreatmentResult.get(0);
+                    Node nodeB = overflowTreatmentResult.get(1);
 
+                    // Adjust the parent Entry's child node ID so that it refers to the first node of the split
+                    parentEntry.setChildNodeId(nodeA.getId());
+                    // Create a new Entry for the second node of the split
+                    Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
+                    // Add the created Entry to the parent Node
+                    parentNode.addEntry(newParentNodeEntry);
+
+
+
+                }
+
+
+
+
+            }
+            // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
+            // the child entries inside its child node.
+            parentEntry.adjustBoundingBox(childNode);
         }
 
+        // Check the root Node for Overflow
+        if (rootNode.isOverflowed()) {
+            // Invoke Overflow Treatment
+            ArrayList<Node> overflowTreatmentResult = overflowTreatment(rootNode, levelOverflowCalled);
+            if (overflowTreatmentResult != null) {
+                // Overflow Treatment caused a root node split, so a new
+                // root node has to be created
+                Node nodeA = overflowTreatmentResult.get(0);
+                Node nodeB = overflowTreatmentResult.get(1);
+                Entry rootEntryA = new Entry(BoundingBox.calculateMBR(nodeA.getEntries()), nodeA.getId());
+                Entry rootEntryB = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
+
+                Node newRoot = new Node();
+
+
+            }
+        }
+
+
+
+
+
+
+
+
     }
 
-    private void overflowTreatment(Node overflowedNode, Entry parentEntry, boolean isFirstCall) {
+    private ArrayList<Node> overflowTreatment(Node overflowedNode, boolean[] levelOverflowCalled) {
+        int overflowedNodeLevel = overflowedNode.getLevel();
+        boolean isFirstCall = !levelOverflowCalled[overflowedNodeLevel];
+        // Update levelOverflowCalled status
+        levelOverflowCalled[overflowedNodeLevel] = true;
+
         if (overflowedNode.getLevel() > 0 && isFirstCall) {
             // If the overflowed Node's level is not the root level and this is the first call
             // of overflowTreatment() in the given level during the insertion of one record,
             // invoke reInsert().
-
-
-
+            reInsert(overflowedNode);
+            return null;
         } else {
             // Invoke splitNode() on the overflowed Node.
-
-
-
+            return overflowedNode.splitNode();
         }
     }
 

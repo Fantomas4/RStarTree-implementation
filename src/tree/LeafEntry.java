@@ -4,8 +4,8 @@ public class LeafEntry extends Entry {
     private long recordId;
     private long blockId;
 
-    public LeafEntry(BoundingBox rectangle, long recordId, long blockId) {
-        super(rectangle);
+    public LeafEntry(BoundingBox boundingBox, long recordId, long blockId) {
+        super(boundingBox);
         this.recordId = recordId;
         this.blockId = blockId;
     }
