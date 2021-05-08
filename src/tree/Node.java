@@ -17,14 +17,21 @@ public class Node {
     private int level;
 
 
-    public Node(ArrayList<Entry> entries, int level) {
+//    public Node(ArrayList<Entry> entries, int level) {
+//        this.entries = entries;
+//        this.level = level;
+//        this.nodeId = -1; // The node id has not been set
+//    }
+
+    public Node(ArrayList<Entry> entries, int level, long nodeId) {
         this.entries = entries;
         this.level = level;
-        this.nodeId = -1; // The node id has not been set
+        this.nodeId = nodeId;
     }
 
-    public Node(ArrayList<Entry> entries, int level, int nodeId) {
-        this.entries = entries;
+    // Used fpr creating a root Node
+    public Node(int level, long nodeId) {
+        this.entries = new ArrayList<>();
         this.level = level;
         this.nodeId = nodeId;
     }
@@ -72,8 +79,10 @@ public class Node {
 
         ArrayList<Node> resultNodes = new ArrayList<>();
         // TODO: Set Node IDs for split nodes!
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level));
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level));
+        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
+        // TODO: Get new node ID for the second split node from File Handler
+        long newNodeId;
+        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId));
 
         return resultNodes;
     }
