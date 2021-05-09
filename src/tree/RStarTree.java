@@ -3,8 +3,7 @@ package tree;
 import utils.EntryComparator;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 public class RStarTree {
     private final double REINSERT_P_PARAMETER = 0.3;
@@ -27,18 +26,19 @@ public class RStarTree {
         return rootLevel + 1;
     }
 
-    // Returns the bottom-up Entry path that represents the optimal insertion sub-tree. The first Entry
-    // of the list returned represents the Entry in the child node of which the new Entry is to be inserted.
-    private ArrayList<Entry> chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
+    // Returns the bottom-up LinkedHashMap  of <Node, Entry> pairs that represent the optimal non-leaf entries insertion
+    // path for the given new Entry. The Entry of the first <Node, Entry> pair returned represents the Entry in the
+    // child node of which the new Entry is to be inserted.
+    private LinkedHashMap<Node, Entry> chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
         if (currentNode.getLevel() - 1 == targetLevel) {
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
             Entry optimalEntry = Collections.min(candidateEntries,
                     new EntryComparator.OverlapEnlargementComparator(candidateEntries, newEntry));
-            ArrayList<Entry> entriesPath = new ArrayList<>();
-            entriesPath.add(optimalEntry);
-            return entriesPath;
+            LinkedHashMap<Node, Entry> chosenPath = new LinkedHashMap<>();
+            chosenPath.put(currentNode, optimalEntry);
+            return chosenPath;
         } else {
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
@@ -49,9 +49,9 @@ public class RStarTree {
             long nextNodeId = optimalEntry.getChildNodeId();
             // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId())
             Node nextNode;
-            ArrayList<Entry> entriesPath = chooseSubTree(newEntry, nextNode, targetLevel);
-            entriesPath.add(optimalEntry);
-            return entriesPath;
+            LinkedHashMap<Node, Entry> chosenPath = chooseSubTree(newEntry, nextNode, targetLevel);
+            chosenPath.put(currentNode, optimalEntry);
+            return chosenPath;
         }
     }
 
@@ -87,19 +87,13 @@ public class RStarTree {
         } else {
             // If the RStar Tree has a height equal or greater than 1, invoke chooseSubTree() to
             // get the insertion path for the new Entry.
-            ArrayList<Entry> bottomUpPathEntries = chooseSubTree(newEntry, rootNode, targetLevel);
-
-            for (int i = 0; i < bottomUpPathEntries.size(); i++) {
+            LinkedHashMap<Node, Entry> bottomUpPathPairs = chooseSubTree(newEntry, rootNode, targetLevel);
+            ArrayList<Node> bottomUpPathNodes = new ArrayList<>(bottomUpPathPairs.keySet());
+            ArrayList<Entry> bottomUpPathEntries = new ArrayList<>(bottomUpPathPairs.values());
+            for (int i = 0; i < bottomUpPathNodes.size(); i++) {
+                Node parentNode = bottomUpPathNodes.get(i);
                 Entry parentEntry = bottomUpPathEntries.get(i);
-                Node parentNode;
-                if (i == bottomUpPathEntries.size() - 1) {
-                    // The current iteration processes the root node as the Parent Entry.
-                    parentNode; // TODO: Get the parent node (root node) from File Handler using rootNodeId
-                } else {
-                    // If the current iteration does not process the root node as the Parent Entry.
-                    // TODO: Get the parent node from File Handler using bottomUpPathEntries.get(i + 1).getChildNodeId()
-                    parentNode;
-                }
+
                 Node childNode; // TODO: Get the child node from File Handler using parentEntry.getChildNodeId();
                 if (childNode.getLevel() == targetLevel) {
                     // If the child Node is the insertion node
@@ -115,6 +109,7 @@ public class RStarTree {
                         Node nodeB = overflowTreatmentResult.get(1);
 
                         // TODO: Update childNode in index file as nodeA using File Handler
+                        // TODO: Save nodeB to index file using File Handler
                         // Create a new Entry for the second node of the split
                         Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
                         // Add the created Entry to the parent Node
@@ -124,6 +119,7 @@ public class RStarTree {
                 // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
                 // the child entries inside its child node.
                 parentEntry.adjustBoundingBox(childNode);
+                // TODO: Update parent Node in index file using File Handler
             }
         }
 
@@ -136,6 +132,9 @@ public class RStarTree {
                 // root node has to be created
                 Node nodeA = overflowTreatmentResult.get(0);
                 Node nodeB = overflowTreatmentResult.get(1);
+                // TODO: Update the old root node in index file as nodeA using File Handler
+                // TODO: Save nodeB to index file as a new node using File Handler
+
                 Entry rootEntryA = new Entry(BoundingBox.calculateMBR(nodeA.getEntries()), nodeA.getId());
                 Entry rootEntryB = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
                 ArrayList<Entry> rootEntries = new ArrayList<>();
@@ -195,6 +194,6 @@ public class RStarTree {
             insert(removedEntry, overflowedNode.getLevel());
         }
 
-        // TODO: Write the updated (former overflowed) Node to IndexFile using File Handler.
+        // TODO: Write the updated (formerly overflowed) Node to IndexFile using File Handler.
     }
 }

@@ -79,8 +79,10 @@ public class Node {
 
         ArrayList<Node> resultNodes = new ArrayList<>();
         // TODO: Set Node IDs for split nodes!
+        // Use the old node ID for the first split node produced
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
         // TODO: Get new node ID for the second split node from File Handler
+        // Use a new node ID for the second split node produced
         long newNodeId;
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId));
 
