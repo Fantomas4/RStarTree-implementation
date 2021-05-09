@@ -176,9 +176,9 @@ public class Node {
 
         for (int d = 0; d < DIMENSIONS; d++) {
             ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
-            entries.sort(new EntryComparator.LowerValueComparator(DIMENSIONS));
+            sortedByLowerValue.sort(new EntryComparator.LowerValueComparator(DIMENSIONS));
             ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
-            entries.sort(new EntryComparator.UpperValueComparator(DIMENSIONS));
+            sortedByUpperValue.sort(new EntryComparator.UpperValueComparator(DIMENSIONS));
 
             ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);

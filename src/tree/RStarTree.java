@@ -11,18 +11,16 @@ public class RStarTree {
     private final int REINSERT_AMOUNT = (int) Math.round(REINSERT_P_PARAMETER * Node.getMaxEntriesLimit());
     private final int LEAF_LEVEL = 0;
 
+    private long rootNodeId;
     private int rootLevel;
-    //    // Contains a list of entries that correspond to the insertion path
-//    // of the last entry chooseSubTree() was called for. The list starts
-//    // with the root entry and ends at the entry that has a child node
-//    // at the target level chooseSubTree was called with.
-//    private ArrayList<Entry> insertionPathEntries;
+
     public RStarTree() {
         rootLevel = 0;
 
         // Create root node
-        long nodeId; //TODO: Get root Node ID from File Handler.
-        Node rootNode = new Node(rootLevel, nodeId);
+        long rootNodeId; //TODO: Get root Node ID from File Handler.
+        Node rootNode = new Node(rootLevel, rootNodeId);
+        // TODO: Save root node using File Handler.
     }
 
     private int getTreeHeight() {
@@ -59,29 +57,32 @@ public class RStarTree {
 
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
-        // Reset the level overflow call status list.
-        // (A boolean array indicating whether Overflow Treatment has been called
-        // for a specific level of the RStar Tree during the insertion of a new
-        // Record).
-        boolean[] levelOverflowCalled = new boolean[getTreeHeight()];
 
         // Create a new LeafEntry for the record
         BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
 
         // Insert the new Leaf Entry into the tree
-        insert(leafEntry, levelOverflowCalled, LEAF_LEVEL);
+        insert(leafEntry, LEAF_LEVEL);
 
     }
 
-    private void insert(Entry newEntry, boolean[] levelOverflowCalled, int targetLevel) {
+    private void insert(Entry newEntry, int targetLevel) {
         // R* Tree paper reference: I1 - Insert
+
+        // Reset the level overflow call status list.
+        // (A boolean array indicating whether Overflow Treatment has been called
+        // for a specific level of the RStar Tree during the insertion of a new
+        // Record).
+        boolean[] levelOverflowCalled = new boolean[getTreeHeight()];
+
         // Get the root node from File Handler
         Node rootNode; // TODO: Get the root node from File Handler using rootNodeId
         
         if (rootLevel == LEAF_LEVEL) {
             // If the root Node is the only node, directly insert the new Entry into it.
             rootNode.addEntry(newEntry);
+            // TODO: Update root Node using File Handler
 
         } else {
             // If the RStar Tree has a height equal or greater than 1, invoke chooseSubTree() to
@@ -92,11 +93,12 @@ public class RStarTree {
                 Entry parentEntry = bottomUpPathEntries.get(i);
                 Node parentNode;
                 if (i == bottomUpPathEntries.size() - 1) {
-                    // The current iteration processes the root node, so there is no parent node.
-                    parentNode = null;
+                    // The current iteration processes the root node as the Parent Entry.
+                    parentNode; // TODO: Get the parent node (root node) from File Handler using rootNodeId
                 } else {
-                    // If the current iteration does not process the root node.
-                    parentNode; // TODO: Get the parent node from File Handler using bottomUpPathEntries.get(i + 1).getChildNodeId()
+                    // If the current iteration does not process the root node as the Parent Entry.
+                    // TODO: Get the parent node from File Handler using bottomUpPathEntries.get(i + 1).getChildNodeId()
+                    parentNode;
                 }
                 Node childNode; // TODO: Get the child node from File Handler using parentEntry.getChildNodeId();
                 if (childNode.getLevel() == targetLevel) {
@@ -142,8 +144,11 @@ public class RStarTree {
 
                 // Create the new root entry
                 // TODO: Get a new node ID for the new root from File Handler
-                long newRootId;
-                Node newRoot = new Node(rootEntries, newRootId, ++rootLevel);
+                long newRootNodeId;
+                Node newRoot = new Node(rootEntries, newRootNodeId, ++rootLevel);
+                // Update the root node ID of RStar Tree.
+                rootNodeId = newRootNodeId;
+                // TODO: Save the new root Node using File Handler.
             }
         }
     }
@@ -168,6 +173,28 @@ public class RStarTree {
 
     private void reInsert(Node overflowedNode) {
         // R* Tree paper reference: RI - ReInsert
-        ArrayList<Entry> sortedEntries = Collections.sort(new EntryComparator.BBCenterDistanceComparator(overflowedNode)
+        // TODO: Verify correctness of implementation
+        ArrayList<Entry> overflowedNodeEntries = overflowedNode.getEntries();
+        BoundingBox overflowedBB = BoundingBox.calculateMBR(overflowedNodeEntries);
+
+        // Sort the M+1 entries in decreasing order of their rectangle centers' distances to the center of the bounding
+        // rectangle of overflowedNode.
+        overflowedNodeEntries.sort(Collections.reverseOrder(new EntryComparator.BBCenterDistanceComparator(overflowedBB)));
+
+        // Remove the first p entries from the overflowed Node and adjust its bounding box.
+        ArrayList<Entry> removedEntries = new ArrayList<>();
+        for (int i = 0; i < REINSERT_AMOUNT; i++) {
+            removedEntries.add(overflowedNodeEntries.remove(0));
+        }
+
+        // Update the overflowed Node's entries
+        overflowedNode.setEntries(overflowedNodeEntries);
+
+        // Reinsert the removed entries
+        for (Entry removedEntry : removedEntries) {
+            insert(removedEntry, overflowedNode.getLevel());
+        }
+
+        // TODO: Write the updated (former overflowed) Node to IndexFile using File Handler.
     }
 }
