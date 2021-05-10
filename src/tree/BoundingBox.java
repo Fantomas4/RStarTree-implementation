@@ -88,7 +88,7 @@ public class BoundingBox implements Serializable {
         return overlapProduct;
     }
 
-    public boolean checkPointOverlap(double[] targetPoint, double radius) {
+    public double calculatePointDistance(double[] targetPoint) {
         double sum = 0;
         for (int d = 0; d < dimensions; d++) {
             double lowerLeftDistance = Math.pow(targetPoint[d] - lowerLeftPoint[d], 2);
@@ -96,7 +96,12 @@ public class BoundingBox implements Serializable {
 
             sum += min(lowerLeftDistance, upperRightDistance);
         }
-        double minimumDistance = sqrt(sum);
+
+        return sqrt(sum);
+    }
+
+    public boolean checkPointOverlap(double[] targetPoint, double radius) {
+        double minimumDistance = calculatePointDistance(targetPoint);
 
         return minimumDistance <= radius;
     }
