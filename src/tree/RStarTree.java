@@ -109,16 +109,18 @@ public class RStarTree {
                         Node nodeA = overflowTreatmentResult.get(0);
                         Node nodeB = overflowTreatmentResult.get(1);
 
-                        // TODO: Update childNode in index file as nodeA using File Handler
+                        // Update the child Node reference
+                        childNode = nodeA;
                         // TODO: Save nodeB to index file using File Handler
                         // Create a new Entry for the second node of the split
                         Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
                         // Add the created Entry to the parent Node
                         parentNode.addEntry(newParentNodeEntry);
                     }
+                    // TODO: Update childNode in index file (as nodeA) using File Handler
                 }
                 // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
-                // the child entries inside its child node.
+                // the child entries (nodeA entries) inside its child node (nodeA).
                 parentEntry.adjustBoundingBox(childNode);
                 // TODO: Update parent Node in index file using File Handler
             }
@@ -150,6 +152,7 @@ public class RStarTree {
                 rootNodeId = newRootNodeId;
                 // TODO: Save the new root Node using File Handler.
             }
+            // TODO: POSSIBLE BUG! Adjust BB for entries ?
         }
     }
 
@@ -194,7 +197,5 @@ public class RStarTree {
         for (Entry removedEntry : removedEntries) {
             insert(removedEntry, overflowedNode.getLevel());
         }
-
-        // TODO: Write the updated (formerly overflowed) Node to IndexFile using File Handler.
     }
 }
