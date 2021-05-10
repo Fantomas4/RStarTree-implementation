@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.min;
+import static java.lang.Math.sqrt;
+
 
 public class BoundingBox implements Serializable {
     private double[] lowerLeftPoint; // The bottom left point of the rectangle
@@ -58,19 +61,19 @@ public class BoundingBox implements Serializable {
         return centerCoordinates;
     }
 
-    public boolean checkOverlap(BoundingBox otherBB) {
-        for (int i = 0; i < dimensions; i ++) {
-            double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
-                    - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
+//    public boolean checkOverlap(BoundingBox otherBB) {
+//        for (int i = 0; i < dimensions; i ++) {
+//            double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
+//                    - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
+//
+//            if (overlapDiff < 0) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
-            if (overlapDiff < 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public double calculateOverlap(BoundingBox otherBB) {
+    public double calculateBoundingBoxOverlap(BoundingBox otherBB) {
         double overlapProduct = 1;
         for (int i = 0; i < dimensions; i ++) {
             double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
@@ -83,6 +86,19 @@ public class BoundingBox implements Serializable {
             }
         }
         return overlapProduct;
+    }
+
+    public boolean checkPointOverlap(double[] targetPoint, double radius) {
+        double sum = 0;
+        for (int d = 0; d < dimensions; d++) {
+            double lowerLeftDistance = Math.pow(targetPoint[d] - lowerLeftPoint[d], 2);
+            double upperRightDistance = Math.pow(targetPoint[d] - upperRightPoint[d], 2);
+
+            sum += min(lowerLeftDistance, upperRightDistance);
+        }
+        double minimumDistance = sqrt(sum);
+
+        return minimumDistance <= radius;
     }
 
     // Class used to calculate minimum bounding rectangles

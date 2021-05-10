@@ -1,7 +1,4 @@
-package utils;
-
-import tree.BoundingBox;
-import tree.Entry;
+package tree;
 
 import java.util.*;
 
@@ -42,7 +39,7 @@ public class EntryComparator {
             for (Entry candidateEntry: candidateEntries) {
                 BoundingBox candidateBoundingBox = candidateEntry.getBoundingBox();
                 //TODO: Check example for a different approach here
-                overlapSum += targetBB.calculateOverlap(candidateBoundingBox);
+                overlapSum += targetBB.calculateBoundingBoxOverlap(candidateBoundingBox);
             }
             return overlapSum;
         }

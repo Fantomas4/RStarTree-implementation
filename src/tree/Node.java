@@ -1,8 +1,5 @@
 package tree;
 
-import utils.EntryComparator;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,7 +148,7 @@ public class Node {
             for (Entry entry : entriesGroupB) {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
-            return BoundingBox.calculateMBR(boundingBoxesA).calculateOverlap(BoundingBox.calculateMBR(boundingBoxesB));
+            return BoundingBox.calculateMBR(boundingBoxesA).calculateBoundingBoxOverlap(BoundingBox.calculateMBR(boundingBoxesB));
         }
 
         public double getDistributionArea() {

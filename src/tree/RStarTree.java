@@ -1,14 +1,11 @@
 package tree;
 
-import utils.EntryComparator;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class RStarTree {
-    private final double REINSERT_P_PARAMETER = 0.3;
-    private final int REINSERT_AMOUNT = (int) Math.round(REINSERT_P_PARAMETER * Node.getMaxEntriesLimit());
-    private final int LEAF_LEVEL = 0;
+    private static final double REINSERT_P_PARAMETER = 0.3;
+    private static final int REINSERT_AMOUNT = (int) Math.round(REINSERT_P_PARAMETER * Node.getMaxEntriesLimit());
+    private static final int LEAF_LEVEL = 0;
 
     private long rootNodeId;
     private int rootLevel;
@@ -20,6 +17,10 @@ public class RStarTree {
         long rootNodeId; //TODO: Get root Node ID from File Handler.
         Node rootNode = new Node(rootLevel, rootNodeId);
         // TODO: Save root node using File Handler.
+    }
+
+    public static int getLEAF_LEVEL() {
+        return LEAF_LEVEL;
     }
 
     private int getTreeHeight() {
