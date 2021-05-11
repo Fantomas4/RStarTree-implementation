@@ -176,7 +176,7 @@ public class RStarTree {
 
     private void reInsert(Node overflowedNode) {
         // R* Tree paper reference: RI - ReInsert
-        // TODO: Verify correctness of implementation
+        // TODO: Verify correctness of implementation (far-reinsert vs close-reinsert)
         ArrayList<Entry> overflowedNodeEntries = overflowedNode.getEntries();
         BoundingBox overflowedBB = BoundingBox.calculateMBR(overflowedNodeEntries);
 

@@ -4,17 +4,12 @@ import tree.*;
 
 import java.util.ArrayList;
 
-public class RangeQuery {
-    private double[] targetPoint;
-    private double range;
-    private Node rootNode;
-    private ArrayList<Record> queryResults;
+public class RangeQuery extends Query{
+    private final double range;
 
     public RangeQuery(double[] targetPoint, double range, Node rootNode) {
-        this.targetPoint = targetPoint;
+        super(targetPoint, rootNode);
         this.range = range;
-        this.rootNode = rootNode;
-        queryResults = new ArrayList<>();
     }
 
     public ArrayList<Record> execute() {

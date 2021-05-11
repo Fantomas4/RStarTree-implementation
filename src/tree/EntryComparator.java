@@ -5,9 +5,9 @@ import java.util.*;
 public class EntryComparator {
 
     public static class OverlapEnlargementComparator implements Comparator<Entry> {
-        private ArrayList<Entry> candidateEntries;
-        private Entry targetEntry;
-        private Map<Entry, Double> enlargementMap;
+        private final ArrayList<Entry> candidateEntries;
+        private final Entry targetEntry;
+        private final Map<Entry, Double> enlargementMap;
 
         public OverlapEnlargementComparator(ArrayList<Entry> candidateEntries, Entry targetEntry) {
             this.candidateEntries = candidateEntries;
@@ -73,9 +73,9 @@ public class EntryComparator {
     }
 
     public static class AreaEnlargementComparator implements Comparator<Entry> {
-        private ArrayList<Entry> candidateEntries;
-        private Entry targetEntry;
-        private Map<Entry, Double> enlargementMap;
+        private final ArrayList<Entry> candidateEntries;
+        private final Entry targetEntry;
+        private final Map<Entry, Double> enlargementMap;
 
         public AreaEnlargementComparator(ArrayList<Entry> candidateEntries, Entry targetEntry) {
             this.candidateEntries = candidateEntries;
@@ -154,7 +154,7 @@ public class EntryComparator {
     }
 
     public static class BBCenterDistanceComparator implements Comparator<Entry> {
-        BoundingBox targetBoundingBox;
+        private final BoundingBox targetBoundingBox;
 
         public BBCenterDistanceComparator(BoundingBox targetBoundingBox) {
             this.targetBoundingBox = targetBoundingBox;
@@ -180,6 +180,22 @@ public class EntryComparator {
 
             double distanceA = calculateDistance(centerA, centerTargetBB);
             double distanceB = calculateDistance(centerB, centerTargetBB);
+
+            return Double.compare(distanceA, distanceB);
+        }
+    }
+
+    public static class DistanceToPointComparator implements Comparator<Entry> {
+        private final double[] targetPoint;
+
+        public DistanceToPointComparator(double[] targetPoint) {
+            this.targetPoint = targetPoint;
+        }
+
+        @Override
+        public int compare(Entry a, Entry b) {
+            double distanceA = a.getBoundingBox().calculatePointDistance(targetPoint);
+            double distanceB = b.getBoundingBox().calculatePointDistance(targetPoint);
 
             return Double.compare(distanceA, distanceB);
         }
