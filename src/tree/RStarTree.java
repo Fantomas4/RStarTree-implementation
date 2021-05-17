@@ -1,22 +1,23 @@
 package tree;
 
 import java.util.*;
+import java.util.logging.FileHandler;
 
 public class RStarTree {
     private static final double REINSERT_P_PARAMETER = 0.3;
     private static final int REINSERT_AMOUNT = (int) Math.round(REINSERT_P_PARAMETER * Node.getMaxEntriesLimit());
     private static final int LEAF_LEVEL = 0;
 
-    private long rootNodeId;
+//    private long rootNodeId;
     private int rootLevel;
 
     public RStarTree() {
         rootLevel = 0;
 
         // Create root node
-        long rootNodeId; //TODO: Get root Node ID from File Handler.
+        long rootNodeId = FileHandler.getNextAvailableNodeId(); //TODO: Get root Node ID from File Handler. CHECK!
         Node rootNode = new Node(rootLevel, rootNodeId);
-        // TODO: Save root node using File Handler.
+        FileHandler.insertNode(rootNode); // TODO: Save root node using File Handler. CHECK!
     }
 
     public static int getLEAF_LEVEL() {
@@ -48,8 +49,7 @@ public class RStarTree {
                     new EntryComparator.AreaEnlargementComparator(candidateEntries, newEntry));
             // Get the next Node from the File Handler.
             long nextNodeId = optimalEntry.getChildNodeId();
-            // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId())
-            Node nextNode;
+            Node nextNode = FileHandler.getNode(nextNodeId); // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId()). CHECK!
             LinkedHashMap<Node, Entry> chosenPath = chooseSubTree(newEntry, nextNode, targetLevel);
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
@@ -78,12 +78,12 @@ public class RStarTree {
         boolean[] levelOverflowCalled = new boolean[getTreeHeight()];
 
         // Get the root node from File Handler
-        Node rootNode; // TODO: Get the root node from File Handler using rootNodeId
+        Node rootNode = FileHandler.getRootNode(); // TODO: Get the root node from File Handler. Check!
         
         if (rootLevel == LEAF_LEVEL) {
             // If the root Node is the only node, directly insert the new Entry into it.
             rootNode.addEntry(newEntry);
-            // TODO: Update root Node using File Handler
+            FileHandler.updateNode(rootNode); // TODO: Update root Node using File Handler. CHECK!
 
         } else {
             // If the RStar Tree has a height equal or greater than 1, invoke chooseSubTree() to
@@ -95,7 +95,7 @@ public class RStarTree {
                 Node parentNode = bottomUpPathNodes.get(i);
                 Entry parentEntry = bottomUpPathEntries.get(i);
 
-                Node childNode; // TODO: Get the child node from File Handler using parentEntry.getChildNodeId();
+                Node childNode = FileHandler.getNode(parentEntry.getChildNodeId()); // TODO: Get the child node from File Handler using parentEntry.getChildNodeId(). CHECK!
                 if (childNode.getLevel() == targetLevel) {
                     // If the child Node is the insertion node
                     childNode.addEntry(newEntry);
@@ -111,18 +111,18 @@ public class RStarTree {
 
                         // Update the child Node reference
                         childNode = nodeA;
-                        // TODO: Save nodeB to index file using File Handler
+                        FileHandler.insertNode(nodeB); // TODO: Save nodeB to index file using File Handler. CHECK!
                         // Create a new Entry for the second node of the split
                         Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
                         // Add the created Entry to the parent Node
                         parentNode.addEntry(newParentNodeEntry);
                     }
-                    // TODO: Update childNode in index file (as nodeA) using File Handler
+                    FileHandler.updateNode(childNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
                 }
                 // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
                 // the child entries (nodeA entries) inside its child node (nodeA).
                 parentEntry.adjustBoundingBox(childNode);
-                // TODO: Update parent Node in index file using File Handler
+                FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
             }
         }
 
@@ -135,8 +135,8 @@ public class RStarTree {
                 // root node has to be created
                 Node nodeA = overflowTreatmentResult.get(0);
                 Node nodeB = overflowTreatmentResult.get(1);
-                // TODO: Update the old root node in index file as nodeA using File Handler
-                // TODO: Save nodeB to index file as a new node using File Handler
+                FileHandler.updateNode(nodeA); // TODO: Update the old root node in index file as nodeA using File Handler. CHECK!
+                FileHandler.insertNode(nodeB); // TODO: Save nodeB to index file as a new node using File Handler. CHECK!
 
                 Entry rootEntryA = new Entry(BoundingBox.calculateMBR(nodeA.getEntries()), nodeA.getId());
                 Entry rootEntryB = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
@@ -145,12 +145,9 @@ public class RStarTree {
                 rootEntries.add(rootEntryB);
 
                 // Create the new root entry
-                // TODO: Get a new node ID for the new root from File Handler
-                long newRootNodeId;
+                long newRootNodeId = FileHandler.getNextAvailableNodeId(); // TODO: Get a new node ID for the new root from File Handler. CHECK!
                 Node newRoot = new Node(rootEntries, newRootNodeId, ++rootLevel);
-                // Update the root node ID of RStar Tree.
-                rootNodeId = newRootNodeId;
-                // TODO: Save the new root Node using File Handler.
+                FileHandler.setRootNode(newRoot); // TODO: Save the new root Node using File Handler. CHECK!
             }
             // TODO: POSSIBLE BUG! Adjust BB for entries ?
         }
