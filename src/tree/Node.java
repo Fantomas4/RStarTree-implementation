@@ -2,14 +2,15 @@ package tree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
 
 public class Node {
     private static final int DIMENSIONS = 3;
-    private static final int MAX_ENTRIES = 10; //TODO: Get max entries per node from filehelper
+    private static final int MAX_ENTRIES = FileHandler.getMaxEntriesInBlock(); //TODO: Get max entries per node from File Handler. CHECK!
     private static final double MIN_LOAD_FACTOR = 0.3;
     private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
 
-    private long nodeId; //TODO: Determine how nodeIds are distributed and set.
+    private long nodeId;
     private ArrayList<Entry> entries;
     private int level;
 
@@ -45,7 +46,6 @@ public class Node {
         entries.add(newEntry);
     }
 
-    //TODO: Could return fixed array instead of ArrayList?
     public ArrayList<Entry> getEntries() {
         return entries;
     }
@@ -75,12 +75,12 @@ public class Node {
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
 
         ArrayList<Node> resultNodes = new ArrayList<>();
-        // TODO: Set Node IDs for split nodes!
+        // TODO: Set Node IDs for split nodes! CHECK!
         // Use the old node ID for the first split node produced
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
-        // TODO: Get new node ID for the second split node from File Handler
+        // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
-        long newNodeId;
+        long newNodeId = FileHandler.getNextAvailableNodeId();
         resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId));
 
         return resultNodes;
