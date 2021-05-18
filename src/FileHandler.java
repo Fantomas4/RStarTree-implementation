@@ -12,26 +12,19 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class FileHandler {
-        private ArrayList<ArrayList<Record>> dataFile; // Dummy data file
-        private ArrayList<Node> indexFile; // Dummy index file
+        private static ArrayList<ArrayList<Record>> dataFile = new ArrayList<>(); // Dummy data file
+        private static ArrayList<Node> indexFile = new ArrayList<>(); // Dummy index file
 
-        private long rootNodeId;
+        private static long rootNodeId = 1;
 
-        private String osmFilePath;
+        private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 32 * 1024;
         private static final long maxRecordsInBlock = 2;  // Dummy maximum number of records in a block
         private static final long maxEntriesInBlock = 5;
 
-        FileHandler()
-        {
-                this.osmFilePath = "map.osm";
-                this.rootNodeId = 1;
-                this.dataFile = new ArrayList<>();
-                this.indexFile = new ArrayList<>();
-        }
 
         // https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
-        private byte[] convertObjectToBytes(Object object) throws IOException
+        private static byte[] convertObjectToBytes(Object object) throws IOException
         {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -40,7 +33,7 @@ public class FileHandler {
         }
 
         // https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
-        private Object convertBytesToObject(byte[] bytes) throws IOException, ClassNotFoundException
+        private static Object convertBytesToObject(byte[] bytes) throws IOException, ClassNotFoundException
         {
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
                 ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
@@ -51,7 +44,7 @@ public class FileHandler {
 
         // Block: [records.length(), record0, record1, ..., ]
         // Block as bytes: [4Bytes + (8Bytes, String Bytes???, dimensions * 8Bytes) * records.length() <= BLOCK_SIZE]
-        private void writeBlockInDataFile(ArrayList<Record> records)
+        private static void writeBlockInDataFile(ArrayList<Record> records)
         {
                 try {
                         byte[] recordsAsByteArray = this.convertObjectToBytes(records);
@@ -64,12 +57,12 @@ public class FileHandler {
                 }
         }
 
-        public long getMaxEntriesInBlock()
+        public static long getMaxEntriesInBlock()
         {
                 return this.maxEntriesInBlock;
         }
 
-        public Record getRecord(int blockId, long recordId)
+        public static Record getRecord(int blockId, long recordId)
         {
                 for (Record record : this.dataFile.get(blockId))
                 {
@@ -81,7 +74,7 @@ public class FileHandler {
                 return null;
         }
 
-        public Node getNode(long nodeId)
+        public static Node getNode(long nodeId)
         {
                 for (Node node : this.indexFile)
                 {
@@ -93,17 +86,17 @@ public class FileHandler {
                 return null;
         }
 
-        public long getNextAvailableNodeId()
+        public static long getNextAvailableNodeId()
         {
                 return this.indexFile.size() + 1;
         }
 
-        public void insertNode(Node newNode)
+        public static void insertNode(Node newNode)
         {
                 this.indexFile.add(newNode);
         }
 
-        public void updateNode(Node updatedNode)
+        public static void updateNode(Node updatedNode)
         {
                 for (Node node : this.indexFile)
                 {
@@ -115,28 +108,28 @@ public class FileHandler {
                 }
         }
 
-        public void setRootNode(Node newRootNode)
+        public static void setRootNode(Node newRootNode)
         {
                 this.indexFile.add(newRootNode);
                 this.rootNodeId = newRootNode.getId();
         }
 
-        public Node getRootNode()
+        public static Node getRootNode()
         {
                 return this.indexFile.get((int) this.getRootNodeId());
         }
 
-        public long getRootNodeId()
+        public static long getRootNodeId()
         {
                 return this.rootNodeId;
         }
 
-        public void getIndexMetadata()
+        public static void getIndexMetadata()
         {
                 // root node id
         }
 
-        public void getDataMetadata()
+        public static void getDataMetadata()
         {
                 // #records
                 // #blocks
@@ -147,7 +140,7 @@ public class FileHandler {
         Extracts Record data (id, name and coordinates) from Open Street Maps XML file and loads them into
         the datafile
         */
-        public void loadDatafile()
+        public static void loadDatafile()
         {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
