@@ -50,7 +50,7 @@ public class FileHandler {
         private static void writeBlockInDataFile(ArrayList<Record> records)
         {
                 try {
-                        byte[] recordsAsByteArray = this.convertObjectToBytes(records);
+                        byte[] recordsAsByteArray = convertObjectToBytes(records);
                         byte[] block = new byte[BLOCK_SIZE];
 
                         //System.arraycopy(recordsAsByteArray, 0, block, );
@@ -62,12 +62,12 @@ public class FileHandler {
 
         public static long getMaxEntriesInBlock()
         {
-                return this.maxEntriesInBlock;
+                return maxEntriesInBlock;
         }
 
         public static Record getRecord(int blockId, long recordId)
         {
-                for (Record record : this.dataFile.get(blockId))
+                for (Record record : dataFile.get(blockId))
                 {
                         if (record.getId() == recordId)
                         {
@@ -79,7 +79,7 @@ public class FileHandler {
 
         public static Node getNode(long nodeId)
         {
-                for (Node node : this.indexFile)
+                for (Node node : indexFile)
                 {
                         if (node.getId() == nodeId)
                         {
@@ -91,17 +91,17 @@ public class FileHandler {
 
         public static long getNextAvailableNodeId()
         {
-                return this.indexFile.size() + 1;
+                return indexFile.size() + 1;
         }
 
         public static void insertNode(Node newNode)
         {
-                this.indexFile.add(newNode);
+                indexFile.add(newNode);
         }
 
         public static void updateNode(Node updatedNode)
         {
-                for (Node node : this.indexFile)
+                for (Node node : indexFile)
                 {
                         if (node.getId() == updatedNode.getId())
                         {
@@ -113,18 +113,18 @@ public class FileHandler {
 
         public static void setRootNode(Node newRootNode)
         {
-                this.indexFile.add(newRootNode);
-                this.rootNodeId = newRootNode.getId();
+                indexFile.add(newRootNode);
+                rootNodeId = newRootNode.getId();
         }
 
         public static Node getRootNode()
         {
-                return this.indexFile.get((int) this.getRootNodeId());
+                return indexFile.get((int) getRootNodeId());
         }
 
         public static long getRootNodeId()
         {
-                return this.rootNodeId;
+                return rootNodeId;
         }
 
         public static void getIndexMetadata()
@@ -181,7 +181,7 @@ public class FileHandler {
                                                         }
                                                         if (records.size() >= maxRecordsInBlock)
                                                         {
-                                                                this.dataFile.add(records);
+                                                                dataFile.add(records);
                                                                 records.clear();
                                                         }
                                                 }
