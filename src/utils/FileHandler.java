@@ -180,7 +180,7 @@ public class FileHandler {
                                                         {
                                                                 dataFile.add(records);
                                                                 DataMetaData.addOneBlock();
-                                                                records.clear();
+                                                                records = new ArrayList<>();
                                                         }
                                                 }
                                         }
