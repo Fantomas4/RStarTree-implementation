@@ -1,7 +1,7 @@
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+//import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -158,15 +158,15 @@ public class FileHandler {
                         NodeList nodeList = doc.getElementsByTagName("node");
                         for (int i = 0; i < nodeList.getLength(); ++i)
                         {
-                                Node node = nodeList.item(i);
-                                if (node.getNodeType() == Node.ELEMENT_NODE)
+                                org.w3c.dom.Node node = nodeList.item(i);
+                                if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE)
                                 {
                                         Element nodeElement = (Element) node;
                                         NodeList tagList = nodeElement.getChildNodes();
                                         for (int j = 0; j < tagList.getLength(); ++j)
                                         {
-                                                Node tag = tagList.item(j);
-                                                if (tag.getNodeType() == Node.ELEMENT_NODE)
+                                                org.w3c.dom.Node tag = tagList.item(j);
+                                                if (tag.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE)
                                                 {
                                                         Element tagElement = (Element) tag;
                                                         if (tagElement.getAttribute("k").equals("name"))
