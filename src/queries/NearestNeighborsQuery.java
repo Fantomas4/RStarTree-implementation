@@ -1,19 +1,27 @@
 package queries;
 
 import tree.*;
+import utils.FileHandler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
 public class NearestNeighborsQuery extends Query {
     private class Neighbor implements Comparable<Neighbor> {
+        private final long blockId;
         private final long recordId;
         private final double distance;
 
-        public Neighbor(long recordId, double distance) {
+        public Neighbor(long blockId, long recordId, double distance) {
+            this.blockId = blockId;
             this.recordId = recordId;
             this.distance = distance;
+        }
+
+        public long getBlockId() {
+            return blockId;
         }
 
         public long getRecordId() {
@@ -49,7 +57,7 @@ public class NearestNeighborsQuery extends Query {
         // Prepare the Array List that contains the result Records
         for (int i = 0; i < kClosestNeighborsQueue.size(); i++) {
             Neighbor neighbor = kClosestNeighborsQueue.remove();
-            Record record; // TODO: Get record from File Handler using neighbor.getRecordId()
+            Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
 
             // Add the record to the results list
             queryResults.add(record);
@@ -74,7 +82,7 @@ public class NearestNeighborsQuery extends Query {
             // The current node is not a leaf node.
             for (Entry entry : entries) {
                 if (entry.getBoundingBox().calculatePointDistance(targetPoint) <= searchRadius) {
-                    Node nextNode; // TODO: Get the next node from File Handler using entry.getChildNodeId()
+                    Node nextNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get the next node from File Handler using entry.getChildNodeId(). CHECK!
                     search(nextNode);
                 }
             }
@@ -93,7 +101,7 @@ public class NearestNeighborsQuery extends Query {
                         // Remove the most distant neighbor from the priority queue and add leafEntry
                         // as a new neighbor.
                         kClosestNeighborsQueue.remove();
-                        kClosestNeighborsQueue.add(new Neighbor(leafEntry.getRecordId(), candidateDistance));
+                        kClosestNeighborsQueue.add(new Neighbor(leafEntry.getBlockId(), leafEntry.getRecordId(), candidateDistance));
 
                         // Update the search radius
                         searchRadius = candidateDistance;
@@ -101,7 +109,7 @@ public class NearestNeighborsQuery extends Query {
                 } else {
                     // The priority queue contains less than k neighbors, so leafEntry is
                     // simply added to the queue.
-                    kClosestNeighborsQueue.add(new Neighbor(leafEntry.getRecordId(), candidateDistance));
+                    kClosestNeighborsQueue.add(new Neighbor(leafEntry.getBlockId(), leafEntry.getRecordId(), candidateDistance));
                 }
             }
         }

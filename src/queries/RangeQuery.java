@@ -1,7 +1,9 @@
 package queries;
 
 import tree.*;
+import utils.FileHandler;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class RangeQuery extends Query{
@@ -28,7 +30,7 @@ public class RangeQuery extends Query{
                 if (hasOverlap) {
                     // The target point overlaps the entry's bounding box,
                     // so we proceed to search inside the entry's child node.
-                    Node childNode; // TODO: Get child node from File Handler using entry.getChildNodeId()
+                    Node childNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get child node from File Handler using entry.getChildNodeId(). CHECK!
                     search(childNode);
                 }
             }
@@ -41,7 +43,7 @@ public class RangeQuery extends Query{
                 if (hasOverlap) {
                     // The target point overlaps the leaf entry's bounding box,
                     // so we proceed to add the leaf entry's record to the query results.
-                    Record record; // TODO: Get the leaf entry's record from File Handler using leafEntry.getRecordId();
+                    Record record = FileHandler.getRecord(leafEntry.getBlockId(), leafEntry.getRecordId()); // TODO: Get the leaf entry's record from File Handler using leafEntry.getRecordId(). CHECK!
                     queryResults.add(record);
                 }
             }

@@ -1,7 +1,9 @@
 package tree;
 
+import utils.DataMetaData;
 import utils.FileHandler;
 
+import java.io.File;
 import java.util.*;
 
 public class RStarTree {
@@ -21,7 +23,8 @@ public class RStarTree {
     }
 
     public void initialize() {
-        
+        FileHandler.loadDatafile();
+        System.out.println(DataMetaData.getNumberOfBlocks());
     }
 
     public static int getLEAF_LEVEL() {

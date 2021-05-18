@@ -8,7 +8,6 @@ import org.xml.sax.SAXException;
 import tree.Node;
 import tree.Record;
 
-import javax.xml.crypto.Data;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,9 +63,9 @@ public class FileHandler {
                 return maxEntriesInBlock;
         }
 
-        public static Record getRecord(int blockId, long recordId)
+        public static Record getRecord(long blockId, long recordId)
         {
-                for (Record record : dataFile.get(blockId))
+                for (Record record : dataFile.get((int)blockId))
                 {
                         if (record.getId() == recordId)
                         {
