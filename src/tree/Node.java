@@ -1,8 +1,9 @@
 package tree;
 
+import utils.FileHandler;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.FileHandler;
+
 
 public class Node {
     private static final int DIMENSIONS = 3;

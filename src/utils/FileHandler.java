@@ -22,8 +22,8 @@ public class FileHandler {
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 32 * 1024;
-        private static final long maxRecordsInBlock = 2;  // Dummy maximum number of records in a block
-        private static final long maxEntriesInBlock = 5;
+        private static final int maxRecordsInBlock = 2;  // Dummy maximum number of records in a block
+        private static final int maxEntriesInBlock = 5;
 
 
         // https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
@@ -60,7 +60,7 @@ public class FileHandler {
                 }
         }
 
-        public static long getMaxEntriesInBlock()
+        public static int getMaxEntriesInBlock()
         {
                 return maxEntriesInBlock;
         }

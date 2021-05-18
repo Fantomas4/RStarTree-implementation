@@ -1,5 +1,7 @@
 package tree;
 
+import utils.FileHandler;
+
 import java.util.*;
 
 public class RStarTree {
@@ -7,7 +9,6 @@ public class RStarTree {
     private static final int REINSERT_AMOUNT = (int) Math.round(REINSERT_P_PARAMETER * Node.getMaxEntriesLimit());
     private static final int LEAF_LEVEL = 0;
 
-//    private long rootNodeId;
     private int rootLevel;
 
     public RStarTree() {
@@ -17,6 +18,10 @@ public class RStarTree {
         long rootNodeId = FileHandler.getNextAvailableNodeId(); //TODO: Get root Node ID from File Handler. CHECK!
         Node rootNode = new Node(rootLevel, rootNodeId);
         FileHandler.insertNode(rootNode); // TODO: Save root node using File Handler. CHECK!
+    }
+
+    public void initialize() {
+        
     }
 
     public static int getLEAF_LEVEL() {
@@ -145,7 +150,7 @@ public class RStarTree {
 
                 // Create the new root entry
                 long newRootNodeId = FileHandler.getNextAvailableNodeId(); // TODO: Get a new node ID for the new root from File Handler. CHECK!
-                Node newRoot = new Node(rootEntries, newRootNodeId, ++rootLevel);
+                Node newRoot = new Node(rootEntries, ++rootLevel, newRootNodeId);
                 FileHandler.setRootNode(newRoot); // TODO: Save the new root Node using File Handler. CHECK!
             }
         }
