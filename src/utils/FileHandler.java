@@ -143,6 +143,7 @@ public class FileHandler {
         {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
+                dataFile.add(new ArrayList<>()); // TODO: DELETE THAT SHIT LATER!!!!
                 try {
                         DocumentBuilder builder = factory.newDocumentBuilder();
                         Document doc = builder.parse(osmFilePath);
