@@ -25,6 +25,14 @@ public class RStarTree {
     public void initialize() {
         FileHandler.loadDatafile();
         System.out.println(DataMetaData.getNumberOfBlocks());
+        int numBlocks = DataMetaData.getNumberOfBlocks();
+
+        for (int i = 1; i < numBlocks; i++) {
+            ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
+            for (Record record : blockRecords) {
+                insertRecord(record, i);
+            }
+        }
     }
 
     public static int getLEAF_LEVEL() {
