@@ -1,7 +1,6 @@
 package tree;
 
 import java.util.*;
-import java.util.logging.FileHandler;
 
 public class RStarTree {
     private static final double REINSERT_P_PARAMETER = 0.3;
@@ -49,7 +48,7 @@ public class RStarTree {
                     new EntryComparator.AreaEnlargementComparator(candidateEntries, newEntry));
             // Get the next Node from the File Handler.
             long nextNodeId = optimalEntry.getChildNodeId();
-            Node nextNode = FileHandler.getNode(nextNodeId); // TODO: Add call to FileHandler method to get the next node (optimalEntry.getChildNodeId()). CHECK!
+            Node nextNode = FileHandler.getNode(nextNodeId); // TODO: Add call to tree.utils.FileHandler method to get the next node (optimalEntry.getChildNodeId()). CHECK!
             LinkedHashMap<Node, Entry> chosenPath = chooseSubTree(newEntry, nextNode, targetLevel);
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
@@ -149,7 +148,6 @@ public class RStarTree {
                 Node newRoot = new Node(rootEntries, newRootNodeId, ++rootLevel);
                 FileHandler.setRootNode(newRoot); // TODO: Save the new root Node using File Handler. CHECK!
             }
-            // TODO: POSSIBLE BUG! Adjust BB for entries ?
         }
     }
 
