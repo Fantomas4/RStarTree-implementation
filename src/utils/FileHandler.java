@@ -8,6 +8,7 @@ import org.xml.sax.SAXException;
 import tree.Node;
 import tree.Record;
 
+import javax.xml.crypto.Data;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,9 +23,7 @@ public class FileHandler {
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 32 * 1024;
-        private static final int maxRecordsInBlock = 2;  // Dummy maximum number of records in a block
         private static final int maxEntriesInBlock = 5;
-
 
         // https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
         private static byte[] convertObjectToBytes(Object object) throws IOException
@@ -89,6 +88,11 @@ public class FileHandler {
                 return null;
         }
 
+        public static ArrayList<Record> getDataBlock(long blockId)
+        {
+                return dataFile.get((int) blockId);
+        }
+
         public static long getNextAvailableNodeId()
         {
                 return indexFile.size() + 1;
@@ -132,13 +136,6 @@ public class FileHandler {
                 // root node id
         }
 
-        public static void getDataMetadata()
-        {
-                // #records
-                // #blocks
-                // TODO: Create MetaDataClass
-        }
-
         /*
         Extracts Record data (id, name and coordinates) from Open Street Maps XML file and loads them into
         the datafile
@@ -179,9 +176,10 @@ public class FileHandler {
                                                                 );
                                                                 // TODO: Add Records to real datafile
                                                         }
-                                                        if (records.size() >= maxRecordsInBlock)
+                                                        if (records.size() >= DataMetaData.getMaxRecordsInBlock())
                                                         {
                                                                 dataFile.add(records);
+                                                                DataMetaData.addOneBlock();
                                                                 records.clear();
                                                         }
                                                 }
