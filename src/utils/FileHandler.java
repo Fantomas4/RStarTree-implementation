@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 //import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import tree.Entry;
 import tree.Node;
 import tree.Record;
 
@@ -127,7 +128,7 @@ public class FileHandler {
 
         public static long getRootNodeId()
         {
-                return rootNodeId - 1;
+                return rootNodeId;
         }
 
         public static void getIndexMetadata()
@@ -144,6 +145,7 @@ public class FileHandler {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
                 dataFile.add(new ArrayList<>()); // TODO: DELETE THAT SHIT LATER!!!!
+                indexFile.add(new Node(new ArrayList<Entry>(), 0, -1)); // TODO: DELETE THAT SHIT TOO!! (dummy indexmetadata)
                 try {
                         DocumentBuilder builder = factory.newDocumentBuilder();
                         Document doc = builder.parse(osmFilePath);
