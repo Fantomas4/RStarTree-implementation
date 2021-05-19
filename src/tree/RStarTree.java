@@ -33,6 +33,7 @@ public class RStarTree {
                 insertRecord(record, i);
             }
         }
+
     }
 
     public static int getLEAF_LEVEL() {
@@ -73,7 +74,7 @@ public class RStarTree {
 
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
-
+        System.out.println("MPIKA 1");
         // Create a new LeafEntry for the record
         BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);

@@ -127,7 +127,7 @@ public class FileHandler {
 
         public static long getRootNodeId()
         {
-                return rootNodeId;
+                return rootNodeId - 1;
         }
 
         public static void getIndexMetadata()

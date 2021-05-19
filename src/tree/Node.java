@@ -6,9 +6,9 @@ import java.util.List;
 
 
 public class Node {
-    private static final int DIMENSIONS = 3;
+    private static final int DIMENSIONS = 2; //TODO: Get number of dimensions from file handler.
     private static final int MAX_ENTRIES = FileHandler.getMaxEntriesInBlock(); //TODO: Get max entries per node from File Handler. CHECK!
-    private static final double MIN_LOAD_FACTOR = 0.3;
+    private static final double MIN_LOAD_FACTOR = 0.2;
     private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
 
     private long nodeId;
@@ -23,13 +23,19 @@ public class Node {
 //    }
 
     public Node(ArrayList<Entry> entries, int level, long nodeId) {
+        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
+        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
+
         this.entries = entries;
         this.level = level;
         this.nodeId = nodeId;
     }
 
-    // Used fpr creating a root Node
+    // Used for creating a root Node
     public Node(int level, long nodeId) {
+        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
+        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
+
         this.entries = new ArrayList<>();
         this.level = level;
         this.nodeId = nodeId;
@@ -176,9 +182,9 @@ public class Node {
 
         for (int d = 0; d < DIMENSIONS; d++) {
             ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
-            sortedByLowerValue.sort(new EntryComparator.LowerValueComparator(DIMENSIONS));
+            sortedByLowerValue.sort(new EntryComparator.LowerValueComparator(d));
             ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
-            sortedByUpperValue.sort(new EntryComparator.UpperValueComparator(DIMENSIONS));
+            sortedByUpperValue.sort(new EntryComparator.UpperValueComparator(d));
 
             ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);
@@ -187,8 +193,8 @@ public class Node {
             AxisDistributions axisDistributions = new AxisDistributions();
             for (ArrayList<Entry> sortedValueList : sortedValueLists) {
                 for (int k = 0; k < MAX_ENTRIES - 2 * MIN_ENTRIES + 2; k++) {
-                    List<Entry> groupA = sortedValueList.subList(0, MIN_ENTRIES - 1 + k);
-                    List<Entry> groupB = sortedValueList.subList(MIN_ENTRIES - 1 + k, sortedValueList.size());
+                    List<Entry> groupA = sortedValueList.subList(0, MIN_ENTRIES - 1 + k + 1);
+                    List<Entry> groupB = sortedValueList.subList(MIN_ENTRIES - 1 + k + 1, sortedValueList.size());
                     Distribution distribution = new Distribution(new ArrayList<>(groupA), new ArrayList<>(groupB));
                     axisDistributions.addDistribution(distribution, distribution.getDistributionMargin());
                 }
