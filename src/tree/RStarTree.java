@@ -70,6 +70,9 @@ public class RStarTree {
             // Get the next Node from the File Handler.
             long nextNodeId = optimalEntry.getChildNodeId();
             Node nextNode = FileHandler.getNode(nextNodeId); // TODO: Add call to tree.utils.FileHandler method to get the next node (optimalEntry.getChildNodeId()). CHECK!
+            if (nextNode == null) {
+                System.out.println("Null node id: " + nextNodeId);
+            }
             LinkedHashMap<Node, Entry> chosenPath = chooseSubTree(newEntry, nextNode, targetLevel);
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
