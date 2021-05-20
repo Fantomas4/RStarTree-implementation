@@ -19,7 +19,7 @@ public class FileHandler {
         private static ArrayList<ArrayList<Record>> dataFile = new ArrayList<>(); // Dummy data file
         private static ArrayList<Node> indexFile = new ArrayList<>(); // Dummy index file
 
-        private static long rootNodeId = 0;
+        private static long rootNodeId = 1;
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 32 * 1024;
