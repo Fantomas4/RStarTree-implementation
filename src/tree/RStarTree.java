@@ -12,6 +12,7 @@ public class RStarTree {
     private static final int LEAF_LEVEL = 0;
 
     private int rootLevel;
+    boolean[] levelOverflowCalled;
 
     public RStarTree() {
         rootLevel = 0;
@@ -41,14 +42,16 @@ public class RStarTree {
     }
 
     private int getTreeHeight() {
-        return rootLevel + 1;
+        return rootLevel;
     }
 
     // Returns the bottom-up LinkedHashMap  of <Node, Entry> pairs that represent the optimal non-leaf entries insertion
     // path for the given new Entry. The Entry of the first <Node, Entry> pair returned represents the Entry in the
     // child node of which the new Entry is to be inserted.
     private LinkedHashMap<Node, Entry> chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
+        System.out.println("455");
         if (currentNode.getLevel() - 1 == targetLevel) {
+            System.out.println("456");
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
@@ -58,6 +61,7 @@ public class RStarTree {
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
         } else {
+            System.out.println("457");
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
@@ -66,6 +70,9 @@ public class RStarTree {
             // Get the next Node from the File Handler.
             long nextNodeId = optimalEntry.getChildNodeId();
             Node nextNode = FileHandler.getNode(nextNodeId); // TODO: Add call to tree.utils.FileHandler method to get the next node (optimalEntry.getChildNodeId()). CHECK!
+            if (nextNode == null) {
+                System.out.println("Null node id: " + nextNodeId);
+            }
             LinkedHashMap<Node, Entry> chosenPath = chooseSubTree(newEntry, nextNode, targetLevel);
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
@@ -74,10 +81,15 @@ public class RStarTree {
 
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
-        System.out.println("MPIKA 1");
         // Create a new LeafEntry for the record
         BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
+
+        // Reset the level overflow call status list.
+        // (A boolean array indicating whether Overflow Treatment has been called
+        // for a specific level of the RStar Tree during the insertion of a new
+        // Record).
+        levelOverflowCalled = new boolean[getTreeHeight() + 1];
 
         // Insert the new Leaf Entry into the tree
         insert(leafEntry, LEAF_LEVEL);
@@ -85,13 +97,9 @@ public class RStarTree {
     }
 
     private void insert(Entry newEntry, int targetLevel) {
+//        System.out.println("232");
+        System.out.println("root level: " + rootLevel);
         // R* Tree paper reference: I1 - Insert
-
-        // Reset the level overflow call status list.
-        // (A boolean array indicating whether Overflow Treatment has been called
-        // for a specific level of the RStar Tree during the insertion of a new
-        // Record).
-        boolean[] levelOverflowCalled = new boolean[getTreeHeight()];
 
         // Get the root node from File Handler
         Node rootNode = FileHandler.getRootNode(); // TODO: Get the root node from File Handler. Check!
@@ -119,7 +127,7 @@ public class RStarTree {
 
                 if (childNode.isOverflowed()) {
                     // Invoke Overflow Treatment
-                    ArrayList<Node> overflowTreatmentResult = overflowTreatment(childNode, levelOverflowCalled);
+                    ArrayList<Node> overflowTreatmentResult = overflowTreatment(childNode);
                     if (overflowTreatmentResult != null) {
                         // Overflow Treatment caused a node split
                         Node nodeA = overflowTreatmentResult.get(0);
@@ -133,11 +141,11 @@ public class RStarTree {
                         // Add the created Entry to the parent Node
                         parentNode.addEntry(newParentNodeEntry);
                     }
-                    FileHandler.updateNode(childNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
                 }
                 // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
                 // the child entries (nodeA entries) inside its child node (nodeA).
                 parentEntry.adjustBoundingBox(childNode);
+                FileHandler.updateNode(childNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
                 FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
             }
         }
@@ -145,7 +153,7 @@ public class RStarTree {
         // Check the root Node for Overflow
         if (rootNode.isOverflowed()) {
             // Invoke Overflow Treatment
-            ArrayList<Node> overflowTreatmentResult = overflowTreatment(rootNode, levelOverflowCalled);
+            ArrayList<Node> overflowTreatmentResult = overflowTreatment(rootNode);
             if (overflowTreatmentResult != null) {
                 // Overflow Treatment caused a root node split, so a new
                 // root node has to be created
@@ -168,7 +176,7 @@ public class RStarTree {
         }
     }
 
-    private ArrayList<Node> overflowTreatment(Node overflowedNode, boolean[] levelOverflowCalled) {
+    private ArrayList<Node> overflowTreatment(Node overflowedNode) {
         int overflowedNodeLevel = overflowedNode.getLevel();
         boolean isFirstCall = !levelOverflowCalled[overflowedNodeLevel];
         // Update levelOverflowCalled status
