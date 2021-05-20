@@ -145,7 +145,7 @@ public class FileHandler {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
                 dataFile.add(new ArrayList<>()); // TODO: DELETE THAT SHIT LATER!!!!
-                indexFile.add(new Node(new ArrayList<Entry>(), 0, -1)); // TODO: DELETE THAT SHIT TOO!! (dummy indexmetadata)
+                indexFile.add(new Node(new ArrayList<Entry>(), 100, -1)); // TODO: DELETE THAT SHIT TOO!! (dummy indexmetadata)
                 try {
                         DocumentBuilder builder = factory.newDocumentBuilder();
                         Document doc = builder.parse(osmFilePath);
