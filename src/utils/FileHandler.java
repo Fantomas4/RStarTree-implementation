@@ -123,7 +123,7 @@ public class FileHandler {
 
         public static Node getRootNode()
         {
-                return indexFile.get((int) getRootNodeId());
+                return getNode(rootNodeId);
         }
 
         public static long getRootNodeId()
