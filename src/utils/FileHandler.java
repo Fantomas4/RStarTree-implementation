@@ -19,7 +19,7 @@ public class FileHandler {
         private static ArrayList<ArrayList<Record>> dataFile = new ArrayList<>(); // Dummy data file
         private static ArrayList<Node> indexFile = new ArrayList<>(); // Dummy index file
 
-        private static long rootNodeId = 1;
+        private static long rootNodeId = 0;
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 32 * 1024;
@@ -145,7 +145,7 @@ public class FileHandler {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
                 dataFile.add(new ArrayList<>()); // TODO: DELETE THAT SHIT LATER!!!!
-                indexFile.add(new Node(new ArrayList<Entry>(), 100, -1)); // TODO: DELETE THAT SHIT TOO!! (dummy indexmetadata)
+                //indexFile.add(new Node(new ArrayList<Entry>(), 100, -1)); // TODO: DELETE THAT SHIT TOO!! (dummy indexmetadata)
                 try {
                         DocumentBuilder builder = factory.newDocumentBuilder();
                         Document doc = builder.parse(osmFilePath);
