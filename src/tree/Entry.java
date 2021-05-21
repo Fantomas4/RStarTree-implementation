@@ -13,7 +13,7 @@ public class Entry implements Serializable {
 
     public Entry(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
-        this.childNodeId = - 1; // tree.Entry has no child node
+        this.childNodeId = -1; // tree.Entry has no child node
     }
 
     public BoundingBox getBoundingBox() {

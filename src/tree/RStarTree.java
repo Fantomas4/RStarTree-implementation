@@ -49,6 +49,7 @@ public class RStarTree {
     // path for the given new Entry. The Entry of the first <Node, Entry> pair returned represents the Entry in the
     // child node of which the new Entry is to be inserted.
     private LinkedHashMap<Node, Entry> chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
+        System.out.println("currentNode level: " + currentNode.getLevel());
         System.out.println("455");
         if (currentNode.getLevel() - 1 == targetLevel) {
             System.out.println("456");
@@ -65,6 +66,9 @@ public class RStarTree {
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
+            if (candidateEntries.size() == 0) {
+                System.out.println("TO ELOUSES");
+            }
             Entry optimalEntry = Collections.min(candidateEntries,
                     new EntryComparator.AreaEnlargementComparator(candidateEntries, newEntry));
             // Get the next Node from the File Handler.
@@ -200,7 +204,7 @@ public class RStarTree {
         ArrayList<Entry> overflowedNodeEntries = overflowedNode.getEntries();
         BoundingBox overflowedBB = BoundingBox.calculateMBR(overflowedNodeEntries);
 
-        // Sort the M+1 entries in decreasing order of their rectangle centers' distances to the center of the bounding
+        // Sort the M+1 entries in decreasing order of their rectangle centers' distances from the center of the bounding
         // rectangle of overflowedNode.
         overflowedNodeEntries.sort(Collections.reverseOrder(new EntryComparator.BBCenterDistanceComparator(overflowedBB)));
 
@@ -211,6 +215,9 @@ public class RStarTree {
         }
 
         // Update the overflowed Node's entries
+        if (overflowedNodeEntries.size() == 0) {
+            System.out.println("EDW TO ELOUSES");
+        }
         overflowedNode.setEntries(overflowedNodeEntries);
 
         // Reinsert the removed entries

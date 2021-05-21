@@ -112,10 +112,12 @@ public class EntryComparator {
                 // both Entry objects have equal area enlargement values,
                 // so the tie is resolved by choosing the entry with the rectangle
                 // of smallest area
-                if (a.getBoundingBox().getArea() >= b.getBoundingBox().getArea()) {
+                if (a.getBoundingBox().getArea() > b.getBoundingBox().getArea()) {
                     return 1;
-                } else {
+                } else if (a.getBoundingBox().getArea() < b.getBoundingBox().getArea())  {
                     return -1;
+                } else {
+                    return 0;
                 }
             }
         }
