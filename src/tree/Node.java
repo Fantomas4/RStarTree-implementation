@@ -7,8 +7,8 @@ import java.util.List;
 
 public class Node {
     private static final int DIMENSIONS = 2; //TODO: Get number of dimensions from file handler.
-    private static final int MAX_ENTRIES = FileHandler.getMaxEntriesInBlock(); //TODO: Get max entries per node from File Handler. CHECK!
-    private static final double MIN_LOAD_FACTOR = 0.2;
+    private static final int MAX_ENTRIES = 3; //TODO: Get max entries per node from File Handler using FileHandler.getMaxEntriesInBlock();
+    private static final double MIN_LOAD_FACTOR = 0.4;
     private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
 
     private long nodeId;
