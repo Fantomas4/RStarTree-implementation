@@ -10,7 +10,7 @@ public class RStarTree {
     private static final int LEAF_LEVEL = 0;
 
     private int rootLevel;
-    boolean[] levelOverflowCalled;
+    HashMap<Integer, Boolean> levelOverflowCalled;
 
     public RStarTree() {
         rootLevel = 0;
@@ -22,99 +22,99 @@ public class RStarTree {
     }
 
     public void initialize() {
-//        FileHandler.loadDatafile();
-//        System.out.println(DataMetaData.getNumberOfBlocks());
-//        int numBlocks = DataMetaData.getNumberOfBlocks();
+        FileHandler.loadDatafile();
+        System.out.println(DataMetaData.getNumberOfBlocks());
+        int numBlocks = DataMetaData.getNumberOfBlocks();
+
+        for (int i = 1; i < numBlocks; i++) {
+            ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
+            for (Record record : blockRecords) {
+                insertRecord(record, i);
+            }
+        }
+
+//        // FOR TESTING PURPOSES ONLY!
+//        double[] coordinates = new double[2];
 //
-//        for (int i = 1; i < numBlocks; i++) {
-//            ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
-//            for (Record record : blockRecords) {
-//                insertRecord(record, i);
-//            }
-//        }
-
-        // FOR TESTING PURPOSES ONLY!
-        double[] coordinates = new double[2];
-
-        coordinates[0] = -100;
-        coordinates[1] = 1;
-        insertRecord(new Record(1, "TR1", coordinates),1);
+//        coordinates[0] = -100;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(1, "TR1", coordinates),1);
+////
+//        coordinates[0] = -80;
+//        coordinates[1] = -1;
+//        insertRecord(new Record(2, "TR2", coordinates),2);
+////
+//        coordinates[0] = 4;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(3, "TR3", coordinates),3);
 //
-        coordinates[0] = -80;
-        coordinates[1] = -1;
-        insertRecord(new Record(2, "TR2", coordinates),2);
+//        coordinates[0] = 5;
+//        coordinates[1] = 0;
+//        insertRecord(new Record(4, "TR4", coordinates),4);
 //
-        coordinates[0] = 4;
-        coordinates[1] = 1;
-        insertRecord(new Record(3, "TR3", coordinates),3);
-
-        coordinates[0] = 5;
-        coordinates[1] = 0;
-        insertRecord(new Record(4, "TR4", coordinates),4);
-
-        coordinates[0] = 14;
-        coordinates[1] = 1;
-        insertRecord(new Record(5, "TR5", coordinates),5);
-
-        coordinates[0] = 2;
-        coordinates[1] = 1;
-        insertRecord(new Record(6, "TR6", coordinates),6);
-
-        coordinates[0] = 2;
-        coordinates[1] = 0.1;
-        insertRecord(new Record(7, "TR7", coordinates),7);
-
-        coordinates[0] = -101;
-        coordinates[1] = 0.1;
-        insertRecord(new Record(8, "TR8", coordinates),8);
+//        coordinates[0] = 14;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(5, "TR5", coordinates),5);
 //
-        coordinates[0] = -102;
-        coordinates[1] = 0.1;
-        insertRecord(new Record(9, "TR9", coordinates),9);
-
-        coordinates[0] = -125;
-        coordinates[1] = 1;
-        insertRecord(new Record(10, "TR10", coordinates),10);
-
-        coordinates[0] = 9;
-        coordinates[1] = 0.9;
-        insertRecord(new Record(11, "TR11", coordinates),11);
-
-        coordinates[0] = -1;
-        coordinates[1] = 0;
-        insertRecord(new Record(12, "TR12", coordinates),12);
-
-        coordinates[0] = 23;
-        coordinates[1] = 1.7;
-        insertRecord(new Record(13, "TR13", coordinates),13);
-
-        coordinates[0] = 12;
-        coordinates[1] = 10;
-        insertRecord(new Record(14, "TR14", coordinates),14);
-
-        coordinates[0] = 20;
-        coordinates[1] = -2;
-        insertRecord(new Record(15, "TR15", coordinates),15);
-
-        coordinates[0] = 2;
-        coordinates[1] = -0.1;
-        insertRecord(new Record(16, "TR16", coordinates),16);
-
-        coordinates[0] = -1;
-        coordinates[1] = -2;
-        insertRecord(new Record(17, "TR17", coordinates),17);
-
-        coordinates[0] = 1;
-        coordinates[1] = 1;
-        insertRecord(new Record(18, "TR18", coordinates),18);
-
-        coordinates[0] = 15;
-        coordinates[1] = -1;
-        insertRecord(new Record(19, "TR19", coordinates),19);
-
-        coordinates[0] = -136;
-        coordinates[1] = 1;
-        insertRecord(new Record(20, "TR20", coordinates),20);
+//        coordinates[0] = 2;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(6, "TR6", coordinates),6);
+//
+//        coordinates[0] = 2;
+//        coordinates[1] = 0.1;
+//        insertRecord(new Record(7, "TR7", coordinates),7);
+//
+//        coordinates[0] = -101;
+//        coordinates[1] = 0.1;
+//        insertRecord(new Record(8, "TR8", coordinates),8);
+////
+//        coordinates[0] = -102;
+//        coordinates[1] = 0.1;
+//        insertRecord(new Record(9, "TR9", coordinates),9);
+//
+//        coordinates[0] = -125;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(10, "TR10", coordinates),10);
+//
+//        coordinates[0] = 9;
+//        coordinates[1] = 0.9;
+//        insertRecord(new Record(11, "TR11", coordinates),11);
+//
+//        coordinates[0] = -1;
+//        coordinates[1] = 0;
+//        insertRecord(new Record(12, "TR12", coordinates),12);
+//
+//        coordinates[0] = 23;
+//        coordinates[1] = 1.7;
+//        insertRecord(new Record(13, "TR13", coordinates),13);
+//
+//        coordinates[0] = 12;
+//        coordinates[1] = 10;
+//        insertRecord(new Record(14, "TR14", coordinates),14);
+//
+//        coordinates[0] = 20;
+//        coordinates[1] = -2;
+//        insertRecord(new Record(15, "TR15", coordinates),15);
+//
+//        coordinates[0] = 2;
+//        coordinates[1] = -0.1;
+//        insertRecord(new Record(16, "TR16", coordinates),16);
+//
+//        coordinates[0] = -1;
+//        coordinates[1] = -2;
+//        insertRecord(new Record(17, "TR17", coordinates),17);
+//
+//        coordinates[0] = 1;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(18, "TR18", coordinates),18);
+//
+//        coordinates[0] = 15;
+//        coordinates[1] = -1;
+//        insertRecord(new Record(19, "TR19", coordinates),19);
+//
+//        coordinates[0] = -136;
+//        coordinates[1] = 1;
+//        insertRecord(new Record(20, "TR20", coordinates),20);
 
     }
 
@@ -124,6 +124,15 @@ public class RStarTree {
 
     private int getTreeHeight() {
         return rootLevel;
+    }
+
+    private void initializeLevelOverflowCalled() {
+        levelOverflowCalled = new HashMap<>();
+        int levels = getTreeHeight() + 1;
+
+        for (int l = 0; l < levels; l++) {
+            levelOverflowCalled.put(l, false);
+        }
     }
 
     // Returns the bottom-up LinkedHashMap  of <Node, Entry> pairs that represent the optimal non-leaf entries insertion
@@ -170,11 +179,11 @@ public class RStarTree {
         BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
 
-        // Reset the level overflow call status list.
+        // Reset the level overflow call status HashMap.
         // (A boolean array indicating whether Overflow Treatment has been called
         // for a specific level of the RStar Tree during the insertion of a new
         // Record).
-        levelOverflowCalled = new boolean[getTreeHeight() + 1];
+        initializeLevelOverflowCalled();
 
         // Insert the new Leaf Entry into the tree
         insert(leafEntry, LEAF_LEVEL);
@@ -228,18 +237,17 @@ public class RStarTree {
                         Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
                         // Add the created Entry to the parent Node
                         parentNode.addEntry(newParentNodeEntry);
-
-                        // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
-                        // the child entries (nodeA entries) inside its child node (nodeA).
-                        parentEntry.adjustBoundingBox(childNode);
-                        FileHandler.updateNode(childNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
-                        FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
                     }
                 }
+
+                // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
+                // the child entries (nodeA entries) inside its child node (nodeA).
+                parentEntry.adjustBoundingBox(childNode);
+
+                FileHandler.updateNode(childNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
+                FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
             }
         }
-
-        System.out.println("DUMMY BREAKPOINT!");
 
         // Check the root Node for Overflow
         if (rootNode.isOverflowed()) {
@@ -263,15 +271,20 @@ public class RStarTree {
                 long newRootNodeId = FileHandler.getNextAvailableNodeId(); // TODO: Get a new node ID for the new root from File Handler. CHECK!
                 Node newRoot = new Node(rootEntries, ++rootLevel, newRootNodeId);
                 FileHandler.setRootNode(newRoot); // TODO: Save the new root Node using File Handler. CHECK!
+
+                // Add a new entry in levelOverflowCalled for the new root level
+                levelOverflowCalled.put(rootLevel, false);
             }
         }
     }
 
     private ArrayList<Node> overflowTreatment(Node overflowedNode, Node parentNode, Entry parentEntry) {
         int overflowedNodeLevel = overflowedNode.getLevel();
-        boolean isFirstCall = !levelOverflowCalled[overflowedNodeLevel];
+        System.out.println("tree levels: " + (getTreeHeight() + 1));
+//        System.out.println("levelOverflowCalled length: " + levelOverflowCalled.length);
+        boolean isFirstCall = !levelOverflowCalled.get(overflowedNodeLevel);
         // Update levelOverflowCalled status
-        levelOverflowCalled[overflowedNodeLevel] = true;
+        levelOverflowCalled.put(overflowedNodeLevel, true);
 
         if (overflowedNode.getLevel() != rootLevel && isFirstCall) {
             // If the overflowed Node's level is not the root level and this is the first call
