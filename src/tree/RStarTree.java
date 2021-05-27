@@ -1,5 +1,8 @@
 package tree;
 
+import org.w3c.dom.ranges.Range;
+import queries.NearestNeighborsQuery;
+import queries.RangeQuery;
 import utils.DataMetaData;
 import utils.FileHandler;
 import java.util.*;
@@ -330,5 +333,19 @@ public class RStarTree {
         for (Entry removedEntry : removedEntries) {
             insert(removedEntry, overflowedNode.getLevel());
         }
+    }
+
+    public ArrayList<Record> executeRangeQuery(double[] targetPoint, double range) {
+        Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
+        RangeQuery rangeQuery = new RangeQuery(targetPoint, range, rootNode);
+
+        return rangeQuery.execute();
+    }
+
+    public ArrayList<Record> executeNNQuery(double[] targetPoint, int k) {
+        Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
+        NearestNeighborsQuery nnQuery = new NearestNeighborsQuery(targetPoint, k, rootNode);
+
+        return nnQuery.execute();
     }
 }
