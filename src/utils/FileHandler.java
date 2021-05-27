@@ -105,11 +105,11 @@ public class FileHandler {
 
         public static void updateNode(Node updatedNode)
         {
-                for (Node node : indexFile)
+                for (int i = 0; i < indexFile.size(); ++i)
                 {
-                        if (node.getId() == updatedNode.getId())
+                        if (indexFile.get(i).getId() == updatedNode.getId())
                         {
-                                node = updatedNode;
+                                indexFile.set(i, updatedNode);
                                 return;
                         }
                 }
