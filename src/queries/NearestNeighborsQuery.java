@@ -3,7 +3,6 @@ package queries;
 import tree.*;
 import utils.FileHandler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
@@ -78,7 +77,7 @@ public class NearestNeighborsQuery extends Query {
         ArrayList<Entry> entries = currentNode.getEntries();
         entries.sort(new EntryComparator.DistanceToPointComparator(targetPoint));
 
-        if (currentNode.getLevel() != RStarTree.getLEAF_LEVEL()) {
+        if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
             // The current node is not a leaf node.
             for (Entry entry : entries) {
                 if (entry.getBoundingBox().calculatePointDistance(targetPoint) <= searchRadius) {

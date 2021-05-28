@@ -121,7 +121,7 @@ public class RStarTree {
 
     }
 
-    public static int getLEAF_LEVEL() {
+    public static int getLeafLevel() {
         return LEAF_LEVEL;
     }
 
@@ -143,9 +143,7 @@ public class RStarTree {
     // child node of which the new Entry is to be inserted.
     private LinkedHashMap<Node, Entry> chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
         System.out.println("currentNode level: " + currentNode.getLevel());
-        System.out.println("455");
         if (currentNode.getLevel() - 1 == targetLevel) {
-            System.out.println("456");
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
@@ -155,21 +153,14 @@ public class RStarTree {
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
         } else {
-            System.out.println("457");
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
-            if (candidateEntries.size() == 0) {
-                System.out.println("TO ELOUSES");
-            }
             Entry optimalEntry = Collections.min(candidateEntries,
                     new EntryComparator.AreaEnlargementComparator(candidateEntries, newEntry));
             // Get the next Node from the File Handler.
             long nextNodeId = optimalEntry.getChildNodeId();
             Node nextNode = FileHandler.getNode(nextNodeId); // TODO: Add call to tree.utils.FileHandler method to get the next node (optimalEntry.getChildNodeId()). CHECK!
-            if (nextNode == null) {
-                System.out.println("Null node id: " + nextNodeId);
-            }
             LinkedHashMap<Node, Entry> chosenPath = chooseSubTree(newEntry, nextNode, targetLevel);
             chosenPath.put(currentNode, optimalEntry);
             return chosenPath;
@@ -194,7 +185,6 @@ public class RStarTree {
     }
 
     private void insert(Entry newEntry, int targetLevel) {
-//        System.out.println("232");
         System.out.println("root level: " + rootLevel);
         // R* Tree paper reference: I1 - Insert
 
