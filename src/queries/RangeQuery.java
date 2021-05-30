@@ -20,7 +20,6 @@ public class RangeQuery extends Query {
 
     private void search(Node currentNode) {
         ArrayList<Entry> nodeEntries = currentNode.getEntries();
-//        System.out.println("current node id: " + currentNode.getId());
 
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
             // The current node is not a leaf node and the overlap between its entries'
@@ -30,7 +29,6 @@ public class RangeQuery extends Query {
                 if (hasOverlap) {
                     // The target point overlaps the entry's bounding box,
                     // so we proceed to search inside the entry's child node.
-                    System.out.println("childNode id: " + entry.getChildNodeId());
                     Node childNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get child node from File Handler using entry.getChildNodeId(). CHECK!
                     search(childNode);
                 }

@@ -23,8 +23,8 @@ public class Node {
 //    }
 
     public Node(ArrayList<Entry> entries, int level, long nodeId) {
-        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
+//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
+//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
 
         this.entries = entries;
         this.level = level;
@@ -33,8 +33,8 @@ public class Node {
 
     // Used for creating a root Node
     public Node(int level, long nodeId) {
-        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
+//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
+//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
 
         this.entries = new ArrayList<>();
         this.level = level;
