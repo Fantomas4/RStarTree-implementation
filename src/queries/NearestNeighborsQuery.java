@@ -55,7 +55,7 @@ public class NearestNeighborsQuery extends Query {
 
         // Prepare the Array List that contains the result Records
         for (int i = 0; i < kClosestNeighborsQueue.size(); i++) {
-            Neighbor neighbor = kClosestNeighborsQueue.remove();
+            Neighbor neighbor = kClosestNeighborsQueue.peek();
             Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
 
             // Add the record to the results list
@@ -80,6 +80,7 @@ public class NearestNeighborsQuery extends Query {
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
             // The current node is not a leaf node.
             for (Entry entry : entries) {
+                System.out.println("788");
                 if (entry.getBoundingBox().calculatePointDistance(targetPoint) <= searchRadius) {
                     Node nextNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get the next node from File Handler using entry.getChildNodeId(). CHECK!
                     search(nextNode);
@@ -88,6 +89,7 @@ public class NearestNeighborsQuery extends Query {
         } else {
             // The current node is a leaf node.
             for (Entry entry : entries) {
+                System.out.println("789");
                 LeafEntry leafEntry = (LeafEntry)entry;
                 double candidateDistance = leafEntry.getBoundingBox().calculatePointDistance(targetPoint);
 

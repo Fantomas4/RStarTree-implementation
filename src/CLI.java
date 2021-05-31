@@ -9,13 +9,13 @@ public class CLI {
         RStarTree rStarTree = new RStarTree();
         rStarTree.initialize();
 
-//        double[] testCoords = new double[2];
-//        testCoords[0] = 0;
-//        testCoords[1] = 0;
+        double[] testCoords = new double[2];
+        testCoords[0] = 0;
+        testCoords[1] = 0;
 //
-//        ArrayList<Record> nnQueryResult = rStarTree.executeNNQuery(testCoords,5);
-//        ArrayList<Record> rangeQueryResult = rStarTree.executeRangeQuery(testCoords, 50);
-//        System.out.println("DONE!");
+        ArrayList<Record> nnQueryResult = rStarTree.executeNNQuery(testCoords,5);
+//        ArrayList<Record> rangeQueryResult = rStarTree.executeRangeQuery(testCoords, 49.2604);
+        System.out.println("DONE!");
     }
 
 }
