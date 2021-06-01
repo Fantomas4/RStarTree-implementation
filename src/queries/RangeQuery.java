@@ -7,9 +7,12 @@ import java.util.ArrayList;
 
 public class RangeQuery extends Query {
     private final double range;
+    protected Node rootNode;
 
     public RangeQuery(double[] targetPoint, double range, Node rootNode) {
-        super(targetPoint, rootNode);
+        super(targetPoint);
+
+        this.rootNode = rootNode;
         this.range = range;
     }
 

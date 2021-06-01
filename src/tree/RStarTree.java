@@ -1,7 +1,6 @@
 package tree;
 
-import org.w3c.dom.ranges.Range;
-import queries.NearestNeighborsQuery;
+import queries.NNQuery;
 import queries.RangeQuery;
 import utils.DataMetaData;
 import utils.FileHandler;
@@ -305,7 +304,7 @@ public class RStarTree {
 
     public ArrayList<Record> executeNNQuery(double[] targetPoint, int k) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
-        NearestNeighborsQuery nnQuery = new NearestNeighborsQuery(targetPoint, k, rootNode);
+        NNQuery nnQuery = new NNQuery(targetPoint, k, rootNode);
 
         return nnQuery.execute();
     }
