@@ -4,6 +4,7 @@ import tree.*;
 import utils.FileHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class RangeQuery extends Query {
     private final double range;
@@ -16,8 +17,10 @@ public class RangeQuery extends Query {
         this.range = range;
     }
 
-    public ArrayList<Record> execute() {
+    public ArrayList<LocationQueryResult> execute() {
         search(rootNode);
+        Collections.sort(queryResults);
+
         return queryResults;
     }
 
@@ -41,12 +44,12 @@ public class RangeQuery extends Query {
             for (Entry entry : nodeEntries) {
                 LeafEntry leafEntry = (LeafEntry) entry;
 
-                boolean hasOverlap = leafEntry.getBoundingBox().checkPointOverlap(targetPoint, range);
-                if (hasOverlap) {
-                    // The target point overlaps the leaf entry's bounding box,
-                    // so we proceed to add the leaf entry's record to the query results.
+                double candidateDistance = leafEntry.getBoundingBox().calculatePointDistance(targetPoint);
+                if (candidateDistance <= range) {
+                    // The distance between the leaf node's record and the target point is less than or equal to the
+                    // specified range, so we proceed to add the leaf entry's record to the query results.
                     Record record = FileHandler.getRecord(leafEntry.getBlockId(), leafEntry.getRecordId()); // TODO: Get the leaf entry's record from File Handler using leafEntry.getRecordId(). CHECK!
-                    queryResults.add(record);
+                    queryResults.add(new LocationQueryResult(record, candidateDistance));
                 }
             }
         }

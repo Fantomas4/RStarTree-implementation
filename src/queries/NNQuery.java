@@ -22,7 +22,7 @@ public class NNQuery extends Query {
         this.rootNode = rootNode;
     }
 
-    public ArrayList<Record> execute() {
+    public ArrayList<LocationQueryResult> execute() {
         search(rootNode);
 
         // Prepare the Array List that contains the result Records
@@ -31,7 +31,7 @@ public class NNQuery extends Query {
             Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
 
             // Add the record to the results list
-            queryResults.add(record);
+            queryResults.add(new LocationQueryResult(record, neighbor.getDistance()));
         }
 
         // Since the elements returned from the queue using remove() are given

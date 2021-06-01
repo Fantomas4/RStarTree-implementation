@@ -1,5 +1,6 @@
 package tree;
 
+import queries.LocationQueryResult;
 import queries.NNQuery;
 import queries.RangeQuery;
 import utils.DataMetaData;
@@ -295,14 +296,14 @@ public class RStarTree {
         }
     }
 
-    public ArrayList<Record> executeRangeQuery(double[] targetPoint, double range) {
+    public ArrayList<LocationQueryResult> executeRangeQuery(double[] targetPoint, double range) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
         RangeQuery rangeQuery = new RangeQuery(targetPoint, range, rootNode);
 
         return rangeQuery.execute();
     }
 
-    public ArrayList<Record> executeNNQuery(double[] targetPoint, int k) {
+    public ArrayList<LocationQueryResult> executeNNQuery(double[] targetPoint, int k) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
         NNQuery nnQuery = new NNQuery(targetPoint, k, rootNode);
 

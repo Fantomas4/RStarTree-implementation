@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Query {
     protected double[] targetPoint;
-    protected ArrayList<Record> queryResults;
+    protected ArrayList<LocationQueryResult> queryResults;
 
     public Query(double[] targetPoint) {
         this.targetPoint = targetPoint;

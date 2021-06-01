@@ -5,6 +5,7 @@ import utils.DataMetaData;
 import utils.FileHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static java.lang.Math.sqrt;
 
@@ -29,8 +30,10 @@ public class SequentialRangeQuery extends Query{
         return sqrt(sum);
     }
 
-    public ArrayList<Record> execute() {
+    public ArrayList<LocationQueryResult> execute() {
         search();
+        Collections.sort(queryResults);
+
         return queryResults;
     }
 
@@ -40,8 +43,9 @@ public class SequentialRangeQuery extends Query{
         for (int blockId = 1; blockId < numBlocks; blockId++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(blockId);
             for (Record record : blockRecords) {
-                if (calculateDistanceFromTarget(record.getCoordinates()) <= range) {
-                    queryResults.add(record);
+                double candidateDistance = calculateDistanceFromTarget(record.getCoordinates());
+                if (candidateDistance <= range) {
+                    queryResults.add(new LocationQueryResult(record,candidateDistance));
                 }
             }
         }
