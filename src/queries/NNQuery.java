@@ -34,11 +34,7 @@ public class NNQuery extends Query {
             queryResults.add(new LocationQueryResult(record, neighbor.getDistance()));
         }
 
-        // Since the elements returned from the queue using remove() are given
-        // in an descending order of distance from the specified target point,
-        // the contents of queryResults are reversed so that they follow
-        // an ascending order of distance.
-        Collections.reverse(queryResults);
+        Collections.sort(queryResults);
         
         return queryResults;
     }
@@ -52,8 +48,7 @@ public class NNQuery extends Query {
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
             // The current node is not a leaf node.
             for (Entry entry : entries) {
-                System.out.println("788");
-                if (entry.getBoundingBox().calculatePointDistance(targetPoint) <= searchRadius) {
+                    if (entry.getBoundingBox().checkPointOverlap(targetPoint, searchRadius)) {
                     Node nextNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get the next node from File Handler using entry.getChildNodeId(). CHECK!
                     search(nextNode);
                 }
@@ -61,7 +56,6 @@ public class NNQuery extends Query {
         } else {
             // The current node is a leaf node.
             for (Entry entry : entries) {
-                System.out.println("789");
                 LeafEntry leafEntry = (LeafEntry)entry;
                 double candidateDistance = leafEntry.getBoundingBox().calculatePointDistance(targetPoint);
 

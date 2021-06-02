@@ -46,11 +46,7 @@ public class SequentialNNQuery extends Query{
             queryResults.add(new LocationQueryResult(record, neighbor.getDistance()));
         }
 
-        // Since the elements returned from the queue using remove() are given
-        // in an descending order of distance from the specified target point,
-        // the contents of queryResults are reversed so that they follow
-        // an ascending order of distance.
-        Collections.reverse(queryResults);
+        Collections.sort(queryResults);
 
         return queryResults;
     }

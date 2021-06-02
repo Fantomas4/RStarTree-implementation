@@ -158,7 +158,7 @@ public class RStarTree {
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
         // Create a new LeafEntry for the record
-        BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
+        BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates().clone());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
 
         // Reset the level overflow call status HashMap.

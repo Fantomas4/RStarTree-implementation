@@ -9,9 +9,9 @@ import static java.lang.Math.sqrt;
 
 
 public class BoundingBox implements Serializable {
-    private double[] lowerLeftPoint; // The bottom left point of the rectangle
-    private double[] upperRightPoint; // The bottom right point of the rectangle
-    private int dimensions;
+    private final double[] lowerLeftPoint; // The bottom left point of the rectangle
+    private final double[] upperRightPoint; // The bottom right point of the rectangle
+    private final int dimensions;
 
     public BoundingBox(double[] lowerLeftPoint, double[] upperRightPoint) {
         if (lowerLeftPoint.length != upperRightPoint.length) {
@@ -115,10 +115,14 @@ public class BoundingBox implements Serializable {
 
         for (BoundingBox boundingBox : boundingBoxes) {
             for (int j = 0; j < dimensions; j++) {
+                double minLowerLeftValue = minLowerLeft[j];
+                double candidateLowerLeftValue = boundingBox.getLowerLeftPoint()[j];
                 if (minLowerLeft[j] > boundingBox.getLowerLeftPoint()[j]) {
                     minLowerLeft[j] = boundingBox.getLowerLeftPoint()[j];
                 }
 
+                double maxUpperRightValue = maxUpperRight[j];
+                double candidateUpperRightValue = boundingBox.getUpperRightPoint()[j];
                 if (maxUpperRight[j] < boundingBox.getUpperRightPoint()[j]) {
                     maxUpperRight[j] = boundingBox.getUpperRightPoint()[j];
                 }

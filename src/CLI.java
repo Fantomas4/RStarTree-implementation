@@ -17,12 +17,15 @@ public class CLI {
         testCoords[1] = 0;
 //
         ArrayList<LocationQueryResult> queryResults;
+        // 49.261
 
 //        queryResults = rStarTree.executeNNQuery(testCoords,10);
-//        queryResults = rStarTree.executeRangeQuery(testCoords, 49.2604);
+//        queryResults = rStarTree.executeRangeQuery(testCoords, 49.261);
 
-//        queryResults = new SequentialNNQuery(testCoords, 10).execute();
-        queryResults = new SequentialRangeQuery(testCoords, 49.2604).execute();
+        queryResults = new SequentialNNQuery(testCoords, 10).execute();
+//        queryResults = new SequentialRangeQuery(testCoords, 49.261).execute();
+
+        System.out.println("*** Found " + queryResults.size() + " query results.");
 
         for (LocationQueryResult result : queryResults) {
             System.out.println("-----------------------------------------");
