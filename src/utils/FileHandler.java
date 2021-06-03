@@ -198,6 +198,7 @@ public class FileHandler {
                 byte[] sizeAsBytes = new byte[Integer.BYTES];
                 int srcPos = 0;
                 System.arraycopy(bytes, srcPos, sizeAsBytes, 0, sizeAsBytes.length);
+                srcPos += sizeAsBytes.length;
                 int size = bytesToInt(sizeAsBytes);
                 if (size == 0)
                 {
