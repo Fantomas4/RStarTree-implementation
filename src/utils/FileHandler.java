@@ -28,7 +28,7 @@ public class FileHandler {
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 2 * 1024; // 32 * 1024
-        private static long nextAvailableNodeId = 0;
+        private static long nextAvailableNodeId = 2;
         // (RecordId, nameLength, name, Coordinates)
         private static final int RECORD_SIZE = Long.BYTES + Integer.BYTES + Character.BYTES * 256 + Double.BYTES * dimensions;
         private static final int maxEntriesInBlock = 5;
@@ -130,7 +130,7 @@ public class FileHandler {
                         entriesAsBytes = getEntriesAsBytes(node.getEntries()),
                         levelAsBytes = intToBytes(node.getLevel()),
                         nodeAsBytes = new byte[getNodeSizeInBytes()];
-                System.out.println(getNodeSizeInBytes() + " vs " + (idAsBytes.length + entriesAsBytes.length + levelAsBytes.length));
+
                 int destPos = 0;
                 System.arraycopy(idAsBytes, 0, nodeAsBytes, destPos, idAsBytes.length);
                 destPos += idAsBytes.length;
