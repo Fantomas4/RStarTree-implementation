@@ -17,4 +17,9 @@ public class LeafEntry extends Entry {
     public long getBlockId() {
         return blockId;
     }
+
+    public String toString()
+    {
+        return "LeafEntry(" + super.toString() + ", " + "recordId(" + recordId + "), " + "blockId(" + blockId + "))";
+    }
 }

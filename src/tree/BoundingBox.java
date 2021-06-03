@@ -2,6 +2,7 @@ package tree;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Math.min;
@@ -140,5 +141,10 @@ public class BoundingBox implements Serializable {
         }
 
         return calculateMBR(boundingBoxes);
+    }
+
+    public String toString()
+    {
+        return "BoundingBox(" + Arrays.toString(lowerLeftPoint) + ", " +  Arrays.toString(upperRightPoint) + ")";
     }
 }

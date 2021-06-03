@@ -16,6 +16,7 @@ public class Node {
     private int level;
 
 
+
 //    public Node(ArrayList<Entry> entries, int level) {
 //        this.entries = entries;
 //        this.level = level;
@@ -238,5 +239,11 @@ public class Node {
         }
 
         return distributions.get(minIndex);
+    }
+
+    public String toString()
+    {
+        return "Node(" + "nodeId(" + nodeId + "), entries(" + entries + "), level(" + level + "))";
+
     }
 }

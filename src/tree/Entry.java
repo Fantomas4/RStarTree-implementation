@@ -31,4 +31,9 @@ public class Entry implements Serializable {
     public void setChildNodeId(long childNodeId) {
         this.childNodeId = childNodeId;
     }
+
+    public String toString()
+    {
+        return "Entry(" + boundingBox.toString() + ", " + "childNodeId(" + childNodeId + "))";
+    }
 }

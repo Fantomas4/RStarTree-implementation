@@ -549,11 +549,16 @@ public class FileHandler {
                 Record my_record1 = new Record(1, "home", new double[]{1.0, 1.0});
                 Record my_record2 = new Record(2, "office", new double[]{2.0, 2.0});
                 Record my_record3 = new Record(3, "university", new double[]{3.0, 3.0});
-                loadDatafile();
-                /*
+                System.out.println(my_record1);
+                System.out.println(my_record2);
+                System.out.println(my_record3);
+                //loadDatafile();
+
                 ArrayList<Entry> entries = new ArrayList<>();
                 entries.add(new Entry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0})));
                 Node my_node = new Node(entries, 0, getNextAvailableNodeId());
+                System.out.println(my_node);
+                /*
                 insertNode(my_node);
                 updateNode(new Node(entries, 90000, my_node.getId()));
                 Node node = getNode(my_node.getId());
