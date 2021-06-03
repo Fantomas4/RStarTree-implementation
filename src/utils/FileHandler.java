@@ -53,7 +53,13 @@ public class FileHandler {
         }
 
         // TODO: Make DataFile and IndexFile classes
-
+        public void deleteIndexAndDataFile()
+        {
+                File indexfile = new File(INDEXFILE_NAME),
+                        datafile = new File(DATAFILE_NAME);
+                indexfile.delete();
+                datafile.delete();
+        }
 
 
         public static long getNextAvailableNodeId()
