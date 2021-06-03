@@ -151,6 +151,7 @@ public class FileHandler {
                         }
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
                         fos.write(nodeAsBytes);
+                        IndexMetaData.addOneNode();
                 } catch (FileNotFoundException e) {
                         e.printStackTrace();
                 } catch (IOException e) {
@@ -250,7 +251,7 @@ public class FileHandler {
                                 {
                                         if (DEBUG_MODE > 1)
                                         {
-                                                System.out.println("Reading node with id: " + nodeId + " from indexfile");
+                                                System.out.println("Reading node" + nodeId + " from indexfile");
                                                 System.out.println("Node" + nodeId + ": " + node);
                                         }
                                         return node;
@@ -271,9 +272,9 @@ public class FileHandler {
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "rw");
-                        for (int i = 0; i < nextAvailableNodeId; ++i)
+                        for (long i = 0; i < IndexMetaData.getNumOfNodes(); ++i)
                         {
-                                raf.seek(i * getNodeSizeInBytes());
+                                //raf.seek(i * getNodeSizeInBytes());
                                 raf.readFully(nodeAsBytes);
                                 node = getNodeFromBytes(nodeAsBytes);
                                 if (node.getId() == updatedNode.getId())
@@ -288,6 +289,7 @@ public class FileHandler {
                                         raf.write(getNodeAsBytes(updatedNode));
                                 }
                         }
+                        raf.close();
                 } catch (FileNotFoundException e) {
                         e.printStackTrace();
                 } catch (IOException e) {
@@ -612,7 +614,7 @@ public class FileHandler {
                 System.out.println(my_node);
 
                 insertNode(my_node);
-                //updateNode(new Node(entries, 90000, my_node.getId()));
+                updateNode(new Node(entries, 90000, my_node.getId()));
                 Node node = getNode(my_node.getId());
 
 
