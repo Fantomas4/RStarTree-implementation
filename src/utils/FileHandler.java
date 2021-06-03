@@ -145,6 +145,10 @@ public class FileHandler {
         {
                 byte[] nodeAsBytes = getNodeAsBytes(newNode);
                 try {
+                        if (DEBUG_MODE > 1)
+                        {
+                                System.out.println("Writing to indexfile: " + newNode );
+                        }
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
                         fos.write(nodeAsBytes);
                 } catch (FileNotFoundException e) {
@@ -243,6 +247,11 @@ public class FileHandler {
                                 node = getNodeFromBytes(nodeAsBytes);
                                 if (node.getId() == nodeId)
                                 {
+                                        if (DEBUG_MODE > 1)
+                                        {
+                                                System.out.println("Reading node with id: " + nodeId + " from indexfile");
+                                                System.out.println("Node" + nodeId + ": " + node);
+                                        }
                                         return node;
                                 }
                         }
@@ -268,6 +277,12 @@ public class FileHandler {
                                 node = getNodeFromBytes(nodeAsBytes);
                                 if (node.getId() == updatedNode.getId())
                                 {
+                                        if (DEBUG_MODE > 1)
+                                        {
+                                                System.out.println("Updating node" + updatedNode.getId());
+                                                System.out.println("Old node" + updatedNode.getId() + ": " + node);
+                                                System.out.println("New node" + updatedNode.getId() + ": " + updatedNode);
+                                        }
                                         raf.seek(i * getNodeSizeInBytes()); // TODO: May not be needed
                                         raf.write(getNodeAsBytes(updatedNode));
                                 }
@@ -359,17 +374,18 @@ public class FileHandler {
 
         private static byte[] getRecordAsBytes(Record record)
         {
-                byte[] idAsBytes = longToBytes(record.getId());
-                byte[] nameAsBytes = record.getName().getBytes(StandardCharsets.UTF_8);
-                byte[] nameLengthAsBytes = intToBytes(nameAsBytes.length);
-                byte[] coordinatesAsBytes = new byte[record.getCoordinates().length * Double.BYTES];
+                byte[] idAsBytes = longToBytes(record.getId()),
+                        nameAsBytes = record.getName().getBytes(StandardCharsets.UTF_8),
+                        nameLengthAsBytes = intToBytes(nameAsBytes.length),
+                        coordinatesAsBytes = new byte[record.getCoordinates().length * Double.BYTES],
+                        recordAsBytes = new byte[getRecordLengthInBytes()];
+
                 for (int i = 0; i < record.getCoordinates().length; ++i)
                 {
                         double coordinate = record.getCoordinates()[i];
                         System.arraycopy(doubleToBytes(coordinate), 0, coordinatesAsBytes, i * Double.BYTES, Double.BYTES);
                 }
 
-                byte[] recordAsBytes = new byte[getRecordLengthInBytes()];
                 int destPos = 0;
                 System.arraycopy(idAsBytes, 0, recordAsBytes, destPos, idAsBytes.length);
                 destPos += idAsBytes.length;
@@ -390,6 +406,7 @@ public class FileHandler {
                         nameLengthAsBytes = new byte[Integer.BYTES],
                         nameAsBytes = new byte[256],
                         coordinatesAsBytes = new byte[dimensions * Double.BYTES];
+
                 int srcPos = 0;
                 System.arraycopy(bytes, srcPos, idAsBytes, 0, Long.BYTES);
                 srcPos += Long.BYTES;
@@ -578,32 +595,25 @@ public class FileHandler {
                 System.out.println(my_record1);
                 System.out.println(my_record2);
                 System.out.println(my_record3);
-                */
+
 
                 loadDatafile();
                 for (int i = 0; i < DataMetaData.getNumberOfBlocks(); ++i)
                 {
                         getDataBlock(i);
                 }
+                */
 
 
-                /*
                 ArrayList<Entry> entries = new ArrayList<>();
                 entries.add(new Entry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0})));
                 Node my_node = new Node(entries, 0, getNextAvailableNodeId());
                 System.out.println(my_node);
 
                 insertNode(my_node);
-                updateNode(new Node(entries, 90000, my_node.getId()));
+                //updateNode(new Node(entries, 90000, my_node.getId()));
                 Node node = getNode(my_node.getId());
-                if (node != null)
-                {
-                        System.out.println("found");
-                        System.out.println(node.getLevel());
-                }
-                else
-                        System.out.println("not found");
-                */
+
 
 
                 System.out.println("lets go");
