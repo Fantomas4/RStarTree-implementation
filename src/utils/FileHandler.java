@@ -20,6 +20,8 @@ import java.util.ArrayList;
 
 public class FileHandler {
 
+        private static final int DEBUG_MODE = 2;
+
         private static final String DATAFILE_NAME = "datafile.dat";
         private static final String INDEXFILE_NAME = "indexfile.dat";
 
@@ -29,8 +31,7 @@ public class FileHandler {
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 2 * 1024; // 32 * 1024
         private static long nextAvailableNodeId = 2;
-        // (RecordId, nameLength, name, Coordinates)
-        private static final int RECORD_SIZE = Long.BYTES + Integer.BYTES + Character.BYTES * 256 + Double.BYTES * dimensions;
+
         private static final int maxEntriesInBlock = 5;
         private static final int maxEntriesInNode = 3;
 
@@ -414,6 +415,10 @@ public class FileHandler {
 
         private static void writeDataBlock(ArrayList<Record> records)
         {
+                if (DEBUG_MODE > 1)
+                {
+                        System.out.println("Writing data block with records " + records);
+                }
                 if (records.size() > DataMetaData.getMaxRecordsInBlock())
                 {
                         throw new IllegalArgumentException("records array doesn't fit in block");
@@ -439,10 +444,18 @@ public class FileHandler {
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
+                if (DEBUG_MODE > 1)
+                {
+                        System.out.println("Block" + (DataMetaData.getNumberOfBlocks() - 1) + " written successfully");
+                }
         }
 
         public static ArrayList<Record> getDataBlock(long blockId)
         {
+                if (DEBUG_MODE > 1)
+                {
+                        System.out.println("Reading data block" + blockId);
+                }
                 byte[] block = new byte[BLOCK_SIZE];
                 try {
                         RandomAccessFile raf = new RandomAccessFile(DATAFILE_NAME, "r");
@@ -466,6 +479,10 @@ public class FileHandler {
                         srcPos += getRecordLengthInBytes();
                         records.add(getRecordFromBytes(recordAsBytes));
                 }
+                if (DEBUG_MODE > 1)
+                {
+                        System.out.println("block" + blockId + ": " + records);
+                }
                 return records;
         }
 
@@ -487,8 +504,13 @@ public class FileHandler {
         */
         public static void loadDatafile()
         {
+                if (DEBUG_MODE > 1)
+                {
+                        System.out.println("Reading OSM File:");
+                }
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
+                Record record;
                 try {
                         DocumentBuilder builder = factory.newDocumentBuilder();
                         Document doc = builder.parse(osmFilePath);
@@ -516,9 +538,12 @@ public class FileHandler {
                                                                 double lon = Double.parseDouble(
                                                                         nodeElement.getAttribute("lon"));
                                                                 String name = tagElement.getAttribute("v");
-                                                                records.add(
-                                                                        new Record(id, name, new double[]{lat, lon})
-                                                                );
+                                                                record = new Record(id, name, new double[]{lat, lon});
+                                                                records.add(record);
+                                                                if (DEBUG_MODE > 1)
+                                                                {
+                                                                        System.out.println("Reading " + record);
+                                                                }
                                                         }
                                                         if (records.size() == DataMetaData.getMaxRecordsInBlock())
                                                         {
@@ -546,19 +571,28 @@ public class FileHandler {
 
 
         public static void main(String[] args) throws FileNotFoundException {
+                /*
                 Record my_record1 = new Record(1, "home", new double[]{1.0, 1.0});
                 Record my_record2 = new Record(2, "office", new double[]{2.0, 2.0});
                 Record my_record3 = new Record(3, "university", new double[]{3.0, 3.0});
                 System.out.println(my_record1);
                 System.out.println(my_record2);
                 System.out.println(my_record3);
-                //loadDatafile();
+                */
 
+                loadDatafile();
+                for (int i = 0; i < DataMetaData.getNumberOfBlocks(); ++i)
+                {
+                        getDataBlock(i);
+                }
+
+
+                /*
                 ArrayList<Entry> entries = new ArrayList<>();
                 entries.add(new Entry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0})));
                 Node my_node = new Node(entries, 0, getNextAvailableNodeId());
                 System.out.println(my_node);
-                /*
+
                 insertNode(my_node);
                 updateNode(new Node(entries, 90000, my_node.getId()));
                 Node node = getNode(my_node.getId());
