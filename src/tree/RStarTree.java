@@ -241,8 +241,9 @@ public class RStarTree {
             }
 
             FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
-
         }
+
+        System.out.println("dummy");
     }
 
     private ArrayList<Node> overflowTreatment(Node overflowedNode, Node parentNode, Entry parentEntry) {
