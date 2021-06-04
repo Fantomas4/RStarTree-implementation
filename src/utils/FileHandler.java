@@ -5,10 +5,7 @@ import org.w3c.dom.Element;
 //import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import tree.BoundingBox;
-import tree.Entry;
-import tree.Node;
-import tree.Record;
+import tree.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +26,7 @@ public class FileHandler {
         private static final String INDEXFILE_NAME = "indexfile.dat";
 
         private static long rootNodeId = 1;
-        private static int dimensions = 2;
+        private static final int dimensions = 2;
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 2 * 1024; // 32 * 1024
@@ -71,17 +68,19 @@ public class FileHandler {
         }
 
 
-
+        // (lowerLeftPoint[], upperRightPoint)
         private static int getBoundingBoxSizeInBytes()
         {
                 return 2 * Double.BYTES * dimensions;
         }
 
+        // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)
         private static int getEntrySizeInBytes()
         {
-                return getBoundingBoxSizeInBytes() + Long.BYTES;
+                return 1 + getBoundingBoxSizeInBytes() + Long.BYTES + Long.BYTES + Long.BYTES;
         }
 
+        // (NodeId, entriesSize, entries, level)
         private static int getNodeSizeInBytes()
         {
                 return Long.BYTES + Integer.BYTES + maxEntriesInNode * getEntrySizeInBytes() + Integer.BYTES;
@@ -92,6 +91,7 @@ public class FileHandler {
         {
                 byte[] boundingBoxAsBytes = new byte[getBoundingBoxSizeInBytes()];
                 int destPos = 0;
+
                 for (int i = 0; i < dimensions; ++i)
                 {
                         System.arraycopy(doubleToBytes(boundingBox.getLowerLeftPoint()[i]), 0, boundingBoxAsBytes, destPos, Double.BYTES);
@@ -102,28 +102,42 @@ public class FileHandler {
                         System.arraycopy(doubleToBytes(boundingBox.getUpperRightPoint()[i]), 0, boundingBoxAsBytes, destPos, Double.BYTES);
                         destPos += Double.BYTES;
                 }
+
                 return boundingBoxAsBytes;
         }
 
         private static byte[] getEntryAsBytes(Entry entry)
         {
                 byte[] entryAsBytes = new byte[getEntrySizeInBytes()];
-                System.arraycopy(getBoundingBoxAsBytes(entry.getBoundingBox()), 0, entryAsBytes, 0, getBoundingBoxSizeInBytes());
-                System.arraycopy(longToBytes(entry.getChildNodeId()), 0, entryAsBytes, getBoundingBoxSizeInBytes(), Long.BYTES);
+                int destPos = 0;
+
+                entryAsBytes[destPos] = (byte)(entry instanceof LeafEntry ? 1 : 0);
+                destPos += 1;
+                System.arraycopy(getBoundingBoxAsBytes(entry.getBoundingBox()), 0, entryAsBytes, destPos, getBoundingBoxSizeInBytes());
+                destPos += getBoundingBoxSizeInBytes();
+                System.arraycopy(longToBytes(entry.getChildNodeId()), 0, entryAsBytes, destPos, Long.BYTES);
+                if (entry instanceof LeafEntry)
+                {
+                        destPos += Long.BYTES;
+                        LeafEntry leafEntry = (LeafEntry) entry;
+                        System.arraycopy(longToBytes(leafEntry.getRecordId()), 0, entryAsBytes, destPos, Long.BYTES);
+                        destPos += Long.BYTES;
+                        System.arraycopy(longToBytes(leafEntry.getBlockId()), 0, entryAsBytes, destPos, Long.BYTES);
+                }
+
                 return entryAsBytes;
         }
 
         private static byte[] getEntriesAsBytes(ArrayList<Entry> entries)
         {
                 byte[] entriesAsBytes = new byte[Integer.BYTES + maxEntriesInNode * getEntrySizeInBytes()];
-
                 int destPos = 0;
+
                 System.arraycopy(intToBytes(entries.size()), 0, entriesAsBytes, destPos, Integer.BYTES);
                 destPos += Integer.BYTES;
-
-                for (int i = 0; i < entries.size(); ++i)
+                for (Entry entry : entries)
                 {
-                        System.arraycopy(getEntryAsBytes(entries.get(i)), 0, entriesAsBytes, destPos, getEntrySizeInBytes());
+                        System.arraycopy(getEntryAsBytes(entry), 0, entriesAsBytes, destPos, getEntrySizeInBytes());
                         destPos += getEntrySizeInBytes();
                 }
 
@@ -140,13 +154,14 @@ public class FileHandler {
                         entriesAsBytes = getEntriesAsBytes(node.getEntries()),
                         levelAsBytes = intToBytes(node.getLevel()),
                         nodeAsBytes = new byte[getNodeSizeInBytes()];
-
                 int destPos = 0;
+
                 System.arraycopy(idAsBytes, 0, nodeAsBytes, destPos, idAsBytes.length);
                 destPos += idAsBytes.length;
                 System.arraycopy(entriesAsBytes, 0, nodeAsBytes, destPos, entriesAsBytes.length);
                 destPos += entriesAsBytes.length;
                 System.arraycopy(levelAsBytes, 0, nodeAsBytes, destPos, levelAsBytes.length);
+
                 return nodeAsBytes;
         }
 
@@ -162,8 +177,6 @@ public class FileHandler {
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
                         fos.write(nodeAsBytes);
                         IndexMetaData.addOneNode();
-                } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -173,8 +186,8 @@ public class FileHandler {
         {
                 byte[] lowerLeftPointAsBytes = new byte[Double.BYTES * dimensions],
                         upperRightPointAsBytes = new byte[Double.BYTES * dimensions];
-
                 int srcPos = 0;
+
                 System.arraycopy(bytes, srcPos, lowerLeftPointAsBytes, 0, lowerLeftPointAsBytes.length);
                 srcPos += lowerLeftPointAsBytes.length;
                 System.arraycopy(bytes, srcPos, upperRightPointAsBytes, 0, upperRightPointAsBytes.length);
@@ -196,11 +209,30 @@ public class FileHandler {
         private static Entry getEntryFromBytes(byte[] bytes)
         {
                 byte[] boundingBoxAsBytes = new byte[getBoundingBoxSizeInBytes()],
-                        childNodeIdAsBytes = new byte[Long.BYTES];
+                        childNodeIdAsBytes = new byte[Long.BYTES],
+                        recordIdAsBytes = new byte[Long.BYTES],
+                        blockIdAsBytes = new byte[Long.BYTES];
                 int srcPos = 0;
+
+                byte isLeafEntryAsByte = bytes[srcPos];
+                srcPos += 1;
                 System.arraycopy(bytes, srcPos, boundingBoxAsBytes, 0, boundingBoxAsBytes.length);
                 srcPos += boundingBoxAsBytes.length;
                 System.arraycopy(bytes, srcPos, childNodeIdAsBytes, 0, childNodeIdAsBytes.length);
+                if (isLeafEntryAsByte != 0) // is LeafEntry
+                {
+                        srcPos += childNodeIdAsBytes.length;
+                        System.arraycopy(bytes, srcPos, recordIdAsBytes, 0, recordIdAsBytes.length);
+                        srcPos += recordIdAsBytes.length;
+                        System.arraycopy(bytes, srcPos, blockIdAsBytes, 0, blockIdAsBytes.length);
+
+                        return new LeafEntry(
+                                getBoundingBoxFromBytes(boundingBoxAsBytes),
+                                bytesToLong(recordIdAsBytes),
+                                bytesToLong(blockIdAsBytes)
+                        );
+                }
+
                 return new Entry(getBoundingBoxFromBytes(boundingBoxAsBytes), bytesToLong(childNodeIdAsBytes));
         }
 
@@ -252,7 +284,7 @@ public class FileHandler {
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "r");
-                        for (int i = 0; i < nextAvailableNodeId; ++i)
+                        for (long i = 0; i < nextAvailableNodeId; ++i)
                         {
                                 raf.seek(i * getNodeSizeInBytes());
                                 raf.readFully(nodeAsBytes);
@@ -268,8 +300,6 @@ public class FileHandler {
                                 }
                         }
 
-                } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -309,8 +339,6 @@ public class FileHandler {
                                 }
                         }
                         raf.close();
-                } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -334,11 +362,6 @@ public class FileHandler {
         public static long getRootNodeId()
         {
                 return rootNodeId;
-        }
-
-        public static void getIndexMetadata()
-        {
-                // root node id
         }
 
 
@@ -472,9 +495,8 @@ public class FileHandler {
                 int destPos = 0;
                 System.arraycopy(intToBytes(numberOfRecords), 0, block, destPos, Integer.BYTES);
                 destPos += Integer.BYTES;
-                for (int i = 0; i < records.size(); ++i)
-                {
-                        System.arraycopy(getRecordAsBytes(records.get(i)), 0, block, destPos, getRecordLengthInBytes());
+                for (Record record : records) {
+                        System.arraycopy(getRecordAsBytes(record), 0, block, destPos, getRecordLengthInBytes());
                         destPos += getRecordLengthInBytes();
                 }
 
@@ -482,8 +504,6 @@ public class FileHandler {
                         FileOutputStream fos = new FileOutputStream(DATAFILE_NAME, true);
                         fos.write(block);
                         DataMetaData.addOneBlock();
-                } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -510,8 +530,6 @@ public class FileHandler {
                         RandomAccessFile raf = new RandomAccessFile(DATAFILE_NAME, "r");
                         raf.seek(blockId * BLOCK_SIZE);
                         raf.readFully(block);
-                } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -603,11 +621,7 @@ public class FileHandler {
                                         }
                                 }
                         }
-                } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                } catch (IOException e) {
-                        e.printStackTrace();
-                } catch (SAXException e) {
+                } catch (ParserConfigurationException | SAXException | IOException e) {
                         e.printStackTrace();
                 }
         }
@@ -639,6 +653,7 @@ public class FileHandler {
 
                 ArrayList<Entry> entries = new ArrayList<>();
                 entries.add(new Entry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0})));
+                entries.add(new LeafEntry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0}), 10, 0));
                 Node my_node = new Node(entries, 0, getNextAvailableNodeId());
                 System.out.println(my_node);
 
