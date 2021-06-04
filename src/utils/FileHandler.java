@@ -53,7 +53,7 @@ public class FileHandler {
         }
 
         // TODO: Make DataFile and IndexFile classes
-        public void deleteIndexAndDataFile()
+        public static void deleteIndexAndDataFile()
         {
                 File indexfile = new File(INDEXFILE_NAME),
                         datafile = new File(DATAFILE_NAME);
@@ -305,6 +305,10 @@ public class FileHandler {
 
         public static void setRootNode(Node newRootNode)
         {
+                if (DEBUG_MODE > 1)
+                {
+                        System.out.println("Setting root node(" + newRootNode.getId() + ")");
+                }
                 insertNode(newRootNode);
                 rootNodeId = newRootNode.getId();
         }
