@@ -20,6 +20,9 @@ import java.util.ArrayList;
 
 public class FileHandler {
 
+        private static ArrayList<Node> dummyIndexFile = new ArrayList<>();
+        private static ArrayList<Record[]> dummyDataFile = new ArrayList<>();
+
         private static final int DEBUG_MODE = 2;
 
         private static final String DATAFILE_NAME = "datafile.dat";
@@ -154,6 +157,7 @@ public class FileHandler {
                         if (DEBUG_MODE > 1)
                         {
                                 System.out.println("Writing to indexfile: " + newNode );
+                                dummyIndexFile.add(newNode);
                         }
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
                         fos.write(nodeAsBytes);
@@ -290,6 +294,15 @@ public class FileHandler {
                                                 System.out.println("Updating node" + updatedNode.getId());
                                                 System.out.println("Old node" + updatedNode.getId() + ": " + node);
                                                 System.out.println("New node" + updatedNode.getId() + ": " + updatedNode);
+
+                                                for (int j = 0; j < dummyIndexFile.size(); ++j)
+                                                {
+                                                        if (dummyIndexFile.get(j).getId() == updatedNode.getId())
+                                                        {
+                                                                dummyIndexFile.set(j, updatedNode);
+                                                                break;
+                                                        }
+                                                }
                                         }
                                         raf.seek(i * getNodeSizeInBytes()); // TODO: May not be needed
                                         raf.write(getNodeAsBytes(updatedNode));
@@ -477,6 +490,12 @@ public class FileHandler {
                 if (DEBUG_MODE > 1)
                 {
                         System.out.println("Block" + (DataMetaData.getNumberOfBlocks() - 1) + " written successfully");
+                        Record[] dummyBlock = new Record[DataMetaData.getMaxRecordsInBlock()];
+                        for (int i = 0; i < records.size(); ++i)
+                        {
+                                dummyBlock[i] = records.get(i);
+                        }
+                        dummyDataFile.add(dummyBlock);
                 }
         }
 
