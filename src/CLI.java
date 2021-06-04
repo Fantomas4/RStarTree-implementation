@@ -10,7 +10,6 @@ public class CLI {
 
     public static void main(String[] args) {
         RStarTree rStarTree = new RStarTree();
-        rStarTree.initialize();
 
         double[] testCoords = new double[2];
         testCoords[0] = 0;

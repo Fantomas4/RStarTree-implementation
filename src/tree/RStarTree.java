@@ -17,16 +17,16 @@ public class RStarTree {
     boolean[] levelOverflowCalled;
 
     public RStarTree() {
+        FileHandler.deleteIndexAndDataFile();
+        FileHandler.loadDatafile();
+
         rootLevel = 0;
 
         // Create root node
-        long rootNodeId = FileHandler.getNextAvailableNodeId(); //TODO: Get root Node ID from File Handler. CHECK!
+        long rootNodeId = FileHandler.getRootNodeId(); //TODO: Get root Node ID from File Handler. CHECK!
         Node rootNode = new Node(rootLevel, rootNodeId);
-        FileHandler.insertNode(rootNode); // TODO: Save root node using File Handler. CHECK!
-    }
+        FileHandler.setRootNode(rootNode); // TODO: Save root node using File Handler. CHECK!
 
-    public void initialize() {
-        FileHandler.loadDatafile();
         int numBlocks = DataMetaData.getNumberOfBlocks();
 
         int dRecordsCount = 0;
@@ -123,7 +123,6 @@ public class RStarTree {
 //        coordinates[0] = -136;
 //        coordinates[1] = 1;
 //        insertRecord(new Record(20, "TR20", coordinates),20);
-
     }
 
     public static int getLeafLevel() {
