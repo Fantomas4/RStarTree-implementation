@@ -236,6 +236,10 @@ public class RStarTree {
         }
 
         if (parentNode != null) {
+            if (parentNode.isOverflowed()) {
+                System.out.println("**********************");
+            }
+
             FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
 
         }
