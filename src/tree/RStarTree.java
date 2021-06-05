@@ -16,6 +16,9 @@ public class RStarTree {
 //    HashMap<Integer, Boolean> levelOverflowCalled;
     boolean[] levelOverflowCalled;
 
+    int debugRecordCounter = 0;
+    int debugInsertRecursionCounter = 0;
+
     public RStarTree() {
         FileHandler.deleteIndexAndDataFile();
         FileHandler.loadDatafile();
@@ -157,6 +160,10 @@ public class RStarTree {
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
         // Create a new LeafEntry for the record
+        debugRecordCounter++;
+        debugInsertRecursionCounter = 0;
+
+        System.out.println("----------------->>>>Insertion " + debugRecordCounter + " -Inserting record: " + newRecord.getId());
         BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates().clone());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
 
@@ -172,6 +179,7 @@ public class RStarTree {
     }
 
     private void insert(Entry newEntry, Node parentNode, Entry parentEntry, int targetLevel) {
+        debugInsertRecursionCounter ++;
         Node currentNode;
 
         if (parentNode == null && parentEntry == null) {
@@ -189,6 +197,8 @@ public class RStarTree {
             // to determine the path that should be followed.
             Entry chosenEntry = chooseSubTree(newEntry, currentNode, targetLevel);
             insert(newEntry, currentNode, chosenEntry, targetLevel);
+            System.out.println("=======================>>> Returned from recursive insertion " + debugInsertRecursionCounter);
+
         }
 
         if (currentNode.isOverflowed()) {
@@ -296,7 +306,7 @@ public class RStarTree {
         // reinsert the entries.
         Collections.reverse(removedEntries); // Organize the removed entries in an ascending order based on distance.
         for (Entry removedEntry : removedEntries) {
-            insert(removedEntry, parentNode, parentEntry, overflowedNode.getLevel());
+            insert(removedEntry, null, null, overflowedNode.getLevel());
         }
     }
 
