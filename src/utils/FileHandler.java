@@ -192,7 +192,7 @@ public class FileHandler {
                                                         {
                                                                 System.out.println("Trying to reinsert existing entry" + entry);
                                                         }
-                                                        if (dummyEntry.getChildNodeId() == entry.getChildNodeId())
+                                                        if (entry.getChildNodeId() != -1 && dummyEntry.getChildNodeId() == entry.getChildNodeId())
                                                         {
                                                                 System.out.println("childe node duplicate");
                                                         }
@@ -365,6 +365,13 @@ public class FileHandler {
                                         }
                                         raf.seek(i * getNodeSizeInBytes()); // TODO: May not be needed
                                         raf.write(getNodeAsBytes(updatedNode));
+                                        if (DEBUG_MODE > 1)
+                                        {
+                                                byte[] nodeWritten = new byte[getNodeSizeInBytes()];
+                                                raf.seek(i * getNodeSizeInBytes()); // TODO: May not be needed
+                                                raf.readFully(nodeWritten);
+                                                System.out.println("Node written: " + getNodeFromBytes(nodeWritten));
+                                        }
                                 }
                         }
                         raf.close();
