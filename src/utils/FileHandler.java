@@ -146,10 +146,6 @@ public class FileHandler {
 
         private static byte[] getNodeAsBytes(Node node)
         {
-                if (node.getEntries().size() > maxEntriesInNode)
-                {
-                        throw new IllegalStateException("Node contains more entries than allowed");
-                }
                 byte[] idAsBytes = longToBytes(node.getId()),
                         entriesAsBytes = getEntriesAsBytes(node.getEntries()),
                         levelAsBytes = intToBytes(node.getLevel()),
