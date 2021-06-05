@@ -3,6 +3,8 @@ import queries.SequentialNNQuery;
 import queries.SequentialRangeQuery;
 import tree.RStarTree;
 import tree.Record;
+import utils.DataMetaData;
+import utils.FileHandler;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,12 @@ public class CLI {
 
 //        queryResults = new SequentialNNQuery(testCoords, 10).execute();
         queryResults = new SequentialRangeQuery(testCoords, 49.27).execute();
+        ArrayList<Record[]> datafile = FileHandler.getDummyDataFile();
+        for (Record[] records : datafile) {
+            for (int i = 0; i < DataMetaData.getMaxRecordsInBlock(); i++) {
+                System.out.println(records[i]);
+            }
+        }
 
         System.out.println("*** Found " + queryResults.size() + " query results.");
 
