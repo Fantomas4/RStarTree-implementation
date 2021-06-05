@@ -178,6 +178,13 @@ public class FileHandler {
                         if (DEBUG_MODE > 1)
                         {
                                 System.out.println("Writing to indexfile: " + newNode );
+                                for (Node dummyNode : dummyIndexFile)
+                                {
+                                        if (dummyNode.getId() == newNode.getId())
+                                        {
+                                                System.out.println("Trying to reinstert existing node: " + dummyNode);
+                                        }
+                                }
                                 dummyIndexFile.add(newNode);
                         }
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
@@ -301,6 +308,8 @@ public class FileHandler {
                                         {
                                                 System.out.println("Reading node" + nodeId + " from indexfile");
                                                 System.out.println("Node" + nodeId + ": " + node);
+
+
                                         }
                                         return node;
                                 }
@@ -648,7 +657,7 @@ public class FileHandler {
                 System.out.println(my_record2);
                 System.out.println(my_record3);
                 */
-
+                /*
                 loadDatafile();
                 ArrayList<Record> out = new ArrayList<>();
                 for (int i = 0; i < DataMetaData.getNumberOfBlocks(); ++i)
@@ -664,7 +673,7 @@ public class FileHandler {
                         System.out.println(record);
                 }
                 System.out.println(out.size());
-
+                */
 
                 /*
                 ArrayList<Entry> entries = new ArrayList<>();
