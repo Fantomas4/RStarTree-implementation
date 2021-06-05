@@ -226,7 +226,7 @@ public class RStarTree {
 
             }
         }
-
+        System.out.println("currentNode update");
         FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
 
         if (parentEntry != null) {
@@ -239,7 +239,7 @@ public class RStarTree {
             if (parentNode.isOverflowed()) {
                 System.out.println("**********************");
             }
-
+            System.out.println("parentNode update");
             FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
         }
 

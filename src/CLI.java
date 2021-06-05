@@ -19,10 +19,10 @@ public class CLI {
         // 49.261
 
 //        queryResults = rStarTree.executeNNQuery(testCoords,10);
-//        queryResults = rStarTree.executeRangeQuery(testCoords, 49.261);
+//        queryResults = rStarTree.executeRangeQuery(testCoords, 49.27);
 
-        queryResults = new SequentialNNQuery(testCoords, 10).execute();
-//        queryResults = new SequentialRangeQuery(testCoords, 49.261).execute();
+//        queryResults = new SequentialNNQuery(testCoords, 10).execute();
+        queryResults = new SequentialRangeQuery(testCoords, 49.27).execute();
 
         System.out.println("*** Found " + queryResults.size() + " query results.");
 
