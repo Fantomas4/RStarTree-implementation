@@ -52,6 +52,16 @@ public class FileHandler {
                 return objectInputStream.readObject();
         }
 
+        public static ArrayList<Record[]> getDummyDataFile()
+        {
+                return dummyDataFile;
+        }
+
+        public static ArrayList<Node> getDummyIndexFile()
+        {
+                return dummyIndexFile;
+        }
+
         // TODO: Make DataFile and IndexFile classes
         public static void deleteIndexAndDataFile()
         {
@@ -637,16 +647,26 @@ public class FileHandler {
                 System.out.println(my_record1);
                 System.out.println(my_record2);
                 System.out.println(my_record3);
-
-
-                loadDatafile();
-                for (int i = 0; i < DataMetaData.getNumberOfBlocks(); ++i)
-                {
-                        getDataBlock(i);
-                }
                 */
 
+                loadDatafile();
+                ArrayList<Record> out = new ArrayList<>();
+                for (int i = 0; i < DataMetaData.getNumberOfBlocks(); ++i)
+                {
+                        ArrayList<Record> records = getDataBlock(i);
+                        for (Record record : records)
+                        {
+                                out.add(record);
+                        }
+                }
+                for (Record record : out)
+                {
+                        System.out.println(record);
+                }
+                System.out.println(out.size());
 
+
+                /*
                 ArrayList<Entry> entries = new ArrayList<>();
                 entries.add(new Entry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0})));
                 entries.add(new LeafEntry(new BoundingBox(new double[]{0.0, 0.0}, new double[]{1.0, 1.0}), 10, 0));
@@ -656,7 +676,7 @@ public class FileHandler {
                 insertNode(my_node);
                 updateNode(new Node(entries, 90000, my_node.getId()));
                 Node node = getNode(my_node.getId());
-
+                */
 
 
                 System.out.println("lets go");
