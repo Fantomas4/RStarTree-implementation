@@ -257,7 +257,7 @@ public class FileHandler {
         private static Node getNodeFromBytes(byte[] bytes)
         {
                 byte[] idAsBytes = new byte[Long.BYTES],
-                        entriesAsBytes = new byte[Integer.BYTES + maxEntriesInNode * getEntrySizeInBytes()],
+                        entriesAsBytes = new byte[Integer.BYTES + (maxEntriesInNode + 1) * getEntrySizeInBytes()],
                         levelAsBytes = new byte[Integer.BYTES];
                 int srcPos = 0;
                 System.arraycopy(bytes, srcPos, idAsBytes, 0, idAsBytes.length);
