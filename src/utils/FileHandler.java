@@ -192,6 +192,10 @@ public class FileHandler {
                                                         {
                                                                 System.out.println("Trying to reinsert existing entry" + entry);
                                                         }
+                                                        if (dummyEntry.getChildNodeId() == entry.getChildNodeId())
+                                                        {
+                                                                System.out.println("childe node duplicate");
+                                                        }
                                                 }
                                         }
                                 }
