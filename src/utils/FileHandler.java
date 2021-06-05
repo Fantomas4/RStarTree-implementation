@@ -130,7 +130,7 @@ public class FileHandler {
 
         private static byte[] getEntriesAsBytes(ArrayList<Entry> entries)
         {
-                byte[] entriesAsBytes = new byte[Integer.BYTES + maxEntriesInNode * getEntrySizeInBytes()];
+                byte[] entriesAsBytes = new byte[Integer.BYTES + (maxEntriesInNode + 1) * getEntrySizeInBytes()];
                 int destPos = 0;
 
                 System.arraycopy(intToBytes(entries.size()), 0, entriesAsBytes, destPos, Integer.BYTES);
