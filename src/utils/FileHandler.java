@@ -184,6 +184,16 @@ public class FileHandler {
                                         {
                                                 System.out.println("Trying to reinstert existing node: " + dummyNode);
                                         }
+                                        for (Entry dummyEntry : dummyNode.getEntries())
+                                        {
+                                                for (Entry entry : newNode.getEntries())
+                                                {
+                                                        if (dummyEntry.equals(entry))
+                                                        {
+                                                                System.out.println("Trying to reinsert existing entry" + entry);
+                                                        }
+                                                }
+                                        }
                                 }
                                 dummyIndexFile.add(newNode);
                         }
