@@ -34,7 +34,7 @@ public class RStarTree {
 
         int dRecordsCount = 0;
 
-        for (int i = 1; i < numBlocks; i++) {
+        for (int i = 0; i < numBlocks; i++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
             for (Record record : blockRecords) {
                 insertRecord(record, i);
@@ -192,6 +192,23 @@ public class RStarTree {
         if (currentNode.getLevel() == targetLevel) {
             // The target level has been reached, so newEntry is added to currentNode
             currentNode.addEntry(newEntry);
+
+            System.out.println("currentNode update");
+            FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
+
+            if (parentEntry != null) {
+                // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
+                // the child entries (nodeA entries) inside its child node (nodeA).
+                parentEntry.adjustBoundingBox(currentNode);
+            }
+
+            if (parentNode != null) {
+                if (parentNode.isOverflowed()) {
+                    System.out.println("**********************");
+                }
+                System.out.println("parentNode update");
+                FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
+            }
         } else {
             // Continue the recursion to reach the target level, by using chooseSubTree
             // to determine the path that should be followed.
@@ -234,24 +251,26 @@ public class RStarTree {
                     FileHandler.setRootNode(newRoot); // TODO: Save the new root Node using File Handler. CHECK!
                 }
 
+                System.out.println("currentNode update");
+                FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
+
+                if (parentEntry != null) {
+                    // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
+                    // the child entries (nodeA entries) inside its child node (nodeA).
+                    parentEntry.adjustBoundingBox(currentNode);
+                }
+
+                if (parentNode != null) {
+                    if (parentNode.isOverflowed()) {
+                        System.out.println("**********************");
+                    }
+                    System.out.println("parentNode update");
+                    FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
+                }
+
             }
         }
-        System.out.println("currentNode update");
-        FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
 
-        if (parentEntry != null) {
-            // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
-            // the child entries (nodeA entries) inside its child node (nodeA).
-            parentEntry.adjustBoundingBox(currentNode);
-        }
-
-        if (parentNode != null) {
-            if (parentNode.isOverflowed()) {
-                System.out.println("**********************");
-            }
-            System.out.println("parentNode update");
-            FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
-        }
 
         System.out.println("dummy");
     }
@@ -308,6 +327,7 @@ public class RStarTree {
         for (Entry removedEntry : removedEntries) {
             insert(removedEntry, null, null, overflowedNode.getLevel());
         }
+        System.out.println("Exiting reinsert...");
     }
 
     public ArrayList<LocationQueryResult> executeRangeQuery(double[] targetPoint, double range) {

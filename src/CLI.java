@@ -24,7 +24,7 @@ public class CLI {
 //        queryResults = rStarTree.executeRangeQuery(testCoords, 49.27);
 
 //        queryResults = new SequentialNNQuery(testCoords, 10).execute();
-//        queryResults = new SequentialRangeQuery(testCoords, 49.27).execute();
+        queryResults = new SequentialRangeQuery(testCoords, 49.27).execute();
 
 //        ArrayList<Record[]> datafile = FileHandler.getDummyDataFile();
 //        for (Record[] records : datafile) {
@@ -33,19 +33,22 @@ public class CLI {
 //            }
 //        }
 //
-//        System.out.println("*** Found " + queryResults.size() + " query results.");
-//
-//        for (LocationQueryResult result : queryResults) {
-//            System.out.println("-----------------------------------------");
-//            System.out.println("Record ID: " + result.getRecordId());
-//            System.out.println("Name: " + result.getName());
-//            double[] coordinates = result.getCoordinates();
-//            System.out.format("Coordinates: %f,%f\n", coordinates[0], coordinates[1]);
-//            System.out.println("Distance: " + result.getDistance());
-//            System.out.println("-----------------------------------------\n");
-//        }
-//
-//        System.out.println("DONE!");
+        System.out.println("*** Found " + queryResults.size() + " query results.");
+
+        for (LocationQueryResult result : queryResults) {
+            System.out.println("-----------------------------------------");
+            System.out.println("Record ID: " + result.getRecordId());
+            System.out.println("Name: " + result.getName());
+            double[] coordinates = result.getCoordinates();
+            System.out.format("Coordinates: %f,%f\n", coordinates[0], coordinates[1]);
+            System.out.println("Distance: " + result.getDistance());
+            System.out.println("-----------------------------------------\n");
+        }
+
+        System.out.println("DONE!");
+
+
+
     }
 
 }
