@@ -83,7 +83,7 @@ public class FileHandler {
         // (NodeId, entriesSize, entries, level)
         private static int getNodeSizeInBytes()
         {
-                return Long.BYTES + Integer.BYTES + maxEntriesInNode * getEntrySizeInBytes() + Integer.BYTES;
+                return Long.BYTES + Integer.BYTES + (maxEntriesInNode + 1) * getEntrySizeInBytes() + Integer.BYTES;
         }
 
 
