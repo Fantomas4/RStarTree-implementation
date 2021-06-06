@@ -26,7 +26,8 @@ public class NNQuery extends Query {
         search(rootNode);
 
         // Prepare the Array List that contains the result Records
-        for (int i = 0; i < k; i++) {
+        int numNeighbors = kClosestNeighborsQueue.size();
+        for (int i = 0; i < numNeighbors; i++) {
             Neighbor neighbor = kClosestNeighborsQueue.remove();
             Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
 

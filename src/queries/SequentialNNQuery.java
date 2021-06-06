@@ -38,7 +38,8 @@ public class SequentialNNQuery extends Query{
         search();
 
         // Prepare the Array List that contains the result Records
-        for (int i = 0; i < k; i++) {
+        int numNeighbors = kClosestNeighborsQueue.size();
+        for (int i = 0; i < numNeighbors; i++) {
             Neighbor neighbor = kClosestNeighborsQueue.remove();
             Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
 
@@ -54,7 +55,7 @@ public class SequentialNNQuery extends Query{
     private void search() {
         int numBlocks = DataMetaData.getNumberOfBlocks();
 
-        for (int blockId = 1; blockId < numBlocks; blockId++) {
+        for (int blockId = 0; blockId < numBlocks; blockId++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(blockId);
             for (Record record : blockRecords) {
                 double candidateDistance = calculateDistanceFromTarget(record.getCoordinates());
