@@ -26,11 +26,11 @@ public class BoundingBox implements Serializable {
     }
 
     public double[] getLowerLeftPoint() {
-        return lowerLeftPoint;
+        return lowerLeftPoint.clone();
     }
 
     public double[] getUpperRightPoint() {
-        return upperRightPoint;
+        return upperRightPoint.clone();
     }
 
     public int getDimensions() {
@@ -61,18 +61,6 @@ public class BoundingBox implements Serializable {
         }
         return centerCoordinates;
     }
-
-//    public boolean checkOverlap(BoundingBox otherBB) {
-//        for (int i = 0; i < dimensions; i ++) {
-//            double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
-//                    - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
-//
-//            if (overlapDiff < 0) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
 
     public double calculateBoundingBoxOverlap(BoundingBox otherBB) {
         double overlapProduct = 1;
@@ -116,14 +104,10 @@ public class BoundingBox implements Serializable {
 
         for (BoundingBox boundingBox : boundingBoxes) {
             for (int j = 0; j < dimensions; j++) {
-                double minLowerLeftValue = minLowerLeft[j];
-                double candidateLowerLeftValue = boundingBox.getLowerLeftPoint()[j];
                 if (minLowerLeft[j] > boundingBox.getLowerLeftPoint()[j]) {
                     minLowerLeft[j] = boundingBox.getLowerLeftPoint()[j];
                 }
 
-                double maxUpperRightValue = maxUpperRight[j];
-                double candidateUpperRightValue = boundingBox.getUpperRightPoint()[j];
                 if (maxUpperRight[j] < boundingBox.getUpperRightPoint()[j]) {
                     maxUpperRight[j] = boundingBox.getUpperRightPoint()[j];
                 }
