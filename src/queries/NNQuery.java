@@ -7,66 +7,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
-public class NearestNeighborsQuery extends Query {
-    private class Neighbor implements Comparable<Neighbor> {
-        private final long blockId;
-        private final long recordId;
-        private final double distance;
-
-        public Neighbor(long blockId, long recordId, double distance) {
-            this.blockId = blockId;
-            this.recordId = recordId;
-            this.distance = distance;
-        }
-
-        public long getBlockId() {
-            return blockId;
-        }
-
-        public long getRecordId() {
-            return recordId;
-        }
-
-        public double getDistance() {
-            return distance;
-        }
-
-        @Override
-        public int compareTo(Neighbor other) {
-            // Using this method, class objects are sorted
-            // in descending order of distance.
-            return Double.compare(other.distance, this.distance);
-        }
-    }
-
+public class NNQuery extends Query {
     private final int k;
     private double searchRadius;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
+    protected Node rootNode;
 
-    public NearestNeighborsQuery(double[] targetPoint, int k, Node rootNode) {
-        super(targetPoint, rootNode);
+    public NNQuery(double[] targetPoint, int k, Node rootNode) {
+        super(targetPoint);
+
         this.k = k;
         searchRadius = Double.MAX_VALUE;
         kClosestNeighborsQueue = new PriorityQueue<>();
+        this.rootNode = rootNode;
     }
 
-    public ArrayList<Record> execute() {
+    public ArrayList<LocationQueryResult> execute() {
         search(rootNode);
 
         // Prepare the Array List that contains the result Records
-        for (int i = 0; i < kClosestNeighborsQueue.size(); i++) {
+        int numNeighbors = kClosestNeighborsQueue.size();
+        for (int i = 0; i < numNeighbors; i++) {
             Neighbor neighbor = kClosestNeighborsQueue.remove();
             Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
 
             // Add the record to the results list
-            queryResults.add(record);
+            queryResults.add(new LocationQueryResult(record, neighbor.getDistance()));
         }
 
-        // Since the elements returned from the queue using remove() are given
-        // in an descending order of distance from the specified target point,
-        // the contents of queryResults are reversed so that they follow
-        // an ascending order of distance.
-        Collections.reverse(queryResults);
+        Collections.sort(queryResults);
         
         return queryResults;
     }
@@ -80,7 +49,7 @@ public class NearestNeighborsQuery extends Query {
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
             // The current node is not a leaf node.
             for (Entry entry : entries) {
-                if (entry.getBoundingBox().calculatePointDistance(targetPoint) <= searchRadius) {
+                    if (entry.getBoundingBox().checkPointOverlap(targetPoint, searchRadius)) {
                     Node nextNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get the next node from File Handler using entry.getChildNodeId(). CHECK!
                     search(nextNode);
                 }

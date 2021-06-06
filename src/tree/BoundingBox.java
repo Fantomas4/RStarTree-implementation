@@ -2,6 +2,7 @@ package tree;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Math.min;
@@ -9,9 +10,9 @@ import static java.lang.Math.sqrt;
 
 
 public class BoundingBox implements Serializable {
-    private double[] lowerLeftPoint; // The bottom left point of the rectangle
-    private double[] upperRightPoint; // The bottom right point of the rectangle
-    private int dimensions;
+    private final double[] lowerLeftPoint; // The bottom left point of the rectangle
+    private final double[] upperRightPoint; // The bottom right point of the rectangle
+    private final int dimensions;
 
     public BoundingBox(double[] lowerLeftPoint, double[] upperRightPoint) {
         if (lowerLeftPoint.length != upperRightPoint.length) {
@@ -25,11 +26,11 @@ public class BoundingBox implements Serializable {
     }
 
     public double[] getLowerLeftPoint() {
-        return lowerLeftPoint;
+        return lowerLeftPoint.clone();
     }
 
     public double[] getUpperRightPoint() {
-        return upperRightPoint;
+        return upperRightPoint.clone();
     }
 
     public int getDimensions() {
@@ -60,18 +61,6 @@ public class BoundingBox implements Serializable {
         }
         return centerCoordinates;
     }
-
-//    public boolean checkOverlap(BoundingBox otherBB) {
-//        for (int i = 0; i < dimensions; i ++) {
-//            double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
-//                    - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
-//
-//            if (overlapDiff < 0) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
 
     public double calculateBoundingBoxOverlap(BoundingBox otherBB) {
         double overlapProduct = 1;
@@ -136,5 +125,10 @@ public class BoundingBox implements Serializable {
         }
 
         return calculateMBR(boundingBoxes);
+    }
+
+    public String toString()
+    {
+        return "BoundingBox(" + Arrays.toString(lowerLeftPoint) + ", " +  Arrays.toString(upperRightPoint) + ")";
     }
 }

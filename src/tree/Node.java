@@ -16,6 +16,7 @@ public class Node {
     private int level;
 
 
+
 //    public Node(ArrayList<Entry> entries, int level) {
 //        this.entries = entries;
 //        this.level = level;
@@ -23,8 +24,8 @@ public class Node {
 //    }
 
     public Node(ArrayList<Entry> entries, int level, long nodeId) {
-        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
+//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
+//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
 
         this.entries = entries;
         this.level = level;
@@ -33,8 +34,8 @@ public class Node {
 
     // Used for creating a root Node
     public Node(int level, long nodeId) {
-        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
+//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
+//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
 
         this.entries = new ArrayList<>();
         this.level = level;
@@ -84,7 +85,9 @@ public class Node {
         ArrayList<Node> resultNodes = new ArrayList<>();
         // TODO: Set Node IDs for split nodes! CHECK!
         // Use the old node ID for the first split node produced
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
+        setEntries(chosenDistribution.getEntriesGroupA());
+        resultNodes.add(this);
+//        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
         // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
         long newNodeId = FileHandler.getNextAvailableNodeId();
@@ -236,5 +239,11 @@ public class Node {
         }
 
         return distributions.get(minIndex);
+    }
+
+    public String toString()
+    {
+        return "Node(" + "nodeId(" + nodeId + "), entries(" + entries + "), level(" + level + "))";
+
     }
 }

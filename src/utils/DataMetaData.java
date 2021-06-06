@@ -2,7 +2,7 @@ package utils;
 
 public class DataMetaData {
         private static final int maxRecordsInBlock = 2; // Dummy maximum number of records in a block
-        private static int numberOfBlocks = 1;
+        private static int numberOfBlocks = 0;
 
         public static int getMaxRecordsInBlock()
         {

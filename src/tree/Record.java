@@ -1,6 +1,7 @@
 package tree;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class Record implements Serializable {
     private long id;
@@ -23,6 +24,11 @@ public class Record implements Serializable {
 
     public double[] getCoordinates() {
         return coordinates;
+    }
+
+    public String toString()
+    {
+        return "Record(id(" + id + "), name(" + name + "), coordinates(" + Arrays.toString(coordinates) + "))";
     }
 
 }
