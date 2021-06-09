@@ -145,8 +145,8 @@ public class Node {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
 
-            double marginA = BoundingBox.calculateMBR(boundingBoxesA).getMargin();
-            double marginB = BoundingBox.calculateMBR(boundingBoxesB).getMargin();
+            double marginA = BoundingBox.calculateMBR(boundingBoxesA).calculateMargin();
+            double marginB = BoundingBox.calculateMBR(boundingBoxesB).calculateMargin();
             return marginA + marginB;
         }
 
@@ -184,8 +184,8 @@ public class Node {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
 
-            double areaA = BoundingBox.calculateMBR(boundingBoxesA).getArea();
-            double areaB = BoundingBox.calculateMBR(boundingBoxesB).getArea();
+            double areaA = BoundingBox.calculateMBR(boundingBoxesA).calculateArea();
+            double areaB = BoundingBox.calculateMBR(boundingBoxesB).calculateArea();
             return areaA + areaB;
         }
     }

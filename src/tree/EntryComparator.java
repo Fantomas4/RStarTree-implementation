@@ -82,13 +82,13 @@ public class EntryComparator {
             this.targetEntry = targetEntry;
             enlargementMap = new HashMap<>();
 
-            double areaBefore = targetEntry.getBoundingBox().getArea();
+            double areaBefore = targetEntry.getBoundingBox().calculateArea();
             for (Entry candidateEntry : candidateEntries) {
                 ArrayList<BoundingBox> mbrBoundingBoxes = new ArrayList<>();
                 mbrBoundingBoxes.add(candidateEntry.getBoundingBox());
                 mbrBoundingBoxes.add(targetEntry.getBoundingBox());
                 BoundingBox enlargedBB = BoundingBox.calculateMBR(mbrBoundingBoxes);
-                double areaAfter = enlargedBB.getArea();
+                double areaAfter = enlargedBB.calculateArea();
                 double areaDiff = areaAfter - areaBefore;
 
                 if (areaDiff < 0 ) {
@@ -112,9 +112,9 @@ public class EntryComparator {
                 // both Entry objects have equal area enlargement values,
                 // so the tie is resolved by choosing the entry with the rectangle
                 // of smallest area
-                if (a.getBoundingBox().getArea() > b.getBoundingBox().getArea()) {
+                if (a.getBoundingBox().calculateArea() > b.getBoundingBox().calculateArea()) {
                     return 1;
-                } else if (a.getBoundingBox().getArea() < b.getBoundingBox().getArea())  {
+                } else if (a.getBoundingBox().calculateArea() < b.getBoundingBox().calculateArea())  {
                     return -1;
                 } else {
                     return 0;
@@ -176,9 +176,9 @@ public class EntryComparator {
 
         @Override
         public int compare(Entry a, Entry b) {
-            double[] centerTargetBB = targetBoundingBox.getCenter();
-            double[] centerA = a.getBoundingBox().getCenter();
-            double[] centerB = b.getBoundingBox().getCenter();
+            double[] centerTargetBB = targetBoundingBox.calculateCenter();
+            double[] centerA = a.getBoundingBox().calculateCenter();
+            double[] centerB = b.getBoundingBox().calculateCenter();
 
             double distanceA = calculateDistance(centerA, centerTargetBB);
             double distanceB = calculateDistance(centerB, centerTargetBB);

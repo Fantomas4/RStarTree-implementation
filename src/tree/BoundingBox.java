@@ -10,9 +10,9 @@ import static java.lang.Math.sqrt;
 
 
 public class BoundingBox implements Serializable {
-    private final double[] lowerLeftPoint; // The bottom left point of the rectangle
-    private final double[] upperRightPoint; // The bottom right point of the rectangle
-    private final int dimensions;
+    private final double[] lowerLeftPoint; // The bottom left point of the bounding box
+    private final double[] upperRightPoint; // The bottom right point of the bounding box
+    private final int dimensions; // The number of dimensions of this bounding box
 
     public BoundingBox(double[] lowerLeftPoint, double[] upperRightPoint) {
         if (lowerLeftPoint.length != upperRightPoint.length) {
@@ -25,19 +25,34 @@ public class BoundingBox implements Serializable {
         }
     }
 
+    /** Getter method used to retrieve the values of the bounding box's lower left point.
+     * @return a copy of the bounding box's array that contains the values of its lower left point.
+     */
     public double[] getLowerLeftPoint() {
         return lowerLeftPoint.clone();
     }
 
+    /**
+     * Getter method used to retrieve the values of the bounding box's upper right point.
+     * @return a copy of the bounding box's array that contains the values of its upper right point.
+     */
     public double[] getUpperRightPoint() {
         return upperRightPoint.clone();
     }
 
+    /**
+     * Getter method used to retrieve the number of dimensions of the bounding box.
+     * @return  a number representing the number of dimensions.
+     */
     public int getDimensions() {
         return dimensions;
     }
 
-    public double getMargin() {
+    /**
+     * Calculates the margin of the bounding box.
+     * @return a number representing the margin of the bounding box.
+     */
+    public double calculateMargin() {
         double sum = 0;
         for (int i = 0; i < dimensions; i ++) {
             sum += Math.abs(upperRightPoint[i] - lowerLeftPoint[i]);
@@ -45,7 +60,11 @@ public class BoundingBox implements Serializable {
         return sum;
     }
 
-    public double getArea() {
+    /**
+     * Calculates the area of the bounding box.
+     * @return a number representing the area of the bounding box.
+     */
+    public double calculateArea() {
         double product = 1;
         for (int i = 0; i < dimensions; i ++) {
             product *= upperRightPoint[i] - lowerLeftPoint[i];
@@ -53,7 +72,11 @@ public class BoundingBox implements Serializable {
         return Math.abs(product);
     }
 
-    public double[] getCenter() {
+    /**
+     * Calculates the coordinates of this bounding box's center.
+     * @return an array containing the coordinates of the bounding box's center.
+     */
+    public double[] calculateCenter() {
         double[] centerCoordinates = new double[dimensions];
 
         for (int d = 0; d < dimensions; d++) {
@@ -62,6 +85,11 @@ public class BoundingBox implements Serializable {
         return centerCoordinates;
     }
 
+    /**
+     * Calculates the overlap between this bounding box and a given bounding box.
+     * @param otherBB the bounding box for which the overlap with this bounding box is calculated.
+     * @return a number representing the calculated overlap.
+     */
     public double calculateBoundingBoxOverlap(BoundingBox otherBB) {
         double overlapProduct = 1;
         for (int i = 0; i < dimensions; i ++) {
@@ -77,6 +105,11 @@ public class BoundingBox implements Serializable {
         return overlapProduct;
     }
 
+    /**
+     * Calculates the distance between the bounding box and a given point.
+     * @param targetPoint the given point for which the distance from the bounding box is to be calculated.
+     * @return a number representing the distance between the bounding box and the given point.
+     */
     public double calculatePointDistance(double[] targetPoint) {
         double sum = 0;
         for (int d = 0; d < dimensions; d++) {
@@ -89,12 +122,23 @@ public class BoundingBox implements Serializable {
         return sqrt(sum);
     }
 
+    /**
+     * Checks whether a given point overlaps with the bounding box in a specified radius.
+     * @param targetPoint the point for which the overlap with the bounding box is checked.
+     * @param radius the specified radius in which the overlap is checked.
+     * @return true if an overlap exists, or false if an overlap does not exist.
+     */
     public boolean checkPointOverlap(double[] targetPoint, double radius) {
         double minimumDistance = calculatePointDistance(targetPoint);
 
         return minimumDistance <= radius;
     }
 
+    /**
+     * Used to calculate the Minimum Bounding Rectangle (MBR) of a set of bounding boxes.
+     * @param boundingBoxes the bounding boxes for which the MBR is to be calculated.
+     * @return a BoundingBox object representing the MBR for the given set of bounding boxes.
+     */
     // Class used to calculate minimum bounding rectangles
     public static BoundingBox calculateMBR(List<BoundingBox> boundingBoxes) {
         BoundingBox primerBoundingBox = boundingBoxes.remove(0);
@@ -117,6 +161,11 @@ public class BoundingBox implements Serializable {
         return new BoundingBox(minLowerLeft, maxUpperRight);
     }
 
+    /**
+     * Used to calculate the Minimum Bounding Rectangle (MBR) of a set of Entries.
+     * @param entries the Entries for which the MBR is to be calculated.
+     * @return a BoundingBox object representing the MBR for the given set of Entries.
+     */
     public static BoundingBox calculateMBR(ArrayList<Entry> entries) {
         ArrayList<BoundingBox> boundingBoxes = new ArrayList<>();
 
