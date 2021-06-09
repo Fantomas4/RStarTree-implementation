@@ -15,18 +15,7 @@ public class Node {
     private ArrayList<Entry> entries;
     private int level;
 
-
-
-//    public Node(ArrayList<Entry> entries, int level) {
-//        this.entries = entries;
-//        this.level = level;
-//        this.nodeId = -1; // The node id has not been set
-//    }
-
     public Node(ArrayList<Entry> entries, int level, long nodeId) {
-//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
-
         this.entries = entries;
         this.level = level;
         this.nodeId = nodeId;
@@ -87,7 +76,6 @@ public class Node {
         // Use the old node ID for the first split node produced
         setEntries(chosenDistribution.getEntriesGroupA());
         resultNodes.add(this);
-//        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
         // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
         long newNodeId = FileHandler.getNextAvailableNodeId();

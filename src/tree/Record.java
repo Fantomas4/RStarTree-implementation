@@ -3,10 +3,13 @@ package tree;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * Class used to store the information of a location.
+ */
 public class Record implements Serializable {
-    private long id;
-    private String name;
-    private double[] coordinates;
+    private final long id; // The unique identifier of the record.
+    private final String name; // The name of the location stored in the record.
+    private final double[] coordinates; // The coordinates of the location stored in the record.
 
     public Record(long id, String name, double[] coordinates) {
         this.id = id;
