@@ -9,13 +9,16 @@ import java.util.Collections;
 
 import static java.lang.Math.sqrt;
 
-public class SequentialRangeQuery extends Query{
+public class SequentialRangeQuery {
     private final double range;
+    protected double[] targetPoint;
+    protected ArrayList<LocationQueryResult> queryResults;
 
     public SequentialRangeQuery(double[] targetPoint, double range) {
-        super(targetPoint);
-
+        this.targetPoint = targetPoint;
         this.range = range;
+
+        queryResults = new ArrayList<>();
     }
 
     private double calculateDistanceFromTarget(double[] candidatePoint) {

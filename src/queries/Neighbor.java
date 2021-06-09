@@ -1,7 +1,7 @@
 package queries;
 
 /**
- * Class used to store the information of a neighbor found from a Query.
+ * Class used to store the information of a neighbor found from a query.
  */
 public class Neighbor implements Comparable<Neighbor> {
     private final long blockId; // The unique ID of the block that contains the neighbor's record,

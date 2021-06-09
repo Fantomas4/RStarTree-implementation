@@ -6,15 +6,19 @@ import utils.FileHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class RangeQuery extends Query {
+public class TreeRangeQuery {
     private final double range;
     protected Node rootNode;
+    protected double[] targetPoint;
+    protected ArrayList<LocationQueryResult> queryResults;
 
-    public RangeQuery(double[] targetPoint, double range, Node rootNode) {
-        super(targetPoint);
-
+    public TreeRangeQuery(double[] targetPoint, double range, Node rootNode) {
+        this.targetPoint = targetPoint;
         this.rootNode = rootNode;
         this.range = range;
+
+        queryResults = new ArrayList<>();
+
     }
 
     public ArrayList<LocationQueryResult> execute() {

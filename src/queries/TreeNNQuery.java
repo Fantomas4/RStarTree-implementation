@@ -7,19 +7,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
-public class NNQuery extends Query {
+public class TreeNNQuery {
     private final int k;
     private double searchRadius;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
     protected Node rootNode;
+    protected double[] targetPoint;
+    protected ArrayList<LocationQueryResult> queryResults;
 
-    public NNQuery(double[] targetPoint, int k, Node rootNode) {
-        super(targetPoint);
 
+    public TreeNNQuery(double[] targetPoint, int k, Node rootNode) {
         this.k = k;
+        this.targetPoint = targetPoint;
+        this.rootNode = rootNode;
+
+        queryResults = new ArrayList<>();
         searchRadius = Double.MAX_VALUE;
         kClosestNeighborsQueue = new PriorityQueue<>();
-        this.rootNode = rootNode;
     }
 
     public ArrayList<LocationQueryResult> execute() {

@@ -1,8 +1,8 @@
 package tree;
 
 import queries.LocationQueryResult;
-import queries.NNQuery;
-import queries.RangeQuery;
+import queries.TreeNNQuery;
+import queries.TreeRangeQuery;
 import utils.DataMetaData;
 import utils.FileHandler;
 import java.util.*;
@@ -13,7 +13,6 @@ public class RStarTree {
     private static final int LEAF_LEVEL = 0;
 
     private int rootLevel;
-//    HashMap<Integer, Boolean> levelOverflowCalled;
     boolean[] levelOverflowCalled;
 
     int debugRecordCounter = 0;
@@ -332,14 +331,14 @@ public class RStarTree {
 
     public ArrayList<LocationQueryResult> executeRangeQuery(double[] targetPoint, double range) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
-        RangeQuery rangeQuery = new RangeQuery(targetPoint, range, rootNode);
+        TreeRangeQuery rangeQuery = new TreeRangeQuery(targetPoint, range, rootNode);
 
         return rangeQuery.execute();
     }
 
     public ArrayList<LocationQueryResult> executeNNQuery(double[] targetPoint, int k) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
-        NNQuery nnQuery = new NNQuery(targetPoint, k, rootNode);
+        TreeNNQuery nnQuery = new TreeNNQuery(targetPoint, k, rootNode);
 
         return nnQuery.execute();
     }

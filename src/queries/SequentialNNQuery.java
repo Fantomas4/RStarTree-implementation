@@ -10,15 +10,17 @@ import java.util.PriorityQueue;
 
 import static java.lang.Math.sqrt;
 
-public class SequentialNNQuery extends Query{
+public class SequentialNNQuery {
     private final int k;
-    private double searchRadius;
+    protected double[] targetPoint;
+    protected ArrayList<LocationQueryResult> queryResults;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
 
     public SequentialNNQuery(double[] targetPoint, int k) {
-        super(targetPoint);
         this.k = k;
-        searchRadius = Double.MAX_VALUE;
+        this.targetPoint = targetPoint;
+        queryResults = new ArrayList<>();
+
         kClosestNeighborsQueue = new PriorityQueue<>();
     }
 
@@ -70,9 +72,6 @@ public class SequentialNNQuery extends Query{
                         // as a new neighbor.
                         kClosestNeighborsQueue.remove();
                         kClosestNeighborsQueue.add(new Neighbor(blockId, record.getId(), candidateDistance));
-
-                        // Update the search radius
-                        searchRadius = candidateDistance;
                     }
                 } else {
                     // The priority queue contains less than k neighbors, so leafEntry is
