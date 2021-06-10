@@ -6,6 +6,10 @@ import utils.FileHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Class used to perform RStarTree-based range queries to detect the neighbors
+ * of a given point in a specified range.
+ */
 public class TreeRangeQuery {
     private final double range;
     protected Node rootNode;
@@ -21,6 +25,10 @@ public class TreeRangeQuery {
 
     }
 
+    /**
+     * Called to initialize the recursive range search amd return the query results.
+     * @return an ArrayList containing the query results, sorted in ascending order of distance.
+     */
     public ArrayList<LocationQueryResult> execute() {
         search(rootNode);
         Collections.sort(queryResults);
@@ -28,6 +36,10 @@ public class TreeRangeQuery {
         return queryResults;
     }
 
+    /**
+     * Recursive method used to search for the neighbors of a given point in a specified radius.
+     * @param currentNode the node which is to be processed.
+     */
     private void search(Node currentNode) {
         ArrayList<Entry> nodeEntries = currentNode.getEntries();
 
