@@ -2,6 +2,9 @@ package queries;
 
 import tree.Record;
 
+/**
+ * Class used to store the information of query results.
+ */
 public class LocationQueryResult implements Comparable<LocationQueryResult> {
     private final long recordId; // TEMP FOR DEBUGGING!
     private final String name;

@@ -9,6 +9,10 @@ import java.util.Collections;
 
 import static java.lang.Math.sqrt;
 
+/**
+ * Class used to perform sequential range queries on the datafile to detect the neighbors
+ * of a given point in a specified range.
+ */
 public class SequentialRangeQuery {
     private final double range;
     protected double[] targetPoint;
@@ -21,6 +25,12 @@ public class SequentialRangeQuery {
         queryResults = new ArrayList<>();
     }
 
+    /**
+     * Calculates the distance of a given point from the range query's specified target point.
+     * @param candidatePoint the given point whose distance is calculated from the range query's
+     *                       specified target point.
+     * @return a number representing the calculated distance.
+     */
     private double calculateDistanceFromTarget(double[] candidatePoint) {
         int dimensions = targetPoint.length;
         double sum = 0;
@@ -40,6 +50,10 @@ public class SequentialRangeQuery {
         return queryResults;
     }
 
+    /**
+     * Performs a search to locate the neighbors of the given target point inside
+     * the specified radius.
+     */
     private void search() {
         int numBlocks = DataMetaData.getNumberOfBlocks();
 
