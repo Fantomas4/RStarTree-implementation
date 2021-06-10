@@ -26,31 +26,15 @@ public class FileHandler {
         private static final String INDEXFILE_NAME = "indexfile.dat";
 
         private static long rootNodeId = 1;
-        private static final int dimensions = 2;
+        public static final int DIMENSIONS = 2;
 
         private static String osmFilePath = "map.osm";
         private static final int BLOCK_SIZE = 2 * 1024; // 32 * 1024
         private static long nextAvailableNodeId = 2;
 
         private static final int maxEntriesInBlock = 5;
-        private static final int maxEntriesInNode = 3;
+        public static final int maxEntriesInNode = 3;
 
-        // https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
-        private static byte[] convertObjectToBytes(Object object) throws IOException
-        {
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-                objectOutputStream.writeObject(object);
-                return byteArrayOutputStream.toByteArray();
-        }
-
-        // https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
-        private static Object convertBytesToObject(byte[] bytes) throws IOException, ClassNotFoundException
-        {
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-                return objectInputStream.readObject();
-        }
 
         public static ArrayList<Record[]> getDummyDataFile()
         {
@@ -77,103 +61,8 @@ public class FileHandler {
                 return nextAvailableNodeId++;
         }
 
-
-        // (lowerLeftPoint[], upperRightPoint)
-        private static int getBoundingBoxSizeInBytes()
-        {
-                return 2 * Double.BYTES * dimensions;
-        }
-
-        // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)
-        private static int getEntrySizeInBytes()
-        {
-                return 1 + getBoundingBoxSizeInBytes() + Long.BYTES + Long.BYTES + Long.BYTES;
-        }
-
-        // (NodeId, entriesSize, entries, level)
-        private static int getNodeSizeInBytes()
-        {
-                return Long.BYTES + Integer.BYTES + (maxEntriesInNode + 1) * getEntrySizeInBytes() + Integer.BYTES;
-        }
-
-
-        private static byte[] getBoundingBoxAsBytes(BoundingBox boundingBox)
-        {
-                byte[] boundingBoxAsBytes = new byte[getBoundingBoxSizeInBytes()];
-                int destPos = 0;
-
-                for (int i = 0; i < dimensions; ++i)
-                {
-                        System.arraycopy(doubleToBytes(boundingBox.getLowerLeftPoint()[i]), 0, boundingBoxAsBytes, destPos, Double.BYTES);
-                        destPos += Double.BYTES;
-                }
-                for (int i = 0; i < dimensions; ++i)
-                {
-                        System.arraycopy(doubleToBytes(boundingBox.getUpperRightPoint()[i]), 0, boundingBoxAsBytes, destPos, Double.BYTES);
-                        destPos += Double.BYTES;
-                }
-
-                return boundingBoxAsBytes;
-        }
-
-        private static byte[] getEntryAsBytes(Entry entry)
-        {
-                byte[] entryAsBytes = new byte[getEntrySizeInBytes()];
-                int destPos = 0;
-
-                entryAsBytes[destPos] = (byte)(entry instanceof LeafEntry ? 1 : 0);
-                destPos += 1;
-                System.arraycopy(getBoundingBoxAsBytes(entry.getBoundingBox()), 0, entryAsBytes, destPos, getBoundingBoxSizeInBytes());
-                destPos += getBoundingBoxSizeInBytes();
-                System.arraycopy(longToBytes(entry.getChildNodeId()), 0, entryAsBytes, destPos, Long.BYTES);
-                if (entry instanceof LeafEntry)
-                {
-                        destPos += Long.BYTES;
-                        LeafEntry leafEntry = (LeafEntry) entry;
-                        System.arraycopy(longToBytes(leafEntry.getRecordId()), 0, entryAsBytes, destPos, Long.BYTES);
-                        destPos += Long.BYTES;
-                        System.arraycopy(longToBytes(leafEntry.getBlockId()), 0, entryAsBytes, destPos, Long.BYTES);
-                }
-
-                return entryAsBytes;
-        }
-
-        private static byte[] getEntriesAsBytes(ArrayList<Entry> entries)
-        {
-                byte[] entriesAsBytes = new byte[Integer.BYTES + (maxEntriesInNode + 1) * getEntrySizeInBytes()];
-                int destPos = 0;
-
-                System.arraycopy(intToBytes(entries.size()), 0, entriesAsBytes, destPos, Integer.BYTES);
-                destPos += Integer.BYTES;
-                for (Entry entry : entries)
-                {
-                        System.arraycopy(getEntryAsBytes(entry), 0, entriesAsBytes, destPos, getEntrySizeInBytes());
-                        destPos += getEntrySizeInBytes();
-                }
-
-                return entriesAsBytes;
-        }
-
-        private static byte[] getNodeAsBytes(Node node)
-        {
-                byte[] idAsBytes = longToBytes(node.getId()),
-                        entriesAsBytes = getEntriesAsBytes(node.getEntries()),
-                        levelAsBytes = intToBytes(node.getLevel()),
-                        nodeAsBytes = new byte[getNodeSizeInBytes()];
-                int destPos = 0;
-
-                System.arraycopy(idAsBytes, 0, nodeAsBytes, destPos, idAsBytes.length);
-                destPos += idAsBytes.length;
-                System.arraycopy(entriesAsBytes, 0, nodeAsBytes, destPos, entriesAsBytes.length);
-                destPos += entriesAsBytes.length;
-                System.arraycopy(levelAsBytes, 0, nodeAsBytes, destPos, levelAsBytes.length);
-
-                return nodeAsBytes;
-        }
-
         public static void insertNode(Node newNode)
         {
-                byte[] nodeAsBytes = getNodeAsBytes(newNode);
                 try {
                         if (DEBUG_MODE > 1)
                         {
@@ -202,120 +91,25 @@ public class FileHandler {
                                 dummyIndexFile.add(newNode);
                         }
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
-                        fos.write(nodeAsBytes);
+                        fos.write(newNode.toBytes());
                         IndexMetaData.addOneNode();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
         }
-
-        private static BoundingBox getBoundingBoxFromBytes(byte[] bytes)
-        {
-                byte[] lowerLeftPointAsBytes = new byte[Double.BYTES * dimensions],
-                        upperRightPointAsBytes = new byte[Double.BYTES * dimensions];
-                int srcPos = 0;
-
-                System.arraycopy(bytes, srcPos, lowerLeftPointAsBytes, 0, lowerLeftPointAsBytes.length);
-                srcPos += lowerLeftPointAsBytes.length;
-                System.arraycopy(bytes, srcPos, upperRightPointAsBytes, 0, upperRightPointAsBytes.length);
-
-                double[] lowerLeftPoint = new double[dimensions],
-                        upperRightPoint = new double[dimensions];
-                byte[] pointValueAsBytes = new byte[Double.BYTES];
-                for (int i = 0; i < dimensions; ++i)
-                {
-                        System.arraycopy(lowerLeftPointAsBytes, i * Double.BYTES, pointValueAsBytes, 0, Double.BYTES);
-                        lowerLeftPoint[i] = bytesToDouble(pointValueAsBytes);
-
-                        System.arraycopy(upperRightPointAsBytes, i * Double.BYTES, pointValueAsBytes, 0, Double.BYTES);
-                        upperRightPoint[i] = bytesToDouble(pointValueAsBytes);
-                }
-                return new BoundingBox(lowerLeftPoint, upperRightPoint);
-        }
-
-        private static Entry getEntryFromBytes(byte[] bytes)
-        {
-                byte[] boundingBoxAsBytes = new byte[getBoundingBoxSizeInBytes()],
-                        childNodeIdAsBytes = new byte[Long.BYTES],
-                        recordIdAsBytes = new byte[Long.BYTES],
-                        blockIdAsBytes = new byte[Long.BYTES];
-                int srcPos = 0;
-
-                byte isLeafEntryAsByte = bytes[srcPos];
-                srcPos += 1;
-                System.arraycopy(bytes, srcPos, boundingBoxAsBytes, 0, boundingBoxAsBytes.length);
-                srcPos += boundingBoxAsBytes.length;
-                System.arraycopy(bytes, srcPos, childNodeIdAsBytes, 0, childNodeIdAsBytes.length);
-                if (isLeafEntryAsByte != 0) // is LeafEntry
-                {
-                        srcPos += childNodeIdAsBytes.length;
-                        System.arraycopy(bytes, srcPos, recordIdAsBytes, 0, recordIdAsBytes.length);
-                        srcPos += recordIdAsBytes.length;
-                        System.arraycopy(bytes, srcPos, blockIdAsBytes, 0, blockIdAsBytes.length);
-
-                        return new LeafEntry(
-                                getBoundingBoxFromBytes(boundingBoxAsBytes),
-                                bytesToLong(recordIdAsBytes),
-                                bytesToLong(blockIdAsBytes)
-                        );
-                }
-
-                return new Entry(getBoundingBoxFromBytes(boundingBoxAsBytes), bytesToLong(childNodeIdAsBytes));
-        }
-
-        private static ArrayList<Entry> getEntriesFromBytes(byte[] bytes)
-        {
-                byte[] sizeAsBytes = new byte[Integer.BYTES];
-                int srcPos = 0;
-                System.arraycopy(bytes, srcPos, sizeAsBytes, 0, sizeAsBytes.length);
-                srcPos += sizeAsBytes.length;
-                int size = bytesToInt(sizeAsBytes);
-                if (size == 0)
-                {
-                        return null;
-                }
-                ArrayList<Entry> entries = new ArrayList<>();
-                for (int i = 0; i < size; ++i)
-                {
-                        byte[] entryAsBytes = new byte[getEntrySizeInBytes()];
-                        System.arraycopy(bytes, srcPos, entryAsBytes, 0, entryAsBytes.length);
-                        srcPos += entryAsBytes.length;
-                        entries.add(getEntryFromBytes(entryAsBytes));
-                }
-                return entries;
-        }
-
-        private static Node getNodeFromBytes(byte[] bytes)
-        {
-                byte[] idAsBytes = new byte[Long.BYTES],
-                        entriesAsBytes = new byte[Integer.BYTES + (maxEntriesInNode + 1) * getEntrySizeInBytes()],
-                        levelAsBytes = new byte[Integer.BYTES];
-                int srcPos = 0;
-                System.arraycopy(bytes, srcPos, idAsBytes, 0, idAsBytes.length);
-                srcPos += idAsBytes.length;
-                System.arraycopy(bytes, srcPos, entriesAsBytes, 0, entriesAsBytes.length);
-                srcPos += entriesAsBytes.length;
-                System.arraycopy(bytes, srcPos, levelAsBytes, 0, levelAsBytes.length);
-
-                long id = bytesToLong(idAsBytes);
-                ArrayList<Entry> entries = getEntriesFromBytes(entriesAsBytes);
-                int level = bytesToInt(levelAsBytes);
-
-                return entries == null ? new Node(level, id) : new Node(entries, level, id);
-        }
-
+        
         // TODO: MIGHT NEED TO LINEAR SEARCH FOR THE RIGHT NODE ID
         public static Node getNode(long nodeId)
         {
-                byte[] nodeAsBytes = new byte[getNodeSizeInBytes()];
+                byte[] nodeAsBytes = new byte[Node.BYTES];
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "r");
                         for (long i = 0; i < nextAvailableNodeId; ++i)
                         {
-                                raf.seek(i * getNodeSizeInBytes());
+                                raf.seek(i * Node.BYTES);
                                 raf.readFully(nodeAsBytes);
-                                node = getNodeFromBytes(nodeAsBytes);
+                                node = Node.fromBytes(nodeAsBytes);
                                 if (node.getId() == nodeId)
                                 {
                                         if (DEBUG_MODE > 1)
@@ -337,7 +131,7 @@ public class FileHandler {
 
         public static void updateNode(Node updatedNode)
         {
-                byte[] nodeAsBytes = new byte[getNodeSizeInBytes()];
+                byte[] nodeAsBytes = new byte[Node.BYTES];
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "rw");
@@ -345,7 +139,7 @@ public class FileHandler {
                         {
                                 //raf.seek(i * getNodeSizeInBytes());
                                 raf.readFully(nodeAsBytes);
-                                node = getNodeFromBytes(nodeAsBytes);
+                                node = Node.fromBytes(nodeAsBytes);
                                 if (node.getId() == updatedNode.getId())
                                 {
                                         if (DEBUG_MODE > 1)
@@ -363,14 +157,14 @@ public class FileHandler {
                                                         }
                                                 }
                                         }
-                                        raf.seek(i * getNodeSizeInBytes()); // TODO: May not be needed
-                                        raf.write(getNodeAsBytes(updatedNode));
+                                        raf.seek(i * Node.BYTES); // TODO: May not be needed
+                                        raf.write(updatedNode.toBytes());
                                         if (DEBUG_MODE > 1)
                                         {
-                                                byte[] nodeWritten = new byte[getNodeSizeInBytes()];
-                                                raf.seek(i * getNodeSizeInBytes()); // TODO: May not be needed
+                                                byte[] nodeWritten = new byte[Node.BYTES];
+                                                raf.seek(i * Node.BYTES); // TODO: May not be needed
                                                 raf.readFully(nodeWritten);
-                                                System.out.println("Node written: " + getNodeFromBytes(nodeWritten));
+                                                System.out.println("Node written: " + Node.fromBytes(nodeWritten));
                                         }
                                 }
                         }
@@ -402,118 +196,7 @@ public class FileHandler {
 
 
 
-        // https://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
-        private static byte[] longToBytes(long l)
-        {
-                byte[] result = new byte[Long.BYTES];
-                for (int i = Long.BYTES - 1; i >= 0; --i)
-                {
-                        result[i] = (byte)(l & 0xFF);
-                        l >>= Byte.SIZE;
-                }
-                return result;
-        }
 
-        private static long bytesToLong(final byte[] b)
-        {
-                long result = 0;
-                for (int i = 0; i < Long.BYTES; ++i)
-                {
-                        result <<= Byte.SIZE;
-                        result |= (b[i] & 0xFF);
-                }
-                return result;
-        }
-
-        // https://stackoverflow.com/questions/2905556/how-can-i-convert-a-byte-array-into-a-double-and-back?answertab=votes#tab-top
-        private static byte[] doubleToBytes(double value)
-        {
-                byte[] bytes = new byte[Double.BYTES];
-                ByteBuffer.wrap(bytes).putDouble(value);
-                return bytes;
-        }
-
-        private static double bytesToDouble(byte[] bytes)
-        {
-                return ByteBuffer.wrap(bytes).getDouble();
-        }
-
-        // https://stackoverflow.com/questions/1936857/convert-integer-into-byte-array-java
-        private static byte[] intToBytes(int value)
-        {
-                byte[] bytes = new byte[Integer.BYTES];
-                ByteBuffer.wrap(bytes).putInt(value);
-                return bytes;
-        }
-
-        private static int bytesToInt(byte[] bytes)
-        {
-                return ByteBuffer.wrap(bytes).getInt();
-        }
-
-        private static int getRecordLengthInBytes()
-        {
-                // (RecordId, nameLength, name, Coordinates)
-                return Long.BYTES + Integer.BYTES + Character.BYTES * 256 + Double.BYTES * dimensions;
-        }
-
-        private static byte[] getRecordAsBytes(Record record)
-        {
-                byte[] idAsBytes = longToBytes(record.getId()),
-                        nameAsBytes = record.getName().getBytes(StandardCharsets.UTF_8),
-                        nameLengthAsBytes = intToBytes(nameAsBytes.length),
-                        coordinatesAsBytes = new byte[record.getCoordinates().length * Double.BYTES],
-                        recordAsBytes = new byte[getRecordLengthInBytes()];
-
-                for (int i = 0; i < record.getCoordinates().length; ++i)
-                {
-                        double coordinate = record.getCoordinates()[i];
-                        System.arraycopy(doubleToBytes(coordinate), 0, coordinatesAsBytes, i * Double.BYTES, Double.BYTES);
-                }
-
-                int destPos = 0;
-                System.arraycopy(idAsBytes, 0, recordAsBytes, destPos, idAsBytes.length);
-                destPos += idAsBytes.length;
-                System.arraycopy(nameLengthAsBytes, 0, recordAsBytes, destPos, nameLengthAsBytes.length);
-                destPos += nameLengthAsBytes.length;
-                System.arraycopy(nameAsBytes, 0, recordAsBytes, destPos, nameAsBytes.length);
-                destPos += nameAsBytes.length;
-                System.arraycopy(new byte[256 - nameAsBytes.length], 0, recordAsBytes, destPos, 256 - nameAsBytes.length);
-                destPos += (256 - nameAsBytes.length);
-                System.arraycopy(coordinatesAsBytes, 0, recordAsBytes, destPos, coordinatesAsBytes.length);
-
-                return recordAsBytes;
-        }
-
-        private static Record getRecordFromBytes(byte[] bytes)
-        {
-                byte[] idAsBytes = new byte[Long.BYTES],
-                        nameLengthAsBytes = new byte[Integer.BYTES],
-                        nameAsBytes = new byte[256],
-                        coordinatesAsBytes = new byte[dimensions * Double.BYTES];
-
-                int srcPos = 0;
-                System.arraycopy(bytes, srcPos, idAsBytes, 0, Long.BYTES);
-                srcPos += Long.BYTES;
-                System.arraycopy(bytes, srcPos, nameLengthAsBytes, 0, Integer.BYTES);
-                srcPos += Integer.BYTES;
-                System.arraycopy(bytes, srcPos, nameAsBytes, 0, 256);
-                srcPos += 256;
-                System.arraycopy(bytes, srcPos, coordinatesAsBytes, 0, dimensions * Double.BYTES);
-
-                long id = bytesToLong(idAsBytes);
-                int nameLength = bytesToInt(nameLengthAsBytes);
-                String name = new String(nameAsBytes, 0, nameLength);
-                double[] coordinates = new double[dimensions];
-                for (int i = 0; i < dimensions; ++i)
-                {
-                        byte[] coordinateAsBytes = new byte[Double.BYTES];
-                        System.arraycopy(coordinatesAsBytes, i * Double.BYTES, coordinateAsBytes, 0, Double.BYTES);
-                        coordinates[i] = bytesToDouble(coordinateAsBytes);
-                }
-
-                return new Record(id, name, coordinates);
-        }
 
         private static void writeDataBlock(ArrayList<Record> records)
         {
@@ -529,11 +212,14 @@ public class FileHandler {
 
                 byte[] block = new byte[BLOCK_SIZE];
                 int destPos = 0;
-                System.arraycopy(intToBytes(numberOfRecords), 0, block, destPos, Integer.BYTES);
+
+                System.arraycopy(ByteConvertable.intToBytes(numberOfRecords), 0, block, destPos, Integer.BYTES);
                 destPos += Integer.BYTES;
-                for (Record record : records) {
-                        System.arraycopy(getRecordAsBytes(record), 0, block, destPos, getRecordLengthInBytes());
-                        destPos += getRecordLengthInBytes();
+
+                for (Record record : records)
+                {
+                        System.arraycopy(record.toBytes(), 0, block, destPos, Record.BYTES);
+                        destPos += Record.BYTES;
                 }
 
                 try {
@@ -573,14 +259,14 @@ public class FileHandler {
                 int srcPos = 0;
                 System.arraycopy(block, srcPos, numberOfRecordsAsBytes, 0, Integer.BYTES);
                 srcPos += Integer.BYTES;
-                int numberOfRecords = bytesToInt(numberOfRecordsAsBytes);
+                int numberOfRecords = ByteConvertable.bytesToInt(numberOfRecordsAsBytes);
                 ArrayList<Record> records = new ArrayList<>();
                 for (int i = 0; i < numberOfRecords; ++i)
                 {
-                        byte[] recordAsBytes = new byte[getRecordLengthInBytes()];
-                        System.arraycopy(block, srcPos, recordAsBytes, 0, getRecordLengthInBytes());
-                        srcPos += getRecordLengthInBytes();
-                        records.add(getRecordFromBytes(recordAsBytes));
+                        byte[] recordAsBytes = new byte[Record.BYTES];
+                        System.arraycopy(block, srcPos, recordAsBytes, 0, Record.BYTES);
+                        srcPos += Record.BYTES;
+                        records.add(Record.fromBytes(recordAsBytes));
                 }
                 if (DEBUG_MODE > 1)
                 {

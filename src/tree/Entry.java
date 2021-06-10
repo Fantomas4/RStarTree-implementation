@@ -1,10 +1,14 @@
 package tree;
 
+import utils.ByteConvertable;
+
 import java.io.Serializable;
 
-public class Entry implements Serializable {
+public class Entry extends ByteConvertable {
     protected BoundingBox boundingBox;
     private long childNodeId;
+    // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)
+    public static final int BYTES = BoundingBox.BYTES + 3 * Long.BYTES;
 
     public Entry(BoundingBox boundingBox, long childNodeId) {
         this.boundingBox = boundingBox;
@@ -35,5 +39,32 @@ public class Entry implements Serializable {
     public String toString()
     {
         return "Entry(" + boundingBox.toString() + ", " + "childNodeId(" + childNodeId + "))";
+    }
+
+    @Override
+    public byte[] toBytes()
+    {
+        byte[] entryAsBytes = new byte[BYTES];
+        int destPos = 0;
+
+        System.arraycopy(boundingBox.toBytes(), 0, entryAsBytes, destPos, BoundingBox.BYTES);
+        destPos += BoundingBox.BYTES;
+        System.arraycopy(longToBytes(childNodeId), 0, entryAsBytes, destPos, Long.BYTES);
+
+        return entryAsBytes;
+    }
+
+
+    public static Entry fromBytes(byte[] bytes)
+    {
+        byte[] boundingBoxAsBytes = new byte[BoundingBox.BYTES],
+                childNodeIdAsBytes = new byte[Long.BYTES];
+        int srcPos = 0;
+
+        System.arraycopy(bytes, srcPos, boundingBoxAsBytes, 0, boundingBoxAsBytes.length);
+        srcPos += boundingBoxAsBytes.length;
+        System.arraycopy(bytes, srcPos, childNodeIdAsBytes, 0, childNodeIdAsBytes.length);
+
+        return new Entry(BoundingBox.fromBytes(boundingBoxAsBytes), bytesToLong(childNodeIdAsBytes));
     }
 }
