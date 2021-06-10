@@ -12,9 +12,9 @@ import java.util.Collections;
  */
 public class TreeRangeQuery {
     private final double range;
-    protected Node rootNode;
-    protected double[] targetPoint;
-    protected ArrayList<LocationQueryResult> queryResults;
+    private final Node rootNode;
+    private final double[] targetPoint;
+    private final ArrayList<LocationQueryResult> queryResults;
 
     public TreeRangeQuery(double[] targetPoint, double range, Node rootNode) {
         this.targetPoint = targetPoint;
@@ -26,7 +26,7 @@ public class TreeRangeQuery {
     }
 
     /**
-     * Called to initialize the recursive range search amd return the query results.
+     * Called to initialize the recursive range search amd return the sorted query results.
      * @return an ArrayList containing the query results, sorted in ascending order of distance.
      */
     public ArrayList<LocationQueryResult> execute() {

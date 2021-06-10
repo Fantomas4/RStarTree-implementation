@@ -8,16 +8,16 @@ import java.util.Collections;
 import java.util.PriorityQueue;
 
 /**
- * Class used to perform RStarTree-based Nearest Neighbor (NN) queries to detect the "k"
+ * Class used to perform RStarTree-based Nearest Neighbor (NN) queries to determine the "k"
  * closest neighbors of a given point.
  */
 public class TreeNNQuery {
     private final int k;
     private double searchRadius;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
-    protected Node rootNode;
-    protected double[] targetPoint;
-    protected ArrayList<LocationQueryResult> queryResults;
+    private final Node rootNode;
+    private final double[] targetPoint;
+    private final ArrayList<LocationQueryResult> queryResults;
 
 
     public TreeNNQuery(double[] targetPoint, int k, Node rootNode) {
@@ -31,7 +31,7 @@ public class TreeNNQuery {
     }
 
     /**
-     * Called to initialize the recursive nearest neighbor search and return the query results.
+     * Called to initialize the recursive nearest neighbor search and return the sorted query results.
      * @return an ArrayList containing the query results, sorted in an ascending order of distance.
      */
     public ArrayList<LocationQueryResult> execute() {

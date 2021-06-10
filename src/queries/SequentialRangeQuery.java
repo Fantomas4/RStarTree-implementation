@@ -15,8 +15,8 @@ import static java.lang.Math.sqrt;
  */
 public class SequentialRangeQuery {
     private final double range;
-    protected double[] targetPoint;
-    protected ArrayList<LocationQueryResult> queryResults;
+    private final double[] targetPoint;
+    private final ArrayList<LocationQueryResult> queryResults;
 
     public SequentialRangeQuery(double[] targetPoint, double range) {
         this.targetPoint = targetPoint;
@@ -43,6 +43,10 @@ public class SequentialRangeQuery {
         return sqrt(sum);
     }
 
+    /**
+     * Called to start the nearest neighbor search and return the sorted query results.
+     * @return an ArrayList containing the query results, sorted in an ascending order of distance.
+     */
     public ArrayList<LocationQueryResult> execute() {
         search();
         Collections.sort(queryResults);

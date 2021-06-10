@@ -10,11 +10,16 @@ import java.util.PriorityQueue;
 
 import static java.lang.Math.sqrt;
 
+/**
+ * Class used to perform sequential Nearest Neighbor (NN) queries on the datafile to determine
+ * the "k" closest neighbors of a given point.
+ */
 public class SequentialNNQuery {
     private final int k;
-    protected double[] targetPoint;
-    protected ArrayList<LocationQueryResult> queryResults;
+    private final double[] targetPoint;
+    private final ArrayList<LocationQueryResult> queryResults;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
+
 
     public SequentialNNQuery(double[] targetPoint, int k) {
         this.k = k;
@@ -24,6 +29,12 @@ public class SequentialNNQuery {
         kClosestNeighborsQueue = new PriorityQueue<>();
     }
 
+    /**
+     * Calculates the distance of a given point from the range query's specified target point.
+     * @param candidatePoint the given point whose distance is calculated from the range query's
+     *                       specified target point.
+     * @return a number representing the calculated distance.
+     */
     private double calculateDistanceFromTarget(double[] candidatePoint) {
         int dimensions = targetPoint.length;
         double sum = 0;
@@ -36,6 +47,10 @@ public class SequentialNNQuery {
         return sqrt(sum);
     }
 
+    /**
+     * Called to start the nearest neighbor search and return the sorted query results.
+     * @return an ArrayList containing the query results, sorted in an ascending order of distance.
+     */
     public ArrayList<LocationQueryResult> execute() {
         search();
 
@@ -54,6 +69,9 @@ public class SequentialNNQuery {
         return queryResults;
     }
 
+    /**
+     * Performs a search to locate the "k" Nearest Neighbors (NN) of the given target point.
+     */
     private void search() {
         int numBlocks = DataMetaData.getNumberOfBlocks();
 
