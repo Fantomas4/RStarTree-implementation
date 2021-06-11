@@ -2,6 +2,8 @@ package queries;
 
 import tree.Record;
 
+import java.util.Arrays;
+
 public class LocationQueryResult implements Comparable<LocationQueryResult> {
     private final long recordId; // TEMP FOR DEBUGGING!
     private final String name;
@@ -47,5 +49,23 @@ public class LocationQueryResult implements Comparable<LocationQueryResult> {
         } else {
             return distanceCompRes;
         }
+    }
+
+    @Override
+    public String toString() {
+        /*
+        return "LocationQueryResult{" +
+                "recordId=" + recordId +
+                ", name='" + name + '\'' +
+                ", coordinates=" + Arrays.toString(coordinates) +
+                ", distance=" + distance +
+                '}';
+        */
+        return "-----------------------------------------\n" +
+                "Record ID: " + recordId + "\n" +
+                "Name: " + name + "\n" +
+                "Coordinates: " + Arrays.toString(coordinates) + "\n" +
+                "Distance: " + distance + "\n" +
+                "-----------------------------------------\n";
     }
 }
