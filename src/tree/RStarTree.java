@@ -7,6 +7,9 @@ import utils.DataMetaData;
 import utils.FileHandler;
 import java.util.*;
 
+/**
+ * Class used to create RStarTree data structure instances.
+ */
 public class RStarTree {
     private static final double REINSERT_P_PARAMETER = 0.3;
     private static final int REINSERT_AMOUNT = (int) Math.round(REINSERT_P_PARAMETER * Node.getMaxEntriesLimit());
@@ -139,6 +142,15 @@ public class RStarTree {
         return getTreeHeight() + 1;
     }
 
+    /**
+     * Used to find the optimal insertion path to a specified tree level for a new entry, by choosing the optimal entry
+     * from the node being examined.
+     * @param newEntry the new entry for which the optimal insertion path must be found.
+     * @param currentNode the node that is to be processed in order to find its optimal entry that the insertion
+     *                    of the new entry will follow.
+     * @param targetLevel the new entry's desired insertion tree level.
+     * @return
+     */
     private Entry chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
         //        System.out.println("currentNode level: " + currentNode.getLevel());
         if (currentNode.getLevel() - 1 == targetLevel) {
@@ -156,6 +168,11 @@ public class RStarTree {
         }
     }
 
+    /**
+     * Used to insert a new record into the tree structure.
+     * @param newRecord the new record that is to be inserted into the tree structure.
+     * @param blockId the unique ID of the datafile block where the new record is saved.
+     */
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
         // Create a new LeafEntry for the record
@@ -177,6 +194,13 @@ public class RStarTree {
 
     }
 
+    /**
+     * Recursive method used to perform the insertion of a new entry into the tree structure.
+     * @param newEntry the entry that is to be inserted into the tree structure.
+     * @param parentNode the parent node currently being processed.
+     * @param parentEntry the parent node's entry currently being processed.
+     * @param targetLevel the tree level where the new entry is to be placed.
+     */
     private void insert(Entry newEntry, Node parentNode, Entry parentEntry, int targetLevel) {
         debugInsertRecursionCounter ++;
         Node currentNode;
@@ -269,11 +293,17 @@ public class RStarTree {
 
             }
         }
-
-
-        System.out.println("dummy");
     }
 
+    /**
+     * Used to handle an overflowed node by either reinserting some of its entries to the tree structure
+     * or splitting it into 2 new nodes.
+     * @param overflowedNode the overflowed node that needs to be processed.
+     * @param parentNode the parent node of the overflowed node.
+     * @param parentEntry the entry inside the parent node that points to the overflowed node.
+     * @return null if reinsertion was chosen to mitigate the overflowed node, or an ArrayList containing
+     * the 2 new nodes the overflowed node was split into.
+     */
     private ArrayList<Node> overflowTreatment(Node overflowedNode, Node parentNode, Entry parentEntry) {
         int overflowedNodeLevel = overflowedNode.getLevel();
         if (overflowedNode.getLevel() != rootLevel) {
@@ -294,6 +324,13 @@ public class RStarTree {
         return overflowedNode.splitNode();
     }
 
+    /**
+     * Used to remove a portion of the overflowed node's entries (REINSERT_AMOUNT) and reinsert them into the tree
+     * structure, in order to re-balance the overflowed node.
+     * @param overflowedNode the overflowed node.
+     * @param parentNode the overflowed node's parent node.
+     * @param parentEntry the entry inside the parent node that points to the overflowed node.
+     */
     private void reInsert(Node overflowedNode, Node parentNode, Entry parentEntry) {
         // R* Tree paper reference: RI - ReInsert
         // TODO: Verify correctness of implementation (far-reinsert vs close-reinsert)
@@ -329,6 +366,11 @@ public class RStarTree {
         System.out.println("Exiting reinsert...");
     }
 
+    /** Used to instantiate a RangeQuery object and execute a range query for a given point in a specified range.
+     * @param targetPoint the point for which the range query is to be executed.
+     * @param range the range of the range query.
+     * @return an ArrayList that contains LocationQueryResult objects representing the range query's results.
+     */
     public ArrayList<LocationQueryResult> executeRangeQuery(double[] targetPoint, double range) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
         TreeRangeQuery rangeQuery = new TreeRangeQuery(targetPoint, range, rootNode);
@@ -336,6 +378,13 @@ public class RStarTree {
         return rangeQuery.execute();
     }
 
+    /**
+     * Used to instantiate an NNQuery object and execute a k-nearest neighbors query for a given point, using a specified
+     * "k" value.
+     * @param targetPoint the point for which the NN query is to be executed.
+     * @param k the specified "k" value.
+     * @return an ArrayList that contains LocationQueryResult objects representing the NN query's results.
+     */
     public ArrayList<LocationQueryResult> executeNNQuery(double[] targetPoint, int k) {
         Node rootNode = FileHandler.getRootNode(); // TODO: Get root node from File Handler. CHECK!
         TreeNNQuery nnQuery = new TreeNNQuery(targetPoint, k, rootNode);
