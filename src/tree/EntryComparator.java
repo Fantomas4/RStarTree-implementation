@@ -2,8 +2,15 @@ package tree;
 
 import java.util.*;
 
+/**
+ * Class that contains custom entry comparators based on different comparison criteria.
+ */
 public class EntryComparator {
 
+    /**
+     * Custom comparator used to compare two entries based on the overlap enlargement effect on their bounding boxes
+     * from the addition of a specified entry to them.
+     */
     public static class OverlapEnlargementComparator implements Comparator<Entry> {
         private final ArrayList<Entry> candidateEntries;
         private final Entry targetEntry;
@@ -72,6 +79,10 @@ public class EntryComparator {
         }
     }
 
+    /**
+     * Custom comparator used to compare two entries based on the area enlargement effect on their bounding boxes
+     * from the addition of a specified entry to them.
+     */
     public static class AreaEnlargementComparator implements Comparator<Entry> {
         private final ArrayList<Entry> candidateEntries;
         private final Entry targetEntry;
@@ -123,6 +134,9 @@ public class EntryComparator {
         }
     }
 
+    /**
+     * Custom comparator used to compare entries based on their upper right point's value for a specified dimension.
+     */
     public static class UpperValueComparator implements Comparator<Entry> {
         private final int targetDimension;
 
@@ -139,6 +153,9 @@ public class EntryComparator {
         }
     }
 
+    /**
+     * Custom comparator used to compare entries based on their lower left point's value for a specified dimension.
+     */
     public static class LowerValueComparator implements Comparator<Entry> {
         private final int targetDimension;
 
@@ -155,6 +172,10 @@ public class EntryComparator {
         }
     }
 
+    /**
+     * Custom comparator used to compare two entries based on their bounding boxes centers' distances from the center of
+     * a specified bounding box.
+     */
     public static class BBCenterDistanceComparator implements Comparator<Entry> {
         private final BoundingBox targetBoundingBox;
 
@@ -187,6 +208,9 @@ public class EntryComparator {
         }
     }
 
+    /**
+     * Custom comparator used to compare two entries based on their bounding boxes' distances from a specified point.
+     */
     public static class DistanceToPointComparator implements Comparator<Entry> {
         private final double[] targetPoint;
 
