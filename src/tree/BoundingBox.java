@@ -1,9 +1,8 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 import utils.FileHandler;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -1,12 +1,12 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 import utils.FileHandler;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Node extends ByteConvertable {
+public class Node extends ByteConvertible {
     private static final int DIMENSIONS = 2; //TODO: Get number of dimensions from file handler.
     private static final int MAX_ENTRIES = 3; //TODO: Get max entries per node from File Handler using FileHandler.getMaxEntriesInBlock();
     private static final double MIN_LOAD_FACTOR = 0.4;

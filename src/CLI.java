@@ -7,7 +7,9 @@ import tree.Record;
 import utils.DataMetaData;
 import utils.FileHandler;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -17,6 +19,8 @@ public class CLI {
     {
         Scanner scanner = new Scanner(System.in);
         String input;
+        ArrayList<LocationQueryResult> queryResults;
+        RStarTree rStarTree = new RStarTree();
         do {
             System.out.println("Options:");
             System.out.println("1) K - Nearest Neighbour Query");
@@ -25,28 +29,95 @@ public class CLI {
 
             System.out.print("Select option: ");
             input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
-
+            if (input.equals("0"))
+            {
+                break;
+            }
             System.out.println();
+            double[] centerCoordinates = new double[FileHandler.DIMENSIONS];
+            System.out.println("Enter center point coordinates: ");
+            for (int i = 0; i < FileHandler.DIMENSIONS; ++i)
+            {
+                System.out.print("Enter center point coordinates for dimension " + (i + 1) + ": ");
+                centerCoordinates[i] = scanner.nextDouble();
+            }
+            System.out.println("Your center point is: " + Arrays.toString(centerCoordinates));
+
+            long startingTime, endingTime;
             switch (input)
             {
                 case "1":
                     System.out.println("K - Nearest Neighbour Query selected");
+                    System.out.print("Enter k (number of nearest neighbours):");
+                    int k = scanner.nextInt();
+                    while (k <= 0)
+                    {
+                        System.out.println("K must be a positive integer");
+                        System.out.print("Enter k (number of nearest neighbours):");
+                        k = scanner.nextInt();
+                    }
+
+                    System.out.println("R-Star Tree");
+                    startingTime = System.nanoTime();
+                    queryResults = rStarTree.executeNNQuery(centerCoordinates, k);
+                    endingTime = System.nanoTime();
+                    for (LocationQueryResult result : queryResults) {
+                        System.out.println(result);
+                    }
+                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
+
+                    System.out.println("Sequential");
+                    startingTime = System.nanoTime();
+                    queryResults = new SequentialNNQuery(centerCoordinates, k).execute();
+                    endingTime = System.nanoTime();
+                    for (LocationQueryResult result : queryResults) {
+                        System.out.println(result);
+                    }
+                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
                     break;
                 case "2":
                     System.out.println("Range Query selected");
+                    System.out.print("Enter radius for range query:");
+                    double r = scanner.nextDouble();
+                    while (r <= 0)
+                    {
+                        System.out.println("Radius must be a positive value");
+                        System.out.print("Enter positive radius:");
+                        r = scanner.nextDouble();
+                    }
+
+                    System.out.println("R-Star Tree");
+                    startingTime = System.nanoTime();
+                    queryResults = rStarTree.executeRangeQuery(centerCoordinates, r);
+                    endingTime = System.nanoTime();
+                    for (LocationQueryResult result : queryResults) {
+                        System.out.println(result);
+                    }
+                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
+
+                    System.out.println("Sequential");
+                    startingTime = System.nanoTime();
+                    queryResults = new SequentialRangeQuery(centerCoordinates, r).execute();
+                    endingTime = System.nanoTime();
+                    for (LocationQueryResult result : queryResults) {
+                        System.out.println(result);
+                    }
+                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
                     break;
             }
-        } while (!input.equals("0"));
+            scanner.nextLine(); // FLushing scanner buffer
+        } while (true);
 
     }
 
     public static void main(String[] args) {
+        /*
         RStarTree rStarTree = new RStarTree();
 
         double[] testCoords = new double[2];
         testCoords[0] = 0;
         testCoords[1] = 0;
-//
+
         ArrayList<LocationQueryResult> queryResults;
         // 49.261
 
@@ -68,7 +139,8 @@ public class CLI {
         for (LocationQueryResult result : queryResults) {
             System.out.println(result);
         }
-
+        */
+        run();
         System.out.println("DONE!");
 
 

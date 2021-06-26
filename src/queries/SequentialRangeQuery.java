@@ -59,7 +59,7 @@ public class SequentialRangeQuery {
      * the specified radius.
      */
     private void search() {
-        int numBlocks = DataMetaData.getNumberOfBlocks();
+        long numBlocks = DataMetaData.getNumberOfBlocks();
 
         for (int blockId = 0; blockId < numBlocks; blockId++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(blockId);

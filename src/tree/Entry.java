@@ -1,6 +1,6 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 
 
 /**

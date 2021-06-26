@@ -11,8 +11,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class FileHandler {
@@ -20,19 +18,18 @@ public class FileHandler {
         private static ArrayList<Node> dummyIndexFile = new ArrayList<>();
         private static ArrayList<Record[]> dummyDataFile = new ArrayList<>();
 
-        private static final int DEBUG_MODE = 2;
+        private static final int DEBUG_MODE = 0;
 
-        private static final String DATAFILE_NAME = "datafile.dat";
-        private static final String INDEXFILE_NAME = "indexfile.dat";
+        public static final String DATAFILE_NAME = "datafile.dat";
+        public static final String INDEXFILE_NAME = "indexfile.dat";
 
         private static long rootNodeId = 1;
         public static final int DIMENSIONS = 2;
 
         private static String osmFilePath = "map.osm";
-        private static final int BLOCK_SIZE = 2 * 1024; // 32 * 1024
+        public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
         private static long nextAvailableNodeId = 2;
 
-        private static final int maxEntriesInBlock = 5;
         public static final int maxEntriesInNode = 3;
 
 
@@ -213,7 +210,7 @@ public class FileHandler {
                 byte[] block = new byte[BLOCK_SIZE];
                 int destPos = 0;
 
-                System.arraycopy(ByteConvertable.intToBytes(numberOfRecords), 0, block, destPos, Integer.BYTES);
+                System.arraycopy(ByteConvertible.intToBytes(numberOfRecords), 0, block, destPos, Integer.BYTES);
                 destPos += Integer.BYTES;
 
                 for (Record record : records)
@@ -223,9 +220,20 @@ public class FileHandler {
                 }
 
                 try {
-                        FileOutputStream fos = new FileOutputStream(DATAFILE_NAME, true);
-                        fos.write(block);
+                        RandomAccessFile raf = new RandomAccessFile(DATAFILE_NAME, "rw");
+
+                        raf.seek(0);
+                        byte[] dataMetaDataAsBytes = new byte[DataMetaData.BYTES];
+                        raf.readFully(dataMetaDataAsBytes);
+                        DataMetaData.fromBytes(dataMetaDataAsBytes);
+
+                        raf.seek(DataMetaData.getNumberOfBlocks() * BLOCK_SIZE);
+                        raf.write(block);
+
                         DataMetaData.addOneBlock();
+
+                        raf.seek(0);
+                        raf.write(DataMetaData.toBytes());
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -259,7 +267,7 @@ public class FileHandler {
                 int srcPos = 0;
                 System.arraycopy(block, srcPos, numberOfRecordsAsBytes, 0, Integer.BYTES);
                 srcPos += Integer.BYTES;
-                int numberOfRecords = ByteConvertable.bytesToInt(numberOfRecordsAsBytes);
+                int numberOfRecords = ByteConvertible.bytesToInt(numberOfRecordsAsBytes);
                 ArrayList<Record> records = new ArrayList<>();
                 for (int i = 0; i < numberOfRecords; ++i)
                 {
@@ -297,6 +305,7 @@ public class FileHandler {
                 {
                         System.out.println("Reading OSM File:");
                 }
+                DataMetaData.init();
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
                 Record record;
@@ -346,11 +355,6 @@ public class FileHandler {
                 } catch (ParserConfigurationException | SAXException | IOException e) {
                         e.printStackTrace();
                 }
-        }
-
-        public static int getMaxEntriesInBlock()
-        {
-                return maxEntriesInBlock;
         }
 
 

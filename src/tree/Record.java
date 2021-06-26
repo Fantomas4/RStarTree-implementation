@@ -1,10 +1,11 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 import utils.FileHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
 
 /**
  * Class used to store the information of a location.

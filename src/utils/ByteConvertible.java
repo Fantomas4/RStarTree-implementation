@@ -6,7 +6,7 @@ import tree.LeafEntry;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public abstract class ByteConvertable
+public abstract class ByteConvertible
 {
         // https://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
         protected static byte[] longToBytes(long l)

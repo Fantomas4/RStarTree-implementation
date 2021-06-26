@@ -73,7 +73,7 @@ public class SequentialNNQuery {
      * Performs a search to locate the "k" Nearest Neighbors (NN) of the given target point.
      */
     private void search() {
-        int numBlocks = DataMetaData.getNumberOfBlocks();
+        long numBlocks = DataMetaData.getNumberOfBlocks();
 
         for (int blockId = 0; blockId < numBlocks; blockId++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(blockId);

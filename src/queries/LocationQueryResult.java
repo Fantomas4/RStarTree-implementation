@@ -66,7 +66,7 @@ public class LocationQueryResult implements Comparable<LocationQueryResult> {
                 '}';
         */
         return "-----------------------------------------\n" +
-                "Record ID: " + recordId + "\n" +
+//                "Record ID: " + recordId + "\n" +
                 "Name: " + name + "\n" +
                 "Coordinates: " + Arrays.toString(coordinates) + "\n" +
                 "Distance: " + distance + "\n" +
