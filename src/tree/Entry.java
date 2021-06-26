@@ -2,9 +2,13 @@ package tree;
 
 import utils.ByteConvertible;
 
-public class Entry extends ByteConvertible {
-    protected BoundingBox boundingBox;
-    private long childNodeId;
+
+/**
+ * Class used to represent the entries each node contains.
+ */
+public class Entry extends ByteConvertable {
+    protected BoundingBox boundingBox; // The minimum bounding box of the entry that is determined based on its child node.
+    private long childNodeId; // The child node's unique ID.
     // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)
     public static final int BYTES = BoundingBox.BYTES + 3 * Long.BYTES;
 
@@ -13,25 +17,20 @@ public class Entry extends ByteConvertible {
         this.childNodeId = childNodeId;
     }
 
-    public Entry(BoundingBox boundingBox) {
-        this.boundingBox = boundingBox;
-        this.childNodeId = -1; // tree.Entry has no child node
-    }
-
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }
 
+    /**
+     * Used to recalculate the bounding box of the entry when its child node is updated.
+     * @param updatedChildNode
+     */
     public void adjustBoundingBox(Node updatedChildNode) {
         boundingBox = BoundingBox.calculateMBR(updatedChildNode.getEntries());
     }
 
     public long getChildNodeId() {
         return childNodeId;
-    }
-
-    public void setChildNodeId(long childNodeId) {
-        this.childNodeId = childNodeId;
     }
 
     public String toString()

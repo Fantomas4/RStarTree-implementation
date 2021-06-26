@@ -10,18 +10,31 @@ import java.util.PriorityQueue;
 
 import static java.lang.Math.sqrt;
 
-public class SequentialNNQuery extends Query{
+/**
+ * Class used to perform sequential Nearest Neighbor (NN) queries on the datafile to determine
+ * the "k" closest neighbors of a given point.
+ */
+public class SequentialNNQuery {
     private final int k;
-    private double searchRadius;
+    private final double[] targetPoint;
+    private final ArrayList<LocationQueryResult> queryResults;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
 
+
     public SequentialNNQuery(double[] targetPoint, int k) {
-        super(targetPoint);
         this.k = k;
-        searchRadius = Double.MAX_VALUE;
+        this.targetPoint = targetPoint;
+        queryResults = new ArrayList<>();
+
         kClosestNeighborsQueue = new PriorityQueue<>();
     }
 
+    /**
+     * Calculates the distance of a given point from the range query's specified target point.
+     * @param candidatePoint the given point whose distance is calculated from the range query's
+     *                       specified target point.
+     * @return a number representing the calculated distance.
+     */
     private double calculateDistanceFromTarget(double[] candidatePoint) {
         int dimensions = targetPoint.length;
         double sum = 0;
@@ -34,6 +47,10 @@ public class SequentialNNQuery extends Query{
         return sqrt(sum);
     }
 
+    /**
+     * Called to start the nearest neighbor search and return the sorted query results.
+     * @return an ArrayList containing the query results, sorted in an ascending order of distance.
+     */
     public ArrayList<LocationQueryResult> execute() {
         search();
 
@@ -52,6 +69,9 @@ public class SequentialNNQuery extends Query{
         return queryResults;
     }
 
+    /**
+     * Performs a search to locate the "k" Nearest Neighbors (NN) of the given target point.
+     */
     private void search() {
         long numBlocks = DataMetaData.getNumberOfBlocks();
 
@@ -70,9 +90,6 @@ public class SequentialNNQuery extends Query{
                         // as a new neighbor.
                         kClosestNeighborsQueue.remove();
                         kClosestNeighborsQueue.add(new Neighbor(blockId, record.getId(), candidateDistance));
-
-                        // Update the search radius
-                        searchRadius = candidateDistance;
                     }
                 } else {
                     // The priority queue contains less than k neighbors, so leafEntry is
