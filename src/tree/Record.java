@@ -1,13 +1,12 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 import utils.FileHandler;
 
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class Record extends ByteConvertable {
+public class Record extends ByteConvertible {
     private long id;
     private String name;
     private double[] coordinates;

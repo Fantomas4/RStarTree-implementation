@@ -1,10 +1,8 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 
-import java.io.Serializable;
-
-public class Entry extends ByteConvertable {
+public class Entry extends ByteConvertible {
     protected BoundingBox boundingBox;
     private long childNodeId;
     // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)

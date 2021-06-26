@@ -30,7 +30,7 @@ public class RStarTree {
         Node rootNode = new Node(rootLevel, rootNodeId);
         FileHandler.setRootNode(rootNode); // TODO: Save root node using File Handler. CHECK!
 
-        int numBlocks = DataMetaData.getNumberOfBlocks();
+        long numBlocks = DataMetaData.getNumberOfBlocks();
 
         int dRecordsCount = 0;
 

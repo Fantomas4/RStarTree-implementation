@@ -1,9 +1,8 @@
 package tree;
 
-import utils.ByteConvertable;
+import utils.ByteConvertible;
 import utils.FileHandler;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +11,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
 
-public class BoundingBox extends ByteConvertable {
+public class BoundingBox extends ByteConvertible {
     private final double[] lowerLeftPoint; // The bottom left point of the rectangle
     private final double[] upperRightPoint; // The bottom right point of the rectangle
     private final int dimensions;
