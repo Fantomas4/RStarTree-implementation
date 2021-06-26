@@ -6,7 +6,7 @@ import utils.ByteConvertible;
 /**
  * Class used to represent the entries each node contains.
  */
-public class Entry extends ByteConvertable {
+public class Entry extends ByteConvertible {
     protected BoundingBox boundingBox; // The minimum bounding box of the entry that is determined based on its child node.
     private long childNodeId; // The child node's unique ID.
     // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)

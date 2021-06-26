@@ -36,7 +36,7 @@ public class RStarTree {
 
         int dRecordsCount = 0;
 
-        for (int i = 0; i < numBlocks; i++) {
+        for (int i = 1; i < numBlocks; i++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
             for (Record record : blockRecords) {
                 insertRecord(record, i);

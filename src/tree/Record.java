@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Class used to store the information of a location.
  */
-public class Record extends ByteConvertable {
+public class Record extends ByteConvertible {
     private long id; // The unique identifier of the record.
     private String name; // The name of the location stored in the record.
     private double[] coordinates; // The coordinates of the location stored in the record.
