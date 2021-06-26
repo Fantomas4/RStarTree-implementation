@@ -18,8 +18,6 @@ public class RStarTree {
     private int rootLevel;
     boolean[] levelOverflowCalled;
 
-    int debugRecordCounter = 0;
-    int debugInsertRecursionCounter = 0;
 
     public RStarTree() {
         FileHandler.deleteIndexAndDataFile();
@@ -152,7 +150,6 @@ public class RStarTree {
      * @return
      */
     private Entry chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
-        //        System.out.println("currentNode level: " + currentNode.getLevel());
         if (currentNode.getLevel() - 1 == targetLevel) {
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
@@ -176,10 +173,7 @@ public class RStarTree {
     private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
         // Create a new LeafEntry for the record
-        debugRecordCounter++;
-        debugInsertRecursionCounter = 0;
 
-        System.out.println("----------------->>>>Insertion " + debugRecordCounter + " -Inserting record: " + newRecord.getId());
         BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates().clone());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
 
@@ -202,7 +196,6 @@ public class RStarTree {
      * @param targetLevel the tree level where the new entry is to be placed.
      */
     private void insert(Entry newEntry, Node parentNode, Entry parentEntry, int targetLevel) {
-        debugInsertRecursionCounter ++;
         Node currentNode;
 
         if (parentNode == null && parentEntry == null) {
@@ -216,7 +209,6 @@ public class RStarTree {
             // The target level has been reached, so newEntry is added to currentNode
             currentNode.addEntry(newEntry);
 
-            System.out.println("currentNode update");
             FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
 
             if (parentEntry != null) {
@@ -226,10 +218,6 @@ public class RStarTree {
             }
 
             if (parentNode != null) {
-                if (parentNode.isOverflowed()) {
-                    System.out.println("**********************");
-                }
-                System.out.println("parentNode update");
                 FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
             }
         } else {
@@ -237,8 +225,6 @@ public class RStarTree {
             // to determine the path that should be followed.
             Entry chosenEntry = chooseSubTree(newEntry, currentNode, targetLevel);
             insert(newEntry, currentNode, chosenEntry, targetLevel);
-            System.out.println("=======================>>> Returned from recursive insertion " + debugInsertRecursionCounter);
-
         }
 
         if (currentNode.isOverflowed()) {
@@ -274,7 +260,6 @@ public class RStarTree {
                     FileHandler.setRootNode(newRoot); // TODO: Save the new root Node using File Handler. CHECK!
                 }
 
-                System.out.println("currentNode update");
                 FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
 
                 if (parentEntry != null) {
@@ -284,10 +269,6 @@ public class RStarTree {
                 }
 
                 if (parentNode != null) {
-                    if (parentNode.isOverflowed()) {
-                        System.out.println("**********************");
-                    }
-                    System.out.println("parentNode update");
                     FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
                 }
 
@@ -363,7 +344,6 @@ public class RStarTree {
         for (Entry removedEntry : removedEntries) {
             insert(removedEntry, null, null, overflowedNode.getLevel());
         }
-        System.out.println("Exiting reinsert...");
     }
 
     /** Used to instantiate a RangeQuery object and execute a range query for a given point in a specified range.
