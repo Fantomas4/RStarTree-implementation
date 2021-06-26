@@ -7,21 +7,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
-public class NNQuery extends Query {
+/**
+ * Class used to perform RStarTree-based Nearest Neighbor (NN) queries to determine the "k"
+ * closest neighbors of a given point.
+ */
+public class TreeNNQuery {
     private final int k;
     private double searchRadius;
     PriorityQueue<Neighbor> kClosestNeighborsQueue; // Stores the k closest neighbors found, in descending order of distance.
-    protected Node rootNode;
+    private final Node rootNode;
+    private final double[] targetPoint;
+    private final ArrayList<LocationQueryResult> queryResults;
 
-    public NNQuery(double[] targetPoint, int k, Node rootNode) {
-        super(targetPoint);
 
+    public TreeNNQuery(double[] targetPoint, int k, Node rootNode) {
         this.k = k;
+        this.targetPoint = targetPoint;
+        this.rootNode = rootNode;
+
+        queryResults = new ArrayList<>();
         searchRadius = Double.MAX_VALUE;
         kClosestNeighborsQueue = new PriorityQueue<>();
-        this.rootNode = rootNode;
     }
 
+    /**
+     * Called to initialize the recursive nearest neighbor search and return the sorted query results.
+     * @return an ArrayList containing the query results, sorted in an ascending order of distance.
+     */
     public ArrayList<LocationQueryResult> execute() {
         search(rootNode);
 
@@ -40,6 +52,10 @@ public class NNQuery extends Query {
         return queryResults;
     }
 
+    /**
+     * Recursive method used to search for the nearest "k" neighbors of a given point.
+     * @param currentNode the node which is to be processed.
+     */
     private void search(Node currentNode) {
         // Sort the entries of the current node in ascending order of their
         // bounding box's distance from the target point.

@@ -14,32 +14,29 @@ public class Node extends ByteConvertable {
     // (NodeId, entriesSize, isLeafNode, entries, level)
     public static final int BYTES = Long.BYTES + Integer.BYTES + 1 + (FileHandler.maxEntriesInNode + 1) * Entry.BYTES + Integer.BYTES;
 
-    private long nodeId;
-    private ArrayList<Entry> entries;
-    private int level;
+    private long nodeId; // The unique ID assigned to the node.
+    private ArrayList<Entry> entries; // A list containing all the entries the node includes.
+    private int level; // The tree level where the node is placed.
 
-
-
-//    public Node(ArrayList<Entry> entries, int level) {
-//        this.entries = entries;
-//        this.level = level;
-//        this.nodeId = -1; // The node id has not been set
-//    }
-
+    /**
+     * Constructor used to initialize a non-root node.
+     * @param entries
+     * @param level the tree level where the node will be placed.
+     * @param nodeId the unique ID assigned to this node.
+     */
     public Node(ArrayList<Entry> entries, int level, long nodeId) {
-//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
-
         this.entries = entries;
         this.level = level;
         this.nodeId = nodeId;
     }
 
-    // Used for creating a root Node
+    /**
+     * Constructor used to initialize a root node
+     * @param level the tree level where the node will be placed.
+     * @param nodeId the unique ID assigned to this node.
+     */
+    //
     public Node(int level, long nodeId) {
-//        System.out.println("MIN_ENTRIES: " + MIN_ENTRIES);
-//        System.out.println("MAX_ENTRIES: " + MAX_ENTRIES);
-
         this.entries = new ArrayList<>();
         this.level = level;
         this.nodeId = nodeId;
@@ -77,10 +74,19 @@ public class Node extends ByteConvertable {
         this.nodeId = nodeId;
     }
 
+    /**
+     * Returns the maximum amount of entries a node can include.
+     * @return an integer representing the maximum amount of entries that can be stored in a node.
+     */
     public static int getMaxEntriesLimit() {
         return MAX_ENTRIES;
     }
 
+    /**
+     * Splits the original node into 2 nodes. The first node uses the same ID as the original node, while the
+     * second node is assigned a new ID from the File Handler.
+     * @return An ArrayList containing the 2 nodes produced by splitting the original node.
+     */
     public ArrayList<Node> splitNode() {
         AxisDistributions axisDistributions = chooseSplitAxis();
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
@@ -90,7 +96,6 @@ public class Node extends ByteConvertable {
         // Use the old node ID for the first split node produced
         setEntries(chosenDistribution.getEntriesGroupA());
         resultNodes.add(this);
-//        resultNodes.add(new Node(chosenDistribution.getEntriesGroupA(), level, nodeId));
         // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
         long newNodeId = FileHandler.getNextAvailableNodeId();
@@ -99,6 +104,98 @@ public class Node extends ByteConvertable {
         return resultNodes;
     }
 
+    /**
+     * Class that stores the entries of an axis-based node split into the 2 discrete groups specified.
+     */
+    private class Distribution {
+        private final ArrayList<Entry> entriesGroupA;
+        private final ArrayList<Entry> entriesGroupB;
+
+        public Distribution(ArrayList<Entry> entriesGroupA, ArrayList<Entry> entriesGroupB) {
+            this.entriesGroupA = entriesGroupA;
+            this.entriesGroupB = entriesGroupB;
+        }
+
+        /**
+         * Getter method that returns the first group of entries in this distribution.
+         * @return an ArrayList that contains the entries of the first group in this distribution.
+         */
+        public ArrayList<Entry> getEntriesGroupA() {
+            return entriesGroupA;
+        }
+
+        /**
+         * Getter method that returns the second group of entries in this distribution.
+         * @return an ArrayList that contains the entries of the second group in this distribution.
+         */
+        public ArrayList<Entry> getEntriesGroupB() {
+            return entriesGroupB;
+        }
+
+        /**
+         * Calculates the total margin of the bounding boxes of this distribution's entries.
+         * @return a number representing the total margin of this distribution entries' bounding boxes.
+         */
+        public double getDistributionMargin() {
+            //TODO: Replace duplicate code with a method/optimize?
+            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+            for (Entry entry : entriesGroupA) {
+                boundingBoxesA.add(entry.getBoundingBox());
+            }
+
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+            for (Entry entry : entriesGroupB) {
+                boundingBoxesB.add(entry.getBoundingBox());
+            }
+
+            double marginA = BoundingBox.calculateMBR(boundingBoxesA).calculateMargin();
+            double marginB = BoundingBox.calculateMBR(boundingBoxesB).calculateMargin();
+            return marginA + marginB;
+        }
+
+        /**
+         * Calculates the total overlap of the bounding boxes of this distribution's entries.
+         * @return a number representing the total overlap of this distribution entries' bounding boxes.
+         */
+        public double getDistributionOverlap() {
+            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+
+            for (Entry entry : entriesGroupA) {
+                boundingBoxesA.add(entry.getBoundingBox());
+            }
+
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+            for (Entry entry : entriesGroupB) {
+                boundingBoxesB.add(entry.getBoundingBox());
+            }
+            return BoundingBox.calculateMBR(boundingBoxesA).calculateBoundingBoxOverlap(BoundingBox.calculateMBR(boundingBoxesB));
+        }
+
+        /**
+         * Calculate the total area of the bounding boxes of this distribution's entries.
+         * @return a number representing the total area of this distribution entries' bounding boxes.
+         */
+        public double getDistributionArea() {
+            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+
+            for (Entry entry : entriesGroupA) {
+                boundingBoxesA.add(entry.getBoundingBox());
+            }
+
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+            for (Entry entry : entriesGroupB) {
+                boundingBoxesB.add(entry.getBoundingBox());
+            }
+
+            double areaA = BoundingBox.calculateMBR(boundingBoxesA).calculateArea();
+            double areaB = BoundingBox.calculateMBR(boundingBoxesB).calculateArea();
+            return areaA + areaB;
+        }
+    }
+
+    /**
+     * Class used to store the chosen distributions (splits) of entries based on the optimal split axis.
+     */
     private class AxisDistributions {
         private final ArrayList<Distribution> distributions = new ArrayList<>();
         private double marginSum = 0;
@@ -117,71 +214,11 @@ public class Node extends ByteConvertable {
         }
     }
 
-    private class Distribution {
-        private final ArrayList<Entry> entriesGroupA;
-        private final ArrayList<Entry> entriesGroupB;
-
-        public Distribution(ArrayList<Entry> entriesGroupA, ArrayList<Entry> entriesGroupB) {
-            this.entriesGroupA = entriesGroupA;
-            this.entriesGroupB = entriesGroupB;
-        }
-
-        public ArrayList<Entry> getEntriesGroupA() {
-            return entriesGroupA;
-        }
-
-        public ArrayList<Entry> getEntriesGroupB() {
-            return entriesGroupB;
-        }
-        //TODO: Replace duplicate code with a method/optimize?
-        public double getDistributionMargin() {
-            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
-            for (Entry entry : entriesGroupA) {
-                boundingBoxesA.add(entry.getBoundingBox());
-            }
-
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
-            for (Entry entry : entriesGroupB) {
-                boundingBoxesB.add(entry.getBoundingBox());
-            }
-
-            double marginA = BoundingBox.calculateMBR(boundingBoxesA).getMargin();
-            double marginB = BoundingBox.calculateMBR(boundingBoxesB).getMargin();
-            return marginA + marginB;
-        }
-
-        public double getDistributionOverlap() {
-            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
-
-            for (Entry entry : entriesGroupA) {
-                boundingBoxesA.add(entry.getBoundingBox());
-            }
-
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
-            for (Entry entry : entriesGroupB) {
-                boundingBoxesB.add(entry.getBoundingBox());
-            }
-            return BoundingBox.calculateMBR(boundingBoxesA).calculateBoundingBoxOverlap(BoundingBox.calculateMBR(boundingBoxesB));
-        }
-
-        public double getDistributionArea() {
-            ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
-
-            for (Entry entry : entriesGroupA) {
-                boundingBoxesA.add(entry.getBoundingBox());
-            }
-
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
-            for (Entry entry : entriesGroupB) {
-                boundingBoxesB.add(entry.getBoundingBox());
-            }
-
-            double areaA = BoundingBox.calculateMBR(boundingBoxesA).getArea();
-            double areaB = BoundingBox.calculateMBR(boundingBoxesB).getArea();
-            return areaA + areaB;
-        }
-    }
-
+    /**
+     * Determines the axis (dimension) of the node's entries where the split will be performed.
+     * @return an AxisDistributions object containing the chosen distributions (splits) of entries based on
+     * the optimal split axis.
+     */
     private AxisDistributions chooseSplitAxis() {
         double minMarginSum = Double.MAX_VALUE;
         AxisDistributions minAxisDistributions = null;
@@ -217,6 +254,12 @@ public class Node extends ByteConvertable {
     }
 
 
+    /**
+     * Given the optimal AxisDistributions for the node's entries that need to be split, this method determines
+     * the optimal split index of the node's entries list.
+     * @param chosenAxisDistributions the optimal AxisDistributions that were determined for the node's entries.
+     * @return the final node entries' distribution based on the determined optimal split index.
+     */
     private Distribution chooseSplitIndex(AxisDistributions chosenAxisDistributions) {
         ArrayList<Distribution> distributions = chosenAxisDistributions.getDistributions();
         int minIndex = 0;
