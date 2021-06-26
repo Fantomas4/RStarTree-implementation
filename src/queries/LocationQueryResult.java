@@ -2,6 +2,9 @@ package queries;
 
 import tree.Record;
 
+import java.util.Arrays;
+
+
 /**
  * Class used to store the information of query results.
  */
@@ -50,5 +53,23 @@ public class LocationQueryResult implements Comparable<LocationQueryResult> {
         } else {
             return distanceCompRes;
         }
+    }
+
+    @Override
+    public String toString() {
+        /*
+        return "LocationQueryResult{" +
+                "recordId=" + recordId +
+                ", name='" + name + '\'' +
+                ", coordinates=" + Arrays.toString(coordinates) +
+                ", distance=" + distance +
+                '}';
+        */
+        return "-----------------------------------------\n" +
+                "Record ID: " + recordId + "\n" +
+                "Name: " + name + "\n" +
+                "Coordinates: " + Arrays.toString(coordinates) + "\n" +
+                "Distance: " + distance + "\n" +
+                "-----------------------------------------\n";
     }
 }

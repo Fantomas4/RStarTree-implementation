@@ -1,15 +1,18 @@
 package tree;
 
+import utils.ByteConvertable;
 import utils.FileHandler;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Node {
+public class Node extends ByteConvertable {
     private static final int DIMENSIONS = 2; //TODO: Get number of dimensions from file handler.
     private static final int MAX_ENTRIES = 3; //TODO: Get max entries per node from File Handler using FileHandler.getMaxEntriesInBlock();
     private static final double MIN_LOAD_FACTOR = 0.4;
     private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
+    // (NodeId, entriesSize, isLeafNode, entries, level)
+    public static final int BYTES = Long.BYTES + Integer.BYTES + 1 + (FileHandler.maxEntriesInNode + 1) * Entry.BYTES + Integer.BYTES;
 
     private long nodeId; // The unique ID assigned to the node.
     private ArrayList<Entry> entries; // A list containing all the entries the node includes.
@@ -288,5 +291,44 @@ public class Node {
     {
         return "Node(" + "nodeId(" + nodeId + "), entries(" + entries + "), level(" + level + "))";
 
+    }
+
+    @Override
+    public byte[] toBytes()
+    {
+        byte[] nodeAsBytes = new byte[BYTES],
+                entriesAsBytes = entriesToBytes(entries);
+        int destPos = 0;
+
+        // Node Id
+        System.arraycopy(longToBytes(nodeId), 0, nodeAsBytes, destPos, Long.BYTES);
+        destPos += Long.BYTES;
+        // Node entries
+        System.arraycopy(entriesAsBytes, 0, nodeAsBytes, destPos, entriesAsBytes.length);
+        destPos += entriesAsBytes.length;
+        // Level of the node
+        System.arraycopy(intToBytes(level), 0, nodeAsBytes, destPos, Integer.BYTES);
+
+        return nodeAsBytes;
+    }
+
+    public static Node fromBytes(byte[] bytes)
+    {
+        byte[] idAsBytes = new byte[Long.BYTES],
+                entriesAsBytes = new byte[Integer.BYTES + 1 + (FileHandler.maxEntriesInNode + 1) * Entry.BYTES],
+                levelAsBytes = new byte[Integer.BYTES];
+        int srcPos = 0;
+
+        System.arraycopy(bytes, srcPos, idAsBytes, 0, idAsBytes.length);
+        srcPos += idAsBytes.length;
+        System.arraycopy(bytes, srcPos, entriesAsBytes, 0, entriesAsBytes.length);
+        srcPos += entriesAsBytes.length;
+        System.arraycopy(bytes, srcPos, levelAsBytes, 0, levelAsBytes.length);
+
+        long id = bytesToLong(idAsBytes);
+        ArrayList<Entry> entries = entriesFromBytes(entriesAsBytes);
+        int level = bytesToInt(levelAsBytes);
+
+        return entries == null ? new Node(level, id) : new Node(entries, level, id);
     }
 }

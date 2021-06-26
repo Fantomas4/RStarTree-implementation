@@ -1,5 +1,8 @@
 package tree;
 
+import utils.ByteConvertable;
+import utils.FileHandler;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,10 +12,12 @@ import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
 
-public class BoundingBox implements Serializable {
+public class BoundingBox extends ByteConvertable {
     private final double[] lowerLeftPoint; // The bottom left point of the bounding box
     private final double[] upperRightPoint; // The bottom right point of the bounding box
     private final int dimensions; // The number of dimensions of this bounding box
+    // (lowerLeftPoint[DIMENSIONS], upperRightPoint[DIMENSIONS])
+    public static final int BYTES = 2 * Double.BYTES * FileHandler.DIMENSIONS;
 
     public BoundingBox(double[] lowerLeftPoint, double[] upperRightPoint) {
         if (lowerLeftPoint.length != upperRightPoint.length) {
@@ -179,5 +184,49 @@ public class BoundingBox implements Serializable {
     public String toString()
     {
         return "BoundingBox(" + Arrays.toString(lowerLeftPoint) + ", " +  Arrays.toString(upperRightPoint) + ")";
+    }
+
+    @Override
+    public byte[] toBytes() {
+        byte[] boundingBoxAsBytes = new byte[BYTES];
+        int destPos = 0;
+
+        for (int i = 0; i < FileHandler.DIMENSIONS; ++i)
+        {
+            System.arraycopy(doubleToBytes(lowerLeftPoint[i]), 0, boundingBoxAsBytes, destPos, Double.BYTES);
+            destPos += Double.BYTES;
+        }
+        for (int i = 0; i < FileHandler.DIMENSIONS; ++i)
+        {
+            System.arraycopy(doubleToBytes(upperRightPoint[i]), 0, boundingBoxAsBytes, destPos, Double.BYTES);
+            destPos += Double.BYTES;
+        }
+
+        return boundingBoxAsBytes;
+    }
+
+    public static BoundingBox fromBytes(byte[] bytes)
+    {
+        byte[] lowerLeftPointAsBytes = new byte[Double.BYTES * FileHandler.DIMENSIONS],
+                upperRightPointAsBytes = new byte[Double.BYTES * FileHandler.DIMENSIONS];
+        int srcPos = 0;
+
+        System.arraycopy(bytes, srcPos, lowerLeftPointAsBytes, 0, lowerLeftPointAsBytes.length);
+        srcPos += lowerLeftPointAsBytes.length;
+        System.arraycopy(bytes, srcPos, upperRightPointAsBytes, 0, upperRightPointAsBytes.length);
+
+        double[] lowerLeftPoint = new double[FileHandler.DIMENSIONS],
+                upperRightPoint = new double[FileHandler.DIMENSIONS];
+        byte[] pointValueAsBytes = new byte[Double.BYTES];
+        for (int i = 0; i < FileHandler.DIMENSIONS; ++i)
+        {
+            System.arraycopy(lowerLeftPointAsBytes, i * Double.BYTES, pointValueAsBytes, 0, Double.BYTES);
+            lowerLeftPoint[i] = bytesToDouble(pointValueAsBytes);
+
+            System.arraycopy(upperRightPointAsBytes, i * Double.BYTES, pointValueAsBytes, 0, Double.BYTES);
+            upperRightPoint[i] = bytesToDouble(pointValueAsBytes);
+        }
+
+        return new BoundingBox(lowerLeftPoint, upperRightPoint);
     }
 }

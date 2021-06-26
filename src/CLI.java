@@ -1,3 +1,4 @@
+import org.w3c.dom.ls.LSInput;
 import queries.LocationQueryResult;
 import queries.SequentialNNQuery;
 import queries.SequentialRangeQuery;
@@ -7,8 +8,37 @@ import utils.DataMetaData;
 import utils.FileHandler;
 
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class CLI {
+
+    public static void run()
+    {
+        Scanner scanner = new Scanner(System.in);
+        String input;
+        do {
+            System.out.println("Options:");
+            System.out.println("1) K - Nearest Neighbour Query");
+            System.out.println("2) Range Query");
+            System.out.println("0) Exit");
+
+            System.out.print("Select option: ");
+            input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
+
+            System.out.println();
+            switch (input)
+            {
+                case "1":
+                    System.out.println("K - Nearest Neighbour Query selected");
+                    break;
+                case "2":
+                    System.out.println("Range Query selected");
+                    break;
+            }
+        } while (!input.equals("0"));
+
+    }
 
     public static void main(String[] args) {
         RStarTree rStarTree = new RStarTree();
@@ -36,13 +66,7 @@ public class CLI {
         System.out.println("*** Found " + queryResults.size() + " query results.");
 
         for (LocationQueryResult result : queryResults) {
-            System.out.println("-----------------------------------------");
-            System.out.println("Record ID: " + result.getRecordId());
-            System.out.println("Name: " + result.getName());
-            double[] coordinates = result.getCoordinates();
-            System.out.format("Coordinates: %f,%f\n", coordinates[0], coordinates[1]);
-            System.out.println("Distance: " + result.getDistance());
-            System.out.println("-----------------------------------------\n");
+            System.out.println(result);
         }
 
         System.out.println("DONE!");
