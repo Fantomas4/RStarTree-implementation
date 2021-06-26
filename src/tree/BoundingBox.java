@@ -11,7 +11,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
 
-public class BoundingBox extends ByteConvertable {
+public class BoundingBox extends ByteConvertible {
     private final double[] lowerLeftPoint; // The bottom left point of the bounding box
     private final double[] upperRightPoint; // The bottom right point of the bounding box
     private final int dimensions; // The number of dimensions of this bounding box
