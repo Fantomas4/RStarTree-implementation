@@ -66,14 +66,14 @@ public class CLI {
                     }
                     System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
 
-                    System.out.println("Sequential");
+                    System.out.println("\n\n\nSequential");
                     startingTime = System.nanoTime();
                     queryResults = new SequentialNNQuery(centerCoordinates, k).execute();
                     endingTime = System.nanoTime();
                     for (LocationQueryResult result : queryResults) {
                         System.out.println(result);
                     }
-                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
+                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms\n\n\n");
                     break;
                 case "2":
                     System.out.println("Range Query selected");
@@ -102,7 +102,7 @@ public class CLI {
                     for (LocationQueryResult result : queryResults) {
                         System.out.println(result);
                     }
-                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
+                    System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms\n\n\nS");
                     break;
             }
             scanner.nextLine(); // FLushing scanner buffer

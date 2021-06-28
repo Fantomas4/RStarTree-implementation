@@ -76,6 +76,11 @@ public class TreeNNQuery {
                 LeafEntry leafEntry = (LeafEntry)entry;
                 double candidateDistance = leafEntry.getBoundingBox().calculatePointDistance(targetPoint);
 
+                // DEBUGGING ONLY!
+                Record debugRecord = FileHandler.getRecord(leafEntry.getBlockId(), leafEntry.getRecordId());
+                String recordName = debugRecord.getName();
+
+
                 if (kClosestNeighborsQueue.size() >= k) {
                     // The priority queue already contains k neighbors, so the most distant neighbor inside
                     // the queue must be compared to the candidate leafEntry.
