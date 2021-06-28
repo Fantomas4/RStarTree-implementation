@@ -95,7 +95,7 @@ public class CLI {
                     }
                     System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
 
-                    System.out.println("Sequential");
+                    System.out.println("\n\n\nSequential");
                     startingTime = System.nanoTime();
                     queryResults = new SequentialRangeQuery(centerCoordinates, r).execute();
                     endingTime = System.nanoTime();

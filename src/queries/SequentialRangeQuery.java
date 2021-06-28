@@ -61,7 +61,7 @@ public class SequentialRangeQuery {
     private void search() {
         long numBlocks = DataMetaData.getNumberOfBlocks();
 
-        for (int blockId = 0; blockId < numBlocks; blockId++) {
+        for (int blockId = 1; blockId < numBlocks; blockId++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(blockId);
             for (Record record : blockRecords) {
                 double candidateDistance = calculateDistanceFromTarget(record.getCoordinates());
