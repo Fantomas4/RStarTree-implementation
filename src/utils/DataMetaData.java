@@ -2,24 +2,43 @@ package utils;
 
 import tree.Record;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class DataMetaData {
         private static final int maxRecordsInBlock = FileHandler.BLOCK_SIZE / Record.BYTES; // Dummy maximum number of records in a block
         private static long numberOfBlocks = 1;
-        public static final int BYTES = Long.BYTES;
+        private static long numberOfRecords = 0;
+        public static final int BYTES = Long.BYTES + Long.BYTES;
 
-        public static void init()
+        public static void write()
         {
+                if (BYTES > FileHandler.BLOCK_SIZE)
+                {
+                        throw new IllegalArgumentException("DataMetaData are bigger then the BLOCK_SIZE in datafile");
+                }
+                byte[] block = new byte[FileHandler.BLOCK_SIZE];
+                System.arraycopy(toBytes(), 0, block, 0, BYTES);
                 try {
                         RandomAccessFile raf = new RandomAccessFile(FileHandler.DATAFILE_NAME, "rw");
                         raf.seek(0);
-                        raf.write(toBytes());
+                        raf.write(block);
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
+        }
+
+        public static void read()
+        {
+                byte[] dataMetaDataAsBytes = new byte[BYTES];
+                try {
+                        RandomAccessFile raf = new RandomAccessFile(FileHandler.DATAFILE_NAME, "r");
+                        raf.seek(0);
+                        raf.readFully(dataMetaDataAsBytes);
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
+                fromBytes(dataMetaDataAsBytes);
         }
 
         public static int getMaxRecordsInBlock()
@@ -33,30 +52,42 @@ public class DataMetaData {
                 return numberOfBlocks;
         }
 
+        public static long getNumberOfRecords()
+        {
+                return numberOfRecords;
+        }
+
         public static void addOneBlock()
         {
                 numberOfBlocks++;
         }
+        public static void addOneRecord() { numberOfRecords++; }
 
         public static byte[] toBytes()
         {
-                byte[] dataMetaDataAsBytes = new byte[BYTES];
+                byte[] dataMetaDataAsBytes = new byte[BYTES],
+                        numberOfBlocksAsBytes = ByteConvertible.longToBytes(numberOfBlocks),
+                        numberOfRecordsAsBytes = ByteConvertible.longToBytes(numberOfRecords);
                 int destPos = 0;
 
-                System.arraycopy(ByteConvertible.longToBytes(numberOfBlocks), 0, dataMetaDataAsBytes, destPos, Long.BYTES);
+                System.arraycopy(numberOfBlocksAsBytes, 0, dataMetaDataAsBytes, destPos, Long.BYTES);
                 destPos += Long.BYTES;
+                System.arraycopy(numberOfRecordsAsBytes, 0, dataMetaDataAsBytes, destPos, Long.BYTES);
 
                 return dataMetaDataAsBytes;
         }
 
         public static void fromBytes(byte[] bytes)
         {
-                byte[] numberOfBlocksAsBytes = new byte[Long.BYTES];
+                byte[] numberOfBlocksAsBytes = new byte[Long.BYTES],
+                        numberOfRecordsAsBytes = new byte[Long.BYTES];
                 int srcPos = 0;
 
                 System.arraycopy(bytes, srcPos, numberOfBlocksAsBytes, 0, Long.BYTES);
                 srcPos += Long.BYTES;
+                System.arraycopy(bytes, srcPos, numberOfRecordsAsBytes, 0, Long.BYTES);
 
                 numberOfBlocks = ByteConvertible.bytesToLong(numberOfBlocksAsBytes);
+                numberOfRecords = ByteConvertible.bytesToLong(numberOfRecordsAsBytes);
         }
 }
