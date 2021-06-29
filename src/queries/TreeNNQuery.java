@@ -62,17 +62,22 @@ public class TreeNNQuery {
         ArrayList<Entry> entries = currentNode.getEntries();
         entries.sort(new EntryComparator.DistanceToPointComparator(targetPoint));
 
+        int i = 0;
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
             // The current node is not a leaf node.
-            for (Entry entry : entries) {
-                    if (entry.getBoundingBox().checkPointOverlap(targetPoint, searchRadius)) {
+            while (i < entries.size() && kClosestNeighborsQueue.size() < k) {
+                Entry entry = entries.get(i);
+                if (entry.getBoundingBox().checkPointOverlap(targetPoint, searchRadius)) {
                     Node nextNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get the next node from File Handler using entry.getChildNodeId(). CHECK!
                     search(nextNode);
                 }
+                i++;
             }
         } else {
             // The current node is a leaf node.
-            for (Entry entry : entries) {
+            while (i < entries.size() && kClosestNeighborsQueue.size() < k) {
+                Entry entry = entries.get(i);
+
                 LeafEntry leafEntry = (LeafEntry)entry;
                 double candidateDistance = leafEntry.getBoundingBox().calculatePointDistance(targetPoint);
 
@@ -100,6 +105,8 @@ public class TreeNNQuery {
                     // simply added to the queue.
                     kClosestNeighborsQueue.add(new Neighbor(leafEntry.getBlockId(), leafEntry.getRecordId(), candidateDistance));
                 }
+
+                i++;
             }
         }
     }
