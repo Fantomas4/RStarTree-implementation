@@ -20,7 +20,7 @@ public class Node extends ByteConvertible {
 
     /**
      * Constructor used to initialize a non-root node.
-     * @param entries
+     * @param entries A list containing all the entries the node includes.
      * @param level the tree level where the node will be placed.
      * @param nodeId the unique ID assigned to this node.
      */
@@ -139,17 +139,19 @@ public class Node extends ByteConvertible {
         public double getDistributionMargin() {
             //TODO: Replace duplicate code with a method/optimize?
             ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+
             for (Entry entry : entriesGroupA) {
                 boundingBoxesA.add(entry.getBoundingBox());
             }
 
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
             for (Entry entry : entriesGroupB) {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
 
             double marginA = BoundingBox.calculateMBR(boundingBoxesA).calculateMargin();
             double marginB = BoundingBox.calculateMBR(boundingBoxesB).calculateMargin();
+
             return marginA + marginB;
         }
 
@@ -159,15 +161,16 @@ public class Node extends ByteConvertible {
          */
         public double getDistributionOverlap() {
             ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
 
             for (Entry entry : entriesGroupA) {
                 boundingBoxesA.add(entry.getBoundingBox());
             }
 
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
             for (Entry entry : entriesGroupB) {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
+
             return BoundingBox.calculateMBR(boundingBoxesA).calculateBoundingBoxOverlap(BoundingBox.calculateMBR(boundingBoxesB));
         }
 
@@ -189,6 +192,7 @@ public class Node extends ByteConvertible {
 
             double areaA = BoundingBox.calculateMBR(boundingBoxesA).calculateArea();
             double areaB = BoundingBox.calculateMBR(boundingBoxesB).calculateArea();
+
             return areaA + areaB;
         }
     }
@@ -225,9 +229,9 @@ public class Node extends ByteConvertible {
 
         for (int d = 0; d < DIMENSIONS; d++) {
             ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
-            sortedByLowerValue.sort(new EntryComparator.LowerValueComparator(d));
+            sortedByLowerValue.sort(new Comparator.LowerValueComparator(d));
             ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
-            sortedByUpperValue.sort(new EntryComparator.UpperValueComparator(d));
+            sortedByUpperValue.sort(new Comparator.UpperValueComparator(d));
 
             ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);
@@ -269,6 +273,7 @@ public class Node extends ByteConvertible {
             Distribution distribution = distributions.get(i);
 
             double distributionOverlap = distribution.getDistributionOverlap();
+
             if (distributionOverlap < minOverlapValue) {
                 // Choose the distribution with the minimum overlap-value.
                 minOverlapValue = distributionOverlap;

@@ -11,9 +11,9 @@ import java.util.Arrays;
  * Class used to store the information of a location.
  */
 public class Record extends ByteConvertible {
-    private long id; // The unique identifier of the record.
-    private String name; // The name of the location stored in the record.
-    private double[] coordinates; // The coordinates of the location stored in the record.
+    private final long id; // The unique identifier of the record.
+    private final String name; // The name of the location stored in the record.
+    private final double[] coordinates; // The coordinates of the location stored in the record.
     // (RecordId, nameLength, name, Coordinates[DIMENSIONS])
     public static final int BYTES =
             Long.BYTES + Integer.BYTES + Character.BYTES * 256 + Double.BYTES * FileHandler.DIMENSIONS;

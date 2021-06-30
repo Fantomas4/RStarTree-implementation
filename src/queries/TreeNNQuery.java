@@ -60,7 +60,7 @@ public class TreeNNQuery {
         // Sort the entries of the current node in ascending order of their
         // bounding box's distance from the target point.
         ArrayList<Entry> entries = currentNode.getEntries();
-        entries.sort(new EntryComparator.DistanceToPointComparator(targetPoint));
+        entries.sort(new Comparator.DistanceToPointComparator(targetPoint));
 
         int i = 0;
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {
@@ -75,7 +75,7 @@ public class TreeNNQuery {
             }
         } else {
             // The current node is a leaf node.
-            while (i < entries.size() && kClosestNeighborsQueue.size() < k) {
+            while (i < entries.size()) {
                 Entry entry = entries.get(i);
 
                 LeafEntry leafEntry = (LeafEntry)entry;

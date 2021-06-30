@@ -58,9 +58,11 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculateMargin() {
         double sum = 0;
+
         for (int i = 0; i < dimensions; i ++) {
             sum += Math.abs(upperRightPoint[i] - lowerLeftPoint[i]);
         }
+
         return sum;
     }
 
@@ -70,9 +72,11 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculateArea() {
         double product = 1;
+
         for (int i = 0; i < dimensions; i ++) {
             product *= upperRightPoint[i] - lowerLeftPoint[i];
         }
+
         return Math.abs(product);
     }
 
@@ -86,6 +90,7 @@ public class BoundingBox extends ByteConvertible {
         for (int d = 0; d < dimensions; d++) {
             centerCoordinates[d] = (upperRightPoint[d] - lowerLeftPoint[d]) / 2;
         }
+
         return centerCoordinates;
     }
 
@@ -96,6 +101,7 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculateBoundingBoxOverlap(BoundingBox otherBB) {
         double overlapProduct = 1;
+
         for (int i = 0; i < dimensions; i ++) {
             double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
                     - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
@@ -106,6 +112,7 @@ public class BoundingBox extends ByteConvertible {
                 overlapProduct *= overlapDiff;
             }
         }
+
         return overlapProduct;
     }
 
@@ -116,6 +123,7 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculatePointDistance(double[] targetPoint) {
         double sum = 0;
+
         for (int d = 0; d < dimensions; d++) {
             double lowerLeftDistance = Math.pow(targetPoint[d] - lowerLeftPoint[d], 2);
             double upperRightDistance = Math.pow(targetPoint[d] - upperRightPoint[d], 2);

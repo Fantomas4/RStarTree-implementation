@@ -155,13 +155,13 @@ public class RStarTree {
             // so the minimum overlap cost is calculated
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
             return Collections.min(candidateEntries,
-                    new EntryComparator.OverlapEnlargementComparator(candidateEntries, newEntry));
+                    new Comparator.OverlapEnlargementComparator(candidateEntries, newEntry));
         } else {
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
             ArrayList<Entry> candidateEntries = currentNode.getEntries();
             return Collections.min(candidateEntries,
-                    new EntryComparator.AreaEnlargementComparator(candidateEntries, newEntry));
+                    new Comparator.AreaEnlargementComparator(candidateEntries, newEntry));
         }
     }
 
@@ -320,7 +320,7 @@ public class RStarTree {
 
         // Sort the M+1 entries in decreasing order of their rectangle centers' distances from the center of the bounding
         // rectangle of overflowedNode.
-        overflowedNodeEntries.sort(Collections.reverseOrder(new EntryComparator.BBCenterDistanceComparator(overflowedBB)));
+        overflowedNodeEntries.sort(Collections.reverseOrder(new Comparator.BBCenterDistanceComparator(overflowedBB)));
 
         // Remove the first p entries from the overflowed Node
         ArrayList<Entry> removedEntries = new ArrayList<>();

@@ -5,13 +5,13 @@ import java.util.*;
 /**
  * Class that contains custom entry comparators based on different comparison criteria.
  */
-public class EntryComparator {
+public class Comparator {
 
     /**
      * Custom comparator used to compare two entries based on the overlap enlargement effect on their bounding boxes
      * from the addition of a specified entry to them.
      */
-    public static class OverlapEnlargementComparator implements Comparator<Entry> {
+    public static class OverlapEnlargementComparator implements java.util.Comparator<Entry> {
         private final ArrayList<Entry> candidateEntries;
         private final Entry targetEntry;
         private final Map<Entry, Double> enlargementMap;
@@ -21,14 +21,17 @@ public class EntryComparator {
             this.targetEntry = targetEntry;
             enlargementMap = new HashMap<>();
 
-            double overlapBefore = calculateOverlap(targetEntry.getBoundingBox());
             for (Entry candidateEntry : candidateEntries) {
                 ArrayList<BoundingBox> mbrBoundingBoxes = new ArrayList<>();
                 mbrBoundingBoxes.add(candidateEntry.getBoundingBox());
                 mbrBoundingBoxes.add(targetEntry.getBoundingBox());
                 BoundingBox enlargedBB = BoundingBox.calculateMBR(mbrBoundingBoxes);
 
-                double overlapAfter = calculateOverlap(enlargedBB);
+                // A new entry generated from candidateEntry using the enlarged Bounding Box that includes targetEntry.
+                Entry newEntry = new Entry(enlargedBB, candidateEntry.getChildNodeId());
+
+                double overlapBefore = calculateOverlap(candidateEntry, candidateEntry.getBoundingBox());
+                double overlapAfter = calculateOverlap(candidateEntry, newEntry.getBoundingBox());
                 double overlapDiff = overlapAfter - overlapBefore;
 
                 if (overlapDiff < 0) {
@@ -40,14 +43,17 @@ public class EntryComparator {
 
         }
 
-        private double calculateOverlap(BoundingBox targetBB) {
+        private double calculateOverlap(Entry excludedEntry, BoundingBox testBB) {
             double overlapSum = 0;
 
             for (Entry candidateEntry: candidateEntries) {
                 BoundingBox candidateBoundingBox = candidateEntry.getBoundingBox();
                 //TODO: Check example for a different approach here
-                overlapSum += targetBB.calculateBoundingBoxOverlap(candidateBoundingBox);
+                if (candidateEntry != excludedEntry) {
+                    overlapSum += testBB.calculateBoundingBoxOverlap(candidateBoundingBox);
+                }
             }
+
             return overlapSum;
         }
 
@@ -62,19 +68,14 @@ public class EntryComparator {
             } else if (overlapScoreA < overlapScoreB) {
                 return -1;
             } else {
-                // both Entry objects have equal overlap enlargement values,
+                // Both Entry objects have equal overlap enlargement values,
                 // so the tie is resolved by choosing the entry whose rectangle
                 // needs the least area enlargement
-                ArrayList<Entry> candidateEntries= new ArrayList<>();
+                ArrayList<Entry> candidateEntries = new ArrayList<>();
                 candidateEntries.add(a);
                 candidateEntries.add(b);
-                Entry resultEntry = Collections.min(candidateEntries, new AreaEnlargementComparator(candidateEntries, targetEntry));
 
-                if (resultEntry == a) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return new AreaEnlargementComparator(candidateEntries, targetEntry).compare(a, b);
             }
         }
     }
@@ -83,22 +84,19 @@ public class EntryComparator {
      * Custom comparator used to compare two entries based on the area enlargement effect on their bounding boxes
      * from the addition of a specified entry to them.
      */
-    public static class AreaEnlargementComparator implements Comparator<Entry> {
-        private final ArrayList<Entry> candidateEntries;
-        private final Entry targetEntry;
+    public static class AreaEnlargementComparator implements java.util.Comparator<Entry> {
         private final Map<Entry, Double> enlargementMap;
 
         public AreaEnlargementComparator(ArrayList<Entry> candidateEntries, Entry targetEntry) {
-            this.candidateEntries = candidateEntries;
-            this.targetEntry = targetEntry;
             enlargementMap = new HashMap<>();
 
-            double areaBefore = targetEntry.getBoundingBox().calculateArea();
             for (Entry candidateEntry : candidateEntries) {
                 ArrayList<BoundingBox> mbrBoundingBoxes = new ArrayList<>();
                 mbrBoundingBoxes.add(candidateEntry.getBoundingBox());
                 mbrBoundingBoxes.add(targetEntry.getBoundingBox());
                 BoundingBox enlargedBB = BoundingBox.calculateMBR(mbrBoundingBoxes);
+
+                double areaBefore = candidateEntry.getBoundingBox().calculateArea();
                 double areaAfter = enlargedBB.calculateArea();
                 double areaDiff = areaAfter - areaBefore;
 
@@ -137,7 +135,7 @@ public class EntryComparator {
     /**
      * Custom comparator used to compare entries based on their upper right point's value for a specified dimension.
      */
-    public static class UpperValueComparator implements Comparator<Entry> {
+    public static class UpperValueComparator implements java.util.Comparator<Entry> {
         private final int targetDimension;
 
         public UpperValueComparator(int targetDimension) {
@@ -156,7 +154,7 @@ public class EntryComparator {
     /**
      * Custom comparator used to compare entries based on their lower left point's value for a specified dimension.
      */
-    public static class LowerValueComparator implements Comparator<Entry> {
+    public static class LowerValueComparator implements java.util.Comparator<Entry> {
         private final int targetDimension;
 
         public LowerValueComparator(int targetDimension) {
@@ -176,7 +174,7 @@ public class EntryComparator {
      * Custom comparator used to compare two entries based on their bounding boxes centers' distances from the center of
      * a specified bounding box.
      */
-    public static class BBCenterDistanceComparator implements Comparator<Entry> {
+    public static class BBCenterDistanceComparator implements java.util.Comparator<Entry> {
         private final BoundingBox targetBoundingBox;
 
         public BBCenterDistanceComparator(BoundingBox targetBoundingBox) {
@@ -211,7 +209,7 @@ public class EntryComparator {
     /**
      * Custom comparator used to compare two entries based on their bounding boxes' distances from a specified point.
      */
-    public static class DistanceToPointComparator implements Comparator<Entry> {
+    public static class DistanceToPointComparator implements java.util.Comparator<Entry> {
         private final double[] targetPoint;
 
         public DistanceToPointComparator(double[] targetPoint) {
