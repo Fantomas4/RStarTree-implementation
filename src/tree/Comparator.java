@@ -121,13 +121,7 @@ public class Comparator {
                 // both Entry objects have equal area enlargement values,
                 // so the tie is resolved by choosing the entry with the rectangle
                 // of smallest area
-                if (a.getBoundingBox().calculateArea() > b.getBoundingBox().calculateArea()) {
-                    return 1;
-                } else if (a.getBoundingBox().calculateArea() < b.getBoundingBox().calculateArea())  {
-                    return -1;
-                } else {
-                    return 0;
-                }
+                return Double.compare(a.getBoundingBox().calculateArea(), b.getBoundingBox().calculateArea());
             }
         }
     }
