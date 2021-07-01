@@ -43,100 +43,17 @@ public class RStarTree {
         }
 
         System.out.println("Number of records inserted: " + dRecordsCount);
-
-//        // FOR TESTING PURPOSES ONLY!
-//        double[] coordinates = new double[2];
-//
-//        coordinates[0] = -100;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(1, "TR1", coordinates),1);
-////
-//        coordinates[0] = -80;
-//        coordinates[1] = -1;
-//        insertRecord(new Record(2, "TR2", coordinates),2);
-////
-//        coordinates[0] = 4;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(3, "TR3", coordinates),3);
-//
-//        coordinates[0] = 5;
-//        coordinates[1] = 0;
-//        insertRecord(new Record(4, "TR4", coordinates),4);
-//
-//        coordinates[0] = 14;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(5, "TR5", coordinates),5);
-//
-//        coordinates[0] = 2;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(6, "TR6", coordinates),6);
-//
-//        coordinates[0] = 2;
-//        coordinates[1] = 0.1;
-//        insertRecord(new Record(7, "TR7", coordinates),7);
-//
-//        coordinates[0] = -101;
-//        coordinates[1] = 0.1;
-//        insertRecord(new Record(8, "TR8", coordinates),8);
-////
-//        coordinates[0] = -102;
-//        coordinates[1] = 0.1;
-//        insertRecord(new Record(9, "TR9", coordinates),9);
-//
-//        coordinates[0] = -125;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(10, "TR10", coordinates),10);
-//
-//        coordinates[0] = 9;
-//        coordinates[1] = 0.9;
-//        insertRecord(new Record(11, "TR11", coordinates),11);
-//
-//        coordinates[0] = -1;
-//        coordinates[1] = 0;
-//        insertRecord(new Record(12, "TR12", coordinates),12);
-//
-//        coordinates[0] = 23;
-//        coordinates[1] = 1.7;
-//        insertRecord(new Record(13, "TR13", coordinates),13);
-//
-//        coordinates[0] = 12;
-//        coordinates[1] = 10;
-//        insertRecord(new Record(14, "TR14", coordinates),14);
-//
-//        coordinates[0] = 20;
-//        coordinates[1] = -2;
-//        insertRecord(new Record(15, "TR15", coordinates),15);
-//
-//        coordinates[0] = 2;
-//        coordinates[1] = -0.1;
-//        insertRecord(new Record(16, "TR16", coordinates),16);
-//
-//        coordinates[0] = -1;
-//        coordinates[1] = -2;
-//        insertRecord(new Record(17, "TR17", coordinates),17);
-//
-//        coordinates[0] = 1;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(18, "TR18", coordinates),18);
-//
-//        coordinates[0] = 15;
-//        coordinates[1] = -1;
-//        insertRecord(new Record(19, "TR19", coordinates),19);
-//
-//        coordinates[0] = -136;
-//        coordinates[1] = 1;
-//        insertRecord(new Record(20, "TR20", coordinates),20);
     }
 
     public static int getLeafLevel() {
         return LEAF_LEVEL;
     }
 
-    private int getTreeHeight() {
+    public int getTreeHeight() {
         return rootLevel;
     }
 
-    private int getTreeLevels() {
+    public int getTreeLevels() {
         return getTreeHeight() + 1;
     }
 
@@ -147,19 +64,19 @@ public class RStarTree {
      * @param currentNode the node that is to be processed in order to find its optimal entry that the insertion
      *                    of the new entry will follow.
      * @param targetLevel the new entry's desired insertion tree level.
-     * @return
+     * @return the optimal entry for the insertion path of newEntry at the current tree level.
      */
     private Entry chooseSubTree(Entry newEntry, Node currentNode, int targetLevel) {
+        ArrayList<Entry> candidateEntries = currentNode.getEntries();
+
         if (currentNode.getLevel() - 1 == targetLevel) {
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
-            ArrayList<Entry> candidateEntries = currentNode.getEntries();
             return Collections.min(candidateEntries,
                     new Comparator.OverlapEnlargementComparator(candidateEntries, newEntry));
         } else {
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
-            ArrayList<Entry> candidateEntries = currentNode.getEntries();
             return Collections.min(candidateEntries,
                     new Comparator.AreaEnlargementComparator(candidateEntries, newEntry));
         }
@@ -174,7 +91,7 @@ public class RStarTree {
         // R* Tree paper reference: ID1 - InsertData
         // Create a new LeafEntry for the record
 
-        BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates().clone());
+        BoundingBox newBoundingBox = new BoundingBox(newRecord.getCoordinates(), newRecord.getCoordinates());
         LeafEntry leafEntry = new LeafEntry(newBoundingBox, newRecord.getId(), blockId);
 
         // Reset the level overflow call status HashMap.
@@ -201,8 +118,10 @@ public class RStarTree {
         if (parentNode == null && parentEntry == null) {
             // Load the root node to currentNode
             currentNode = FileHandler.getRootNode(); // TODO: Get the root node from File Handler. Check!
-        } else {
+        } else if (parentNode != null && parentEntry != null){
             currentNode = FileHandler.getNode(parentEntry.getChildNodeId());
+        } else {
+            throw new IllegalStateException("Both parentNode and parentEntry arguments parameters should be null or non-null at the same time");
         }
 
         if (currentNode.getLevel() == targetLevel) {
@@ -297,6 +216,7 @@ public class RStarTree {
                 // of overflowTreatment() in the given level during the insertion of one record,
                 // invoke reInsert().
                 reInsert(overflowedNode, parentNode, parentEntry);
+
                 return null;
             }
         }

@@ -169,10 +169,10 @@ public class Comparator {
      * a specified bounding box.
      */
     public static class BBCenterDistanceComparator implements java.util.Comparator<Entry> {
-        private final BoundingBox targetBoundingBox;
+        private final double[] centerTargetBB;
 
         public BBCenterDistanceComparator(BoundingBox targetBoundingBox) {
-            this.targetBoundingBox = targetBoundingBox;
+            centerTargetBB = targetBoundingBox.calculateCenter();
         }
 
         private double calculateDistance(double[] pointA, double[] pointB) {
@@ -180,6 +180,7 @@ public class Comparator {
 
             // Calculate the Euclidean distance between point A and point B.
             double sum = 0;
+
             for (int d = 0; d < dimensions; d++) {
                 sum += Math.pow(pointA[d] - pointB[d], 2);
             }
@@ -189,7 +190,6 @@ public class Comparator {
 
         @Override
         public int compare(Entry a, Entry b) {
-            double[] centerTargetBB = targetBoundingBox.calculateCenter();
             double[] centerA = a.getBoundingBox().calculateCenter();
             double[] centerB = b.getBoundingBox().calculateCenter();
 

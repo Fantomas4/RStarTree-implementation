@@ -75,7 +75,7 @@ public class TreeNNQuery {
             }
         } else {
             // The current node is a leaf node.
-            while (i < entries.size()) {
+            while (i < entries.size() && kClosestNeighborsQueue.size() < k) {
                 Entry entry = entries.get(i);
 
                 LeafEntry leafEntry = (LeafEntry)entry;

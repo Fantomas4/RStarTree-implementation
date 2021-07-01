@@ -33,7 +33,7 @@ public class Record extends ByteConvertible {
     }
 
     public double[] getCoordinates() {
-        return coordinates;
+        return coordinates.clone();
     }
 
     public String toString()

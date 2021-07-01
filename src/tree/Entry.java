@@ -23,7 +23,8 @@ public class Entry extends ByteConvertible {
 
     /**
      * Used to recalculate the bounding box of the entry when its child node is updated.
-     * @param updatedChildNode
+     * @param updatedChildNode the updated child node for which we want the entry's bounding box to be recalculated
+     *                         in order to become a minimum bounding box (MBR)
      */
     public void adjustBoundingBox(Node updatedChildNode) {
         boundingBox = BoundingBox.calculateMBR(updatedChildNode.getEntries());
