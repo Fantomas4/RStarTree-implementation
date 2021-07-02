@@ -19,15 +19,8 @@ public class CLI {
     {
         Scanner scanner = new Scanner(System.in);
         String input;
-        System.out.print("Do you want to load from existing index and data files (y/n):");
-        input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
-        while (!input.equals("y") && !input.equals("n"))
-        {
-            System.out.println("Please answer with 'y' for Yes or 'n' for No:");
-            input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
-        }
         ArrayList<LocationQueryResult> queryResults;
-        RStarTree rStarTree = new RStarTree(input.equals("y"));
+        RStarTree rStarTree = new RStarTree();
         do {
             System.out.println("Options:");
             System.out.println("1) K - Nearest Neighbour Query");

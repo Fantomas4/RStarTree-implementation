@@ -17,23 +17,27 @@ public class FileHandler {
 
         private static ArrayList<Node> dummyIndexFile = new ArrayList<>();
         private static ArrayList<Record[]> dummyDataFile = new ArrayList<>();
-        private static final int DEBUG_MODE = 0;
 
+        private static final int DEBUG_MODE = 0;
 
         public static final String DATAFILE_NAME = "datafile.dat";
         public static final String INDEXFILE_NAME = "indexfile.dat";
+
+        private static long rootNodeId = 1;
         public static final int DIMENSIONS = 2;
 
-        private static String osmFilePath = "map.osm";
+        private static String osmFilePath = "map_1.osm";
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
+        private static long nextAvailableNodeId = 2;
+
+        public static final int maxEntriesInNode = 3;
 
 
-
-        // For debugging
         public static ArrayList<Record[]> getDummyDataFile()
         {
                 return dummyDataFile;
         }
+
         public static ArrayList<Node> getDummyIndexFile()
         {
                 return dummyIndexFile;
@@ -46,27 +50,12 @@ public class FileHandler {
                         datafile = new File(DATAFILE_NAME);
                 indexfile.delete();
                 datafile.delete();
-
-                IndexMetaData.write();
-                DataMetaData.write();
-        }
-
-        public static void loadExistingIndexAndDataFile()
-        {
-                File indexfile = new File(INDEXFILE_NAME),
-                        datafile = new File(DATAFILE_NAME);
-                if (!indexfile.isFile() || !datafile.isFile())
-                {
-                        throw new IllegalArgumentException("Index or data files don't exist");
-                }
-                DataMetaData.read();
-                IndexMetaData.read();
         }
 
 
         public static long getNextAvailableNodeId()
         {
-                return IndexMetaData.nextAvailableNodeId++;
+                return nextAvailableNodeId++;
         }
 
         public static void insertNode(Node newNode)
@@ -100,13 +89,10 @@ public class FileHandler {
                         }
                         FileOutputStream fos = new FileOutputStream(INDEXFILE_NAME, true);
                         fos.write(newNode.toBytes());
-
+                        IndexMetaData.addOneNode();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
-
-                IndexMetaData.addOneNode();
-                IndexMetaData.write();
         }
 
         // TODO: MIGHT NEED TO LINEAR SEARCH FOR THE RIGHT NODE ID
@@ -116,7 +102,7 @@ public class FileHandler {
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "r");
-                        for (long i = 1; i < IndexMetaData.nextAvailableNodeId; ++i)
+                        for (long i = 0; i < nextAvailableNodeId; ++i)
                         {
                                 raf.seek(i * Node.BYTES);
                                 raf.readFully(nodeAsBytes);
@@ -146,7 +132,7 @@ public class FileHandler {
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "rw");
-                        for (long i = 1; i < IndexMetaData.getNumOfNodes(); ++i)
+                        for (long i = 0; i < IndexMetaData.getNumOfNodes(); ++i)
                         {
                                 //raf.seek(i * getNodeSizeInBytes());
                                 raf.readFully(nodeAsBytes);
@@ -191,18 +177,18 @@ public class FileHandler {
                 {
                         System.out.println("Setting root node(" + newRootNode.getId() + ")");
                 }
-                IndexMetaData.rootNodeId = newRootNode.getId();
                 insertNode(newRootNode);
+                rootNodeId = newRootNode.getId();
         }
 
         public static Node getRootNode()
         {
-                return getNode(IndexMetaData.rootNodeId);
+                return getNode(rootNodeId);
         }
 
         public static long getRootNodeId()
         {
-                return IndexMetaData.rootNodeId;
+                return rootNodeId;
         }
 
 
@@ -245,7 +231,9 @@ public class FileHandler {
                         raf.write(block);
 
                         DataMetaData.addOneBlock();
-                        DataMetaData.write();
+
+                        raf.seek(0);
+                        raf.write(DataMetaData.toBytes());
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -267,7 +255,6 @@ public class FileHandler {
                 {
                         System.out.println("Reading data block" + blockId);
                 }
-
                 byte[] block = new byte[BLOCK_SIZE];
                 try {
                         RandomAccessFile raf = new RandomAccessFile(DATAFILE_NAME, "r");
@@ -276,13 +263,10 @@ public class FileHandler {
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
-
                 byte[] numberOfRecordsAsBytes = new byte[Integer.BYTES];
                 int srcPos = 0;
-
                 System.arraycopy(block, srcPos, numberOfRecordsAsBytes, 0, Integer.BYTES);
                 srcPos += Integer.BYTES;
-
                 int numberOfRecords = ByteConvertible.bytesToInt(numberOfRecordsAsBytes);
                 ArrayList<Record> records = new ArrayList<>();
                 for (int i = 0; i < numberOfRecords; ++i)
@@ -321,7 +305,7 @@ public class FileHandler {
                 {
                         System.out.println("Reading OSM File:");
                 }
-                // DataMetaData.write(); // MetaData initialization
+                DataMetaData.init();
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
                 Record record;
@@ -354,7 +338,6 @@ public class FileHandler {
                                                                 String name = tagElement.getAttribute("v");
                                                                 record = new Record(id, name, new double[]{lat, lon});
                                                                 records.add(record);
-                                                                DataMetaData.addOneRecord();
                                                                 if (DEBUG_MODE > 1)
                                                                 {
                                                                         System.out.println("Reading " + record);
@@ -372,7 +355,6 @@ public class FileHandler {
                 } catch (ParserConfigurationException | SAXException | IOException e) {
                         e.printStackTrace();
                 }
-                DataMetaData.write();
         }
 
 
