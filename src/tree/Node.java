@@ -1,5 +1,7 @@
 package tree;
 
+import tree.comparators.LowerValueComparator;
+import tree.comparators.UpperValueComparator;
 import utils.ByteConvertible;
 import utils.FileHandler;
 import java.util.ArrayList;
@@ -229,9 +231,9 @@ public class Node extends ByteConvertible {
 
         for (int d = 0; d < DIMENSIONS; d++) {
             ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
-            sortedByLowerValue.sort(new Comparator.LowerValueComparator(d));
+            sortedByLowerValue.sort(new LowerValueComparator(d));
             ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
-            sortedByUpperValue.sort(new Comparator.UpperValueComparator(d));
+            sortedByUpperValue.sort(new UpperValueComparator(d));
 
             ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);

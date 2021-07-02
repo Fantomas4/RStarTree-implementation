@@ -1,6 +1,7 @@
 package queries;
 
 import tree.*;
+import tree.comparators.DistanceToPointComparator;
 import utils.FileHandler;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class TreeNNQuery {
         // Sort the entries of the current node in ascending order of their
         // bounding box's distance from the target point.
         ArrayList<Entry> entries = currentNode.getEntries();
-        entries.sort(new Comparator.DistanceToPointComparator(targetPoint));
+        entries.sort(new DistanceToPointComparator(targetPoint));
 
         int i = 0;
         if (currentNode.getLevel() != RStarTree.getLeafLevel()) {

@@ -3,6 +3,9 @@ package tree;
 import queries.LocationQueryResult;
 import queries.TreeNNQuery;
 import queries.TreeRangeQuery;
+import tree.comparators.AreaEnlargementComparator;
+import tree.comparators.BBCenterDistanceComparator;
+import tree.comparators.OverlapEnlargementComparator;
 import utils.DataMetaData;
 import utils.FileHandler;
 import java.util.*;
@@ -73,12 +76,12 @@ public class RStarTree {
             // The childpointers in currentNode point to nodes located at the target level,
             // so the minimum overlap cost is calculated
             return Collections.min(candidateEntries,
-                    new Comparator.OverlapEnlargementComparator(candidateEntries, newEntry));
+                    new OverlapEnlargementComparator(candidateEntries, newEntry));
         } else {
             // The childpointers in currentNode do not point to nodes located at the target level,
             // so the minimum area cost is calculated.
             return Collections.min(candidateEntries,
-                    new Comparator.AreaEnlargementComparator(candidateEntries, newEntry));
+                    new AreaEnlargementComparator(candidateEntries, newEntry));
         }
     }
 
@@ -115,13 +118,11 @@ public class RStarTree {
     private void insert(Entry newEntry, Node parentNode, Entry parentEntry, int targetLevel) {
         Node currentNode;
 
-        if (parentNode == null && parentEntry == null) {
+        if (parentEntry == null) {
             // Load the root node to currentNode
             currentNode = FileHandler.getRootNode(); // TODO: Get the root node from File Handler. Check!
-        } else if (parentNode != null && parentEntry != null){
-            currentNode = FileHandler.getNode(parentEntry.getChildNodeId());
         } else {
-            throw new IllegalStateException("Both parentNode and parentEntry arguments parameters should be null or non-null at the same time");
+            currentNode = FileHandler.getNode(parentEntry.getChildNodeId());
         }
 
         if (currentNode.getLevel() == targetLevel) {
@@ -134,11 +135,10 @@ public class RStarTree {
                 // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
                 // the child entries (nodeA entries) inside its child node (nodeA).
                 parentEntry.adjustBoundingBox(currentNode);
+                FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
+
             }
 
-            if (parentNode != null) {
-                FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
-            }
         } else {
             // Continue the recursion to reach the target level, by using chooseSubTree
             // to determine the path that should be followed.
@@ -185,10 +185,8 @@ public class RStarTree {
                     // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
                     // the child entries (nodeA entries) inside its child node (nodeA).
                     parentEntry.adjustBoundingBox(currentNode);
-                }
-
-                if (parentNode != null) {
                     FileHandler.updateNode(parentNode); // TODO: Update parent Node in index file using File Handler. CHECK!
+
                 }
 
             }
@@ -240,7 +238,7 @@ public class RStarTree {
 
         // Sort the M+1 entries in decreasing order of their rectangle centers' distances from the center of the bounding
         // rectangle of overflowedNode.
-        overflowedNodeEntries.sort(Collections.reverseOrder(new Comparator.BBCenterDistanceComparator(overflowedBB)));
+        overflowedNodeEntries.sort(Collections.reverseOrder(new BBCenterDistanceComparator(overflowedBB)));
 
         // Remove the first p entries from the overflowed Node
         ArrayList<Entry> removedEntries = new ArrayList<>();
