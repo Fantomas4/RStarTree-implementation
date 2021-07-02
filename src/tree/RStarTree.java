@@ -129,7 +129,7 @@ public class RStarTree {
             // The target level has been reached, so newEntry is added to currentNode
             currentNode.addEntry(newEntry);
 
-            FileHandler.updateNode(currentNode); // TODO: Update childNode in index file (as nodeA) using File Handler. CHECK!
+            FileHandler.updateNode(currentNode); // TODO: Update childNode in index file using File Handler. CHECK!
 
             if (parentEntry != null) {
                 // Adjust the bounding box of the parent Entry so that it's a minimum bounding box enclosing
@@ -147,28 +147,25 @@ public class RStarTree {
         }
 
         if (currentNode.isOverflowed()) {
+
             // Invoke Overflow Treatment
-            ArrayList<Node> overflowTreatmentResult = overflowTreatment(currentNode, parentNode, parentEntry);
+            Node newSplitNode = overflowTreatment(currentNode, parentNode, parentEntry);
 
-            if (overflowTreatmentResult != null) {
+            if (newSplitNode != null) {
                 // Overflow Treatment caused a node split
-                Node nodeA = overflowTreatmentResult.get(0);
-                Node nodeB = overflowTreatmentResult.get(1);
-
                 // Update the child Node reference
-                currentNode = nodeA;
-                FileHandler.insertNode(nodeB); // TODO: Save nodeB to index file using File Handler. CHECK!
+                FileHandler.insertNode(newSplitNode); // TODO: Save newSplitNode to index file using File Handler. CHECK!
 
                 if (currentNode.getLevel() != rootLevel) {
                     // If a non-root node was split
                     // Create a new Entry for the second node of the split
-                    Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
+                    Entry newParentNodeEntry = new Entry(BoundingBox.calculateMBR(newSplitNode.getEntries()), newSplitNode.getId());
                     // Add the created Entry to the parent Node
                     parentNode.addEntry(newParentNodeEntry);
                 } else {
                     // If the root node was split
-                    Entry rootEntryA = new Entry(BoundingBox.calculateMBR(nodeA.getEntries()), nodeA.getId());
-                    Entry rootEntryB = new Entry(BoundingBox.calculateMBR(nodeB.getEntries()), nodeB.getId());
+                    Entry rootEntryA = new Entry(BoundingBox.calculateMBR(currentNode.getEntries()), currentNode.getId());
+                    Entry rootEntryB = new Entry(BoundingBox.calculateMBR(newSplitNode.getEntries()), newSplitNode.getId());
                     ArrayList<Entry> rootEntries = new ArrayList<>();
                     rootEntries.add(rootEntryA);
                     rootEntries.add(rootEntryB);
@@ -202,7 +199,7 @@ public class RStarTree {
      * @return null if reinsertion was chosen to mitigate the overflowed node, or an ArrayList containing
      * the 2 new nodes the overflowed node was split into.
      */
-    private ArrayList<Node> overflowTreatment(Node overflowedNode, Node parentNode, Entry parentEntry) {
+    private Node overflowTreatment(Node overflowedNode, Node parentNode, Entry parentEntry) {
         int overflowedNodeLevel = overflowedNode.getLevel();
         if (overflowedNode.getLevel() != rootLevel) {
             boolean isFirstCall = !levelOverflowCalled[overflowedNodeLevel];

@@ -85,25 +85,22 @@ public class Node extends ByteConvertible {
     }
 
     /**
-     * Splits the original node into 2 nodes. The first node uses the same ID as the original node, while the
+     * Splits the original node into 2 nodes. The first node is the ola node with its entries updated, while the
      * second node is assigned a new ID from the File Handler.
-     * @return An ArrayList containing the 2 nodes produced by splitting the original node.
+     * @return a node representing the second node (new node) generated during the node split.
      */
-    public ArrayList<Node> splitNode() {
+    public Node splitNode() {
         AxisDistributions axisDistributions = chooseSplitAxis();
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
 
-        ArrayList<Node> resultNodes = new ArrayList<>();
         // TODO: Set Node IDs for split nodes! CHECK!
-        // Use the old node ID for the first split node produced
+        // Use the old node with the new entries
         setEntries(chosenDistribution.getEntriesGroupA());
-        resultNodes.add(this);
         // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
         long newNodeId = FileHandler.getNextAvailableNodeId();
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId));
 
-        return resultNodes;
+        return new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId);
     }
 
     /**
