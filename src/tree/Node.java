@@ -2,8 +2,6 @@ package tree;
 
 import utils.ByteConvertible;
 import utils.FileHandler;
-import utils.IndexMetaData;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +12,7 @@ public class Node extends ByteConvertible {
     private static final double MIN_LOAD_FACTOR = 0.4;
     private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
     // (NodeId, entriesSize, isLeafNode, entries, level)
-    public static final int BYTES = Long.BYTES + Integer.BYTES + 1 + (IndexMetaData.maxEntriesInNode + 1) * Entry.BYTES + Integer.BYTES;
+    public static final int BYTES = Long.BYTES + Integer.BYTES + 1 + (FileHandler.maxEntriesInNode + 1) * Entry.BYTES + Integer.BYTES;
 
     private long nodeId; // The unique ID assigned to the node.
     private ArrayList<Entry> entries; // A list containing all the entries the node includes.
@@ -317,7 +315,7 @@ public class Node extends ByteConvertible {
     public static Node fromBytes(byte[] bytes)
     {
         byte[] idAsBytes = new byte[Long.BYTES],
-                entriesAsBytes = new byte[Integer.BYTES + 1 + (IndexMetaData.maxEntriesInNode + 1) * Entry.BYTES],
+                entriesAsBytes = new byte[Integer.BYTES + 1 + (FileHandler.maxEntriesInNode + 1) * Entry.BYTES],
                 levelAsBytes = new byte[Integer.BYTES];
         int srcPos = 0;
 

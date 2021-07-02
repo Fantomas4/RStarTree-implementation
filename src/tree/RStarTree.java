@@ -5,8 +5,6 @@ import queries.TreeNNQuery;
 import queries.TreeRangeQuery;
 import utils.DataMetaData;
 import utils.FileHandler;
-import utils.IndexMetaData;
-
 import java.util.*;
 
 /**
@@ -20,40 +18,31 @@ public class RStarTree {
     private int rootLevel;
     boolean[] levelOverflowCalled;
 
-    public RStarTree()
-    {
-        this(false);
-    }
 
-    public RStarTree(boolean loadExistingTree) {
-        if (loadExistingTree)
-        {
-            FileHandler.loadExistingIndexAndDataFile();
-            rootLevel = FileHandler.getRootNode().getLevel();
-        }
-        else
-        {
-            FileHandler.deleteIndexAndDataFile();
-            FileHandler.loadDatafile();
+    public RStarTree() {
+        FileHandler.deleteIndexAndDataFile();
+        FileHandler.loadDatafile();
 
-            rootLevel = 0;
+        rootLevel = 0;
 
-            // Create root node
-            long rootNodeId = FileHandler.getRootNodeId(); //TODO: Get root Node ID from File Handler. CHECK!
-            Node rootNode = new Node(rootLevel, rootNodeId);
-            FileHandler.setRootNode(rootNode); // TODO: Save root node using File Handler. CHECK!
+        // Create root node
+        long rootNodeId = FileHandler.getRootNodeId(); //TODO: Get root Node ID from File Handler. CHECK!
+        Node rootNode = new Node(rootLevel, rootNodeId);
+        FileHandler.setRootNode(rootNode); // TODO: Save root node using File Handler. CHECK!
 
-            long numBlocks = DataMetaData.getNumberOfBlocks();
-            for (long i = 1; i < numBlocks; i++) {
-                ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
-                for (Record record : blockRecords) {
-                    insertRecord(record, i);
-                }
+        long numBlocks = DataMetaData.getNumberOfBlocks();
+
+        int dRecordsCount = 0;
+
+        for (int i = 1; i < numBlocks; i++) {
+            ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
+            for (Record record : blockRecords) {
+                insertRecord(record, i);
+                dRecordsCount ++;
             }
-
-            System.out.println("Number of records inserted: " + DataMetaData.getNumberOfRecords());
         }
 
+        System.out.println("Number of records inserted: " + dRecordsCount);
 
 //        // FOR TESTING PURPOSES ONLY!
 //        double[] coordinates = new double[2];
@@ -181,7 +170,7 @@ public class RStarTree {
      * @param newRecord the new record that is to be inserted into the tree structure.
      * @param blockId the unique ID of the datafile block where the new record is saved.
      */
-    private void insertRecord(Record newRecord, long blockId) {
+    private void insertRecord(Record newRecord, int blockId) {
         // R* Tree paper reference: ID1 - InsertData
         // Create a new LeafEntry for the record
 
