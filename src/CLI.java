@@ -7,6 +7,7 @@ import tree.Record;
 import utils.DataMetaData;
 import utils.FileHandler;
 
+import java.io.File;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ public class CLI {
         String input;
         ArrayList<LocationQueryResult> queryResults;
         RStarTree rStarTree = new RStarTree();
+        FileHandler.print_tree();
         do {
             System.out.println("Options:");
             System.out.println("1) K - Nearest Neighbour Query");

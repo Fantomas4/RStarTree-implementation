@@ -32,6 +32,36 @@ public class FileHandler {
 
         public static final int maxEntriesInNode = 3;
 
+        public static void print_tree()
+        {
+                ArrayList<Node> new_nodes, nodes = new ArrayList<>();
+                nodes.add(getNode(rootNodeId));
+
+                while (true)
+                {
+                        for (Node node : nodes)
+                        {
+                                System.out.println(node);
+                        }
+                        System.out.println("\n************************************************************************");
+
+                        if (nodes.get(0).getEntries().get(0) instanceof LeafEntry)
+                        {
+                                break;
+                        }
+
+                        new_nodes = new ArrayList<>();
+                        for (Node node : nodes)
+                        {
+                                for (Entry entry : node.getEntries())
+                                {
+                                        new_nodes.add(getNode(entry.getChildNodeId()));
+                                }
+                        }
+                        nodes = new_nodes;
+                }
+        }
+
 
         public static ArrayList<Record[]> getDummyDataFile()
         {
