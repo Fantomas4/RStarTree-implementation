@@ -18,7 +18,7 @@ public class FileHandler {
         private static ArrayList<Node> dummyIndexFile = new ArrayList<>();
         private static ArrayList<Record[]> dummyDataFile = new ArrayList<>();
 
-        private static final int DEBUG_MODE = 2;
+        private static final int DEBUG_MODE = 0;
 
         public static final String DATAFILE_NAME = "datafile.dat";
         public static final String INDEXFILE_NAME = "indexfile.dat";
