@@ -96,6 +96,7 @@ public class Node extends ByteConvertible {
         // TODO: Set Node IDs for split nodes! CHECK!
         // Use the old node with the new entries
         setEntries(chosenDistribution.getEntriesGroupA());
+
         // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
         long newNodeId = FileHandler.getNextAvailableNodeId();

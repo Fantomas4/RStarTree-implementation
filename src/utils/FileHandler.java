@@ -18,7 +18,7 @@ public class FileHandler {
         private static ArrayList<Node> dummyIndexFile = new ArrayList<>();
         private static ArrayList<Record[]> dummyDataFile = new ArrayList<>();
 
-        private static final int DEBUG_MODE = 0;
+        private static final int DEBUG_MODE = 2;
 
         public static final String DATAFILE_NAME = "datafile.dat";
         public static final String INDEXFILE_NAME = "indexfile.dat";
@@ -26,7 +26,7 @@ public class FileHandler {
         private static long rootNodeId = 1;
         public static final int DIMENSIONS = 2;
 
-        private static String osmFilePath = "map_1.osm";
+        private static String osmFilePath = "map_20_records.osm";
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
         private static long nextAvailableNodeId = 2;
 
