@@ -121,29 +121,22 @@ public class BoundingBox extends ByteConvertible {
      * @param targetPoint the given point for which the distance from the bounding box is to be calculated.
      * @return a number representing the distance between the bounding box and the given point.
      */
-    public double calculatePointDistance(double[] targetPoint) {
+    public double calculateMinPointDistance(double[] targetPoint) {
         double sum = 0;
 
         for (int d = 0; d < dimensions; d++) {
-            double lowerLeftDistance = Math.pow(targetPoint[d] - lowerLeftPoint[d], 2);
-            double upperRightDistance = Math.pow(targetPoint[d] - upperRightPoint[d], 2);
+            double rp;
 
-            sum += min(lowerLeftDistance, upperRightDistance);
+            if (targetPoint[d] < lowerLeftPoint[d])
+                rp = lowerLeftPoint[d];
+            else if (targetPoint[d] > upperRightPoint[d])
+                rp = upperRightPoint[d];
+            else
+                rp = targetPoint[d];
+
+            sum += Math.pow(targetPoint[d] - rp, 2);
         }
-
         return sqrt(sum);
-    }
-
-    /**
-     * Checks whether a given point overlaps with the bounding box in a specified radius.
-     * @param targetPoint the point for which the overlap with the bounding box is checked.
-     * @param radius the specified radius in which the overlap is checked.
-     * @return true if an overlap exists, or false if an overlap does not exist.
-     */
-    public boolean checkPointOverlap(double[] targetPoint, double radius) {
-        double minimumDistance = calculatePointDistance(targetPoint);
-
-        return minimumDistance <= radius;
     }
 
     /**

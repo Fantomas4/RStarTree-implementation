@@ -14,8 +14,8 @@ public class DistanceToPointComparator implements java.util.Comparator<Entry> {
 
     @Override
     public int compare(Entry a, Entry b) {
-        double distanceA = a.getBoundingBox().calculatePointDistance(targetPoint);
-        double distanceB = b.getBoundingBox().calculatePointDistance(targetPoint);
+        double distanceA = a.getBoundingBox().calculateMinPointDistance(targetPoint);
+        double distanceB = b.getBoundingBox().calculateMinPointDistance(targetPoint);
 
         return Double.compare(distanceA, distanceB);
     }

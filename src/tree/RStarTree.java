@@ -22,6 +22,9 @@ public class RStarTree {
     boolean[] levelOverflowCalled;
     Queue<RIEntry> reInsertQueue;
 
+    int dRecordsCount = 0;
+    long dId;
+
 
     private class RIEntry {
         private final Entry entry;
@@ -55,11 +58,13 @@ public class RStarTree {
 
         long numBlocks = DataMetaData.getNumberOfBlocks();
 
-        int dRecordsCount = 0;
 
         for (int i = 1; i < numBlocks; i++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
             for (Record record : blockRecords) {
+                // DEBUG ONLY!
+                dId = record.getId();
+
                 insertRecord(record, i);
                 dRecordsCount ++;
             }
@@ -128,18 +133,12 @@ public class RStarTree {
         insert(leafEntry, null, null, LEAF_LEVEL);
 
         // Re-insert all entries that have been added to the reinsert queue
-        int reInsertSize = reInsertQueue.size();
-        for (int i = 0; i < reInsertSize; i++) {
-            RIEntry riEntry = reInsertQueue.remove();
+        RIEntry riEntry = reInsertQueue.poll();
+        while (riEntry != null) {
+            insert(riEntry.getEntry(), null, null, riEntry.getInsertionLevel());
 
-            if (riEntry.getInsertionLevel() == LEAF_LEVEL) {
-                //TODO: CHECK Type casting!
-                insert((LeafEntry)riEntry.getEntry(), null, null, LEAF_LEVEL);
-            } else {
-                insert(riEntry.getEntry(), null, null, riEntry.getInsertionLevel());
-            }
+            riEntry = reInsertQueue.poll();
         }
-
     }
 
     /**
@@ -170,7 +169,7 @@ public class RStarTree {
         }
 
         if (currentNode.isOverflowed()) {
-            overflowTreatment(currentNode, parentNode, parentEntry);
+            overflowTreatment(currentNode, parentNode);
         }
 
         // Update tree structure
@@ -180,9 +179,6 @@ public class RStarTree {
             parentEntry.adjustBoundingBox(currentNode);
             FileHandler.updateNode(parentNode);
         }
-
-
-
     }
 
     /**
@@ -190,11 +186,10 @@ public class RStarTree {
      * or splitting it into 2 new nodes.
      * @param overflowedNode the overflowed node that needs to be processed.
      * @param parentNode the parent node of the overflowed node.
-     * @param parentEntry the entry inside the parent node that points to the overflowed node.
      * @return null if reinsertion was chosen to mitigate the overflowed node, or an ArrayList containing
      * the 2 new nodes the overflowed node was split into.
      */
-    private void overflowTreatment(Node overflowedNode, Node parentNode, Entry parentEntry) {
+    private void overflowTreatment(Node overflowedNode, Node parentNode) {
         int overflowedNodeLevel = overflowedNode.getLevel();
 
         if (overflowedNodeLevel != rootLevel && !levelOverflowCalled[overflowedNodeLevel]) {
@@ -205,17 +200,17 @@ public class RStarTree {
             // Update levelOverflowCalled status
             levelOverflowCalled[overflowedNodeLevel] = true;
 
-            reInsert(overflowedNode, parentNode, parentEntry);
+            reInsert(overflowedNode);
         } else {
             // Invoke splitNode() on the overflowed Node.
             Node splitNode = overflowedNode.splitNode();
-            FileHandler.updateNode(overflowedNode);
+//            FileHandler.updateNode(overflowedNode);
             FileHandler.insertNode(splitNode);
 
             if (overflowedNode.getLevel() != rootLevel) {
                 // If the overflowed node is not the root, create a new entry in the parent node for the new split node.
                 parentNode.addEntry(new Entry(BoundingBox.calculateMBR(splitNode.getEntries()), splitNode.getId()));
-                FileHandler.updateNode(parentNode);
+//                FileHandler.updateNode(parentNode);
             } else {
                 // If the overflowed node is the root, create a new root containing the two new split nodes of the old root.
                 ArrayList<Entry> newRootEntries = new ArrayList<>();
@@ -226,17 +221,14 @@ public class RStarTree {
                 FileHandler.setRootNode(newRootNode);
             }
         }
-
     }
 
     /**
      * Used to remove a portion of the overflowed node's entries (REINSERT_AMOUNT) and reinsert them into the tree
      * structure, in order to re-balance the overflowed node.
      * @param overflowedNode the overflowed node.
-     * @param parentNode the overflowed node's parent node.
-     * @param parentEntry the entry inside the parent node that points to the overflowed node.
      */
-    private void reInsert(Node overflowedNode, Node parentNode, Entry parentEntry) {
+    private void reInsert(Node overflowedNode) {
         // R* Tree paper reference: RI - ReInsert
         // TODO: Verify correctness of implementation (far-reinsert vs close-reinsert)
         BoundingBox overflowedBB = BoundingBox.calculateMBR(overflowedNode.getEntries());
@@ -251,13 +243,13 @@ public class RStarTree {
             removedEntries.add(overflowedNode.getEntries().remove(0));
         }
 
-        FileHandler.updateNode(overflowedNode);// TODO: Update overflowedNode in IndexFile using FileHandler. CHECK!
-
-        // Adjust the parent entry of the updated formerly overflowed node
-        parentEntry.adjustBoundingBox(overflowedNode);
-
-        // Update the parent entry's node (parent node) in IndexFile using FileHandler
-        FileHandler.updateNode(parentNode);// TODO: Update the parent entry's node (parent node) in IndexFile using FileHandler. CHECK!
+//        FileHandler.updateNode(overflowedNode);// TODO: Update overflowedNode in IndexFile using FileHandler. CHECK!
+//
+//        // Adjust the parent entry of the updated formerly overflowed node
+//        parentEntry.adjustBoundingBox(overflowedNode);
+//
+//        // Update the parent entry's node (parent node) in IndexFile using FileHandler
+//        FileHandler.updateNode(parentNode);// TODO: Update the parent entry's node (parent node) in IndexFile using FileHandler. CHECK!
 
         // Starting with the minimum distance stated in the sorting step above (close reinsert), invoke insert() to
         // reinsert the entries.

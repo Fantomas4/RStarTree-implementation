@@ -26,7 +26,7 @@ public class FileHandler {
         private static long rootNodeId = 1;
         public static final int DIMENSIONS = 2;
 
-        private static String osmFilePath = "map_20_records.osm";
+        private static String osmFilePath = "map_1.osm";
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
         private static long nextAvailableNodeId = 2;
 

@@ -1,14 +1,9 @@
-import org.w3c.dom.ls.LSInput;
 import queries.LocationQueryResult;
 import queries.SequentialNNQuery;
 import queries.SequentialRangeQuery;
 import tree.RStarTree;
-import tree.Record;
-import utils.DataMetaData;
 import utils.FileHandler;
 
-import java.io.File;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;

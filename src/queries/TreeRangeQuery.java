@@ -47,8 +47,7 @@ public class TreeRangeQuery {
             // The current node is not a leaf node and the overlap between its entries'
             // bounding boxes and the target point is checked
             for (Entry entry : nodeEntries) {
-                boolean hasOverlap = entry.getBoundingBox().checkPointOverlap(targetPoint, range);
-                if (hasOverlap) {
+                if (entry.getBoundingBox().calculateMinPointDistance(targetPoint) <= range) {
                     // The target point overlaps the entry's bounding box,
                     // so we proceed to search inside the entry's child node.
                     Node childNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get child node from File Handler using entry.getChildNodeId(). CHECK!
@@ -60,7 +59,7 @@ public class TreeRangeQuery {
             for (Entry entry : nodeEntries) {
                 LeafEntry leafEntry = (LeafEntry) entry;
 
-                double candidateDistance = leafEntry.getBoundingBox().calculatePointDistance(targetPoint);
+                double candidateDistance = leafEntry.getBoundingBox().calculateMinPointDistance(targetPoint);
                 if (candidateDistance <= range) {
                     // The distance between the leaf node's record and the target point is less than or equal to the
                     // specified range, so we proceed to add the leaf entry's record to the query results.
