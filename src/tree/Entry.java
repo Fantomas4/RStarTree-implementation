@@ -8,7 +8,7 @@ import utils.ByteConvertible;
  */
 public class Entry extends ByteConvertible {
     protected BoundingBox boundingBox; // The minimum bounding box of the entry that is determined based on its child node.
-    private long childNodeId; // The child node's unique ID.
+    private final long childNodeId; // The child node's unique ID.
     // (isLeafNode, BoundingBox, childNodeId, recordId, blockId)
     public static final int BYTES = BoundingBox.BYTES + 3 * Long.BYTES;
 
@@ -23,7 +23,8 @@ public class Entry extends ByteConvertible {
 
     /**
      * Used to recalculate the bounding box of the entry when its child node is updated.
-     * @param updatedChildNode
+     * @param updatedChildNode the updated child node for which we want the entry's bounding box to be recalculated
+     *                         in order to become a minimum bounding box (MBR)
      */
     public void adjustBoundingBox(Node updatedChildNode) {
         boundingBox = BoundingBox.calculateMBR(updatedChildNode.getEntries());

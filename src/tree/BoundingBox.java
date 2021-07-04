@@ -58,9 +58,11 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculateMargin() {
         double sum = 0;
+
         for (int i = 0; i < dimensions; i ++) {
             sum += Math.abs(upperRightPoint[i] - lowerLeftPoint[i]);
         }
+
         return sum;
     }
 
@@ -70,9 +72,11 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculateArea() {
         double product = 1;
+
         for (int i = 0; i < dimensions; i ++) {
             product *= upperRightPoint[i] - lowerLeftPoint[i];
         }
+
         return Math.abs(product);
     }
 
@@ -86,6 +90,7 @@ public class BoundingBox extends ByteConvertible {
         for (int d = 0; d < dimensions; d++) {
             centerCoordinates[d] = (upperRightPoint[d] - lowerLeftPoint[d]) / 2;
         }
+
         return centerCoordinates;
     }
 
@@ -96,6 +101,7 @@ public class BoundingBox extends ByteConvertible {
      */
     public double calculateBoundingBoxOverlap(BoundingBox otherBB) {
         double overlapProduct = 1;
+
         for (int i = 0; i < dimensions; i ++) {
             double overlapDiff = Math.min(upperRightPoint[i], otherBB.getUpperRightPoint()[i])
                     - Math.max(lowerLeftPoint[i], otherBB.getLowerLeftPoint()[i]);
@@ -106,6 +112,7 @@ public class BoundingBox extends ByteConvertible {
                 overlapProduct *= overlapDiff;
             }
         }
+
         return overlapProduct;
     }
 
@@ -114,28 +121,62 @@ public class BoundingBox extends ByteConvertible {
      * @param targetPoint the given point for which the distance from the bounding box is to be calculated.
      * @return a number representing the distance between the bounding box and the given point.
      */
-    public double calculatePointDistance(double[] targetPoint) {
+    public double calculateMinPointDistance(double[] targetPoint) {
         double sum = 0;
+
         for (int d = 0; d < dimensions; d++) {
-            double lowerLeftDistance = Math.pow(targetPoint[d] - lowerLeftPoint[d], 2);
-            double upperRightDistance = Math.pow(targetPoint[d] - upperRightPoint[d], 2);
+            double rp;
 
-            sum += min(lowerLeftDistance, upperRightDistance);
+            if (targetPoint[d] < lowerLeftPoint[d])
+                rp = lowerLeftPoint[d];
+            else if (targetPoint[d] > upperRightPoint[d])
+                rp = upperRightPoint[d];
+            else
+                rp = targetPoint[d];
+
+            sum += Math.pow(targetPoint[d] - rp, 2);
         }
-
         return sqrt(sum);
     }
 
-    /**
-     * Checks whether a given point overlaps with the bounding box in a specified radius.
-     * @param targetPoint the point for which the overlap with the bounding box is checked.
-     * @param radius the specified radius in which the overlap is checked.
-     * @return true if an overlap exists, or false if an overlap does not exist.
-     */
-    public boolean checkPointOverlap(double[] targetPoint, double radius) {
-        double minimumDistance = calculatePointDistance(targetPoint);
+    public double calculateMinMaxPointDistance(double[] targetPoint) {
+        double minValue = Double.MAX_VALUE;
 
-        return minimumDistance <= radius;
+        for (int d = 0; d < dimensions; d++) {
+            double calculatedValue = 0;
+
+            double rm;
+            if (targetPoint[d] <= (lowerLeftPoint[d] + upperRightPoint[d]) / 2) {
+                rm = lowerLeftPoint[d];
+            } else {
+                rm = upperRightPoint[d];
+            }
+
+            calculatedValue += Math.pow(targetPoint[d] - rm, 2);
+
+            double sum = 0;
+            for (int d2 = 0; d2 < dimensions; d2++) {
+                if (d2 != d) {
+                    double rM;
+
+                    if (targetPoint[d2] >= (lowerLeftPoint[d2] + upperRightPoint[d2]) / 2) {
+                        rM = lowerLeftPoint[d2];
+                    } else {
+                        rM = upperRightPoint[d2];
+                    }
+
+                    sum += Math.pow(targetPoint[d2] - rM, 2);
+                }
+            }
+
+            calculatedValue += sum;
+
+            if (calculatedValue < minValue) {
+                minValue = calculatedValue;
+            }
+        }
+
+        return minValue;
     }
 
     /**

@@ -1,5 +1,7 @@
 package tree;
 
+import tree.comparators.LowerValueComparator;
+import tree.comparators.UpperValueComparator;
 import utils.ByteConvertible;
 import utils.FileHandler;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class Node extends ByteConvertible {
 
     /**
      * Constructor used to initialize a non-root node.
-     * @param entries
+     * @param entries A list containing all the entries the node includes.
      * @param level the tree level where the node will be placed.
      * @param nodeId the unique ID assigned to this node.
      */
@@ -83,25 +85,23 @@ public class Node extends ByteConvertible {
     }
 
     /**
-     * Splits the original node into 2 nodes. The first node uses the same ID as the original node, while the
+     * Splits the original node into 2 nodes. The first node is the ola node with its entries updated, while the
      * second node is assigned a new ID from the File Handler.
-     * @return An ArrayList containing the 2 nodes produced by splitting the original node.
+     * @return a node representing the second node (new node) generated during the node split.
      */
-    public ArrayList<Node> splitNode() {
+    public Node splitNode() {
         AxisDistributions axisDistributions = chooseSplitAxis();
         Distribution chosenDistribution = chooseSplitIndex(axisDistributions);
 
-        ArrayList<Node> resultNodes = new ArrayList<>();
         // TODO: Set Node IDs for split nodes! CHECK!
-        // Use the old node ID for the first split node produced
+        // Use the old node with the new entries
         setEntries(chosenDistribution.getEntriesGroupA());
-        resultNodes.add(this);
+
         // TODO: Get new node ID for the second split node from File Handler. CHECK!
         // Use a new node ID for the second split node produced
         long newNodeId = FileHandler.getNextAvailableNodeId();
-        resultNodes.add(new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId));
 
-        return resultNodes;
+        return new Node(chosenDistribution.getEntriesGroupB(), level, newNodeId);
     }
 
     /**
@@ -139,17 +139,19 @@ public class Node extends ByteConvertible {
         public double getDistributionMargin() {
             //TODO: Replace duplicate code with a method/optimize?
             ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
+
             for (Entry entry : entriesGroupA) {
                 boundingBoxesA.add(entry.getBoundingBox());
             }
 
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
             for (Entry entry : entriesGroupB) {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
 
             double marginA = BoundingBox.calculateMBR(boundingBoxesA).calculateMargin();
             double marginB = BoundingBox.calculateMBR(boundingBoxesB).calculateMargin();
+
             return marginA + marginB;
         }
 
@@ -159,15 +161,16 @@ public class Node extends ByteConvertible {
          */
         public double getDistributionOverlap() {
             ArrayList<BoundingBox> boundingBoxesA = new ArrayList<>();
+            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
 
             for (Entry entry : entriesGroupA) {
                 boundingBoxesA.add(entry.getBoundingBox());
             }
 
-            ArrayList<BoundingBox> boundingBoxesB = new ArrayList<>();
             for (Entry entry : entriesGroupB) {
                 boundingBoxesB.add(entry.getBoundingBox());
             }
+
             return BoundingBox.calculateMBR(boundingBoxesA).calculateBoundingBoxOverlap(BoundingBox.calculateMBR(boundingBoxesB));
         }
 
@@ -189,6 +192,7 @@ public class Node extends ByteConvertible {
 
             double areaA = BoundingBox.calculateMBR(boundingBoxesA).calculateArea();
             double areaB = BoundingBox.calculateMBR(boundingBoxesB).calculateArea();
+
             return areaA + areaB;
         }
     }
@@ -225,9 +229,9 @@ public class Node extends ByteConvertible {
 
         for (int d = 0; d < DIMENSIONS; d++) {
             ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
-            sortedByLowerValue.sort(new EntryComparator.LowerValueComparator(d));
+            sortedByLowerValue.sort(new LowerValueComparator(d));
             ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
-            sortedByUpperValue.sort(new EntryComparator.UpperValueComparator(d));
+            sortedByUpperValue.sort(new UpperValueComparator(d));
 
             ArrayList<ArrayList<Entry>> sortedValueLists = new ArrayList<>();
             sortedValueLists.add(sortedByLowerValue);
@@ -269,6 +273,7 @@ public class Node extends ByteConvertible {
             Distribution distribution = distributions.get(i);
 
             double distributionOverlap = distribution.getDistributionOverlap();
+
             if (distributionOverlap < minOverlapValue) {
                 // Choose the distribution with the minimum overlap-value.
                 minOverlapValue = distributionOverlap;
