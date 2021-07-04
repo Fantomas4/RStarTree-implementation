@@ -10,6 +10,7 @@ import utils.DataMetaData;
 import utils.FileHandler;
 import utils.IndexMetaData;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 /**
@@ -48,9 +49,8 @@ public class RStarTree {
 
 
     public RStarTree() {
-        FileHandler.deleteIndexAndDataFile();
+        FileHandler.init();
         FileHandler.loadDatafile();
-        IndexMetaData.write();
 
         rootLevel = 0;
 
@@ -74,6 +74,7 @@ public class RStarTree {
         }
 
         System.out.println("Number of records inserted: " + dRecordsCount);
+        System.out.println("Number of records inserted: " + DataMetaData.getNumberOfRecords());
     }
 
     public static int getLeafLevel() {

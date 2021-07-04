@@ -51,13 +51,15 @@ public class FileHandler {
         }
 
 
-        // TODO: Make DataFile and IndexFile classes
-        public static void deleteIndexAndDataFile()
+        public static void init()
         {
                 File indexfile = new File(INDEX_FILE_NAME),
                         datafile = new File(DATA_FILE_NAME);
                 indexfile.delete();
                 datafile.delete();
+
+                DataMetaData.write();
+                IndexMetaData.write();
         }
 
 
@@ -149,10 +151,11 @@ public class FileHandler {
 
         private static void writeDataBlock(ArrayList<Record> records)
         {
-                if (records.size() > DataMetaData.getMaxRecordsInBlock())
+                if (records.size() > DataMetaData.MAX_RECORDS_IN_BLOCK)
                 {
                         throw new IllegalArgumentException("records array doesn't fit in block");
                 }
+                DataMetaData.read();
                 int numberOfRecords = records.size();
 
                 byte[] block = new byte[BLOCK_SIZE];
@@ -170,18 +173,11 @@ public class FileHandler {
                 try {
                         RandomAccessFile raf = new RandomAccessFile(DATA_FILE_NAME, "rw");
 
-                        raf.seek(0);
-                        byte[] dataMetaDataAsBytes = new byte[DataMetaData.BYTES];
-                        raf.readFully(dataMetaDataAsBytes);
-                        DataMetaData.fromBytes(dataMetaDataAsBytes);
-
                         raf.seek(DataMetaData.getNumberOfBlocks() * BLOCK_SIZE);
                         raf.write(block);
 
                         DataMetaData.addOneBlock();
-
-                        raf.seek(0);
-                        raf.write(DataMetaData.toBytes());
+                        DataMetaData.write();
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
@@ -189,6 +185,7 @@ public class FileHandler {
 
         public static ArrayList<Record> getDataBlock(long blockId)
         {
+                DataMetaData.read();
                 byte[] block = new byte[BLOCK_SIZE];
                 try {
                         RandomAccessFile raf = new RandomAccessFile(DATA_FILE_NAME, "r");
@@ -231,7 +228,6 @@ public class FileHandler {
         */
         public static void loadDatafile()
         {
-                DataMetaData.init();
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 ArrayList<Record> records = new ArrayList<>();
                 Record record;
@@ -264,8 +260,10 @@ public class FileHandler {
                                                                 String name = tagElement.getAttribute("v");
                                                                 record = new Record(id, name, new double[]{lat, lon});
                                                                 records.add(record);
+                                                                DataMetaData.addOneRecord();
+                                                                DataMetaData.write();
                                                         }
-                                                        if (records.size() == DataMetaData.getMaxRecordsInBlock())
+                                                        if (records.size() == DataMetaData.MAX_RECORDS_IN_BLOCK)
                                                         {
                                                                 writeDataBlock(records);
                                                                 records.clear();
@@ -278,6 +276,5 @@ public class FileHandler {
                         e.printStackTrace();
                 }
         }
-
 }
 
