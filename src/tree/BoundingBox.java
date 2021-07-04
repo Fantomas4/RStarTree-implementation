@@ -117,8 +117,8 @@ public class BoundingBox extends ByteConvertible {
     }
 
     /**
-     * Calculates the distance between the bounding box and a given point.
-     * @param targetPoint the given point for which the distance from the bounding box is to be calculated.
+     * Calculates the min distance between the bounding box and a given point.
+     * @param targetPoint the given point for which the min distance from the bounding box is to be calculated.
      * @return a number representing the distance between the bounding box and the given point.
      */
     public double calculateMinPointDistance(double[] targetPoint) {
@@ -139,6 +139,10 @@ public class BoundingBox extends ByteConvertible {
         return sqrt(sum);
     }
 
+    /** Calculates the min-max distance between the bounding box and a given point.
+     * @param targetPoint the given point for which the min-max distance from the bounding box is to be calculated,
+     * @return a number representing the min-max distance between the bounding box and the given point.
+     */
     public double calculateMinMaxPointDistance(double[] targetPoint) {
         double minValue = Double.MAX_VALUE;
 
