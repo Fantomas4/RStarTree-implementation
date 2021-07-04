@@ -71,18 +71,21 @@ public class FileHandler {
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
+                IndexMetaData.write();
         }
 
         public static Node getNode(long nodeId)
         {
+                IndexMetaData.read();
                 byte[] nodeAsBytes = new byte[Node.BYTES];
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEX_FILE_NAME, "r");
-                        for (long i = 0; i < IndexMetaData.nextAvailableNodeId; ++i)
+                        for (long i = 1; i <= IndexMetaData.getNumOfNodes(); ++i)
                         {
                                 raf.seek(i * Node.BYTES);
                                 raf.readFully(nodeAsBytes);
+
                                 node = Node.fromBytes(nodeAsBytes);
                                 if (node.getId() == nodeId)
                                 {
@@ -98,18 +101,20 @@ public class FileHandler {
 
         public static void updateNode(Node updatedNode)
         {
+                IndexMetaData.read();
                 byte[] nodeAsBytes = new byte[Node.BYTES];
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEX_FILE_NAME, "rw");
-                        for (long i = 0; i < IndexMetaData.getNumOfNodes(); ++i) // TODO: !!! NODE 0
+                        for (long i = 1; i <= IndexMetaData.getNumOfNodes(); ++i)
                         {
-                                //raf.seek(i * getNodeSizeInBytes());
+                                raf.seek(i * Node.BYTES);
                                 raf.readFully(nodeAsBytes);
+
                                 node = Node.fromBytes(nodeAsBytes);
                                 if (node.getId() == updatedNode.getId())
                                 {
-                                        raf.seek(i * Node.BYTES); // TODO: May not be needed
+                                        raf.seek(i * Node.BYTES);
                                         raf.write(updatedNode.toBytes());
                                 }
                         }
@@ -123,15 +128,18 @@ public class FileHandler {
         {
                 insertNode(newRootNode);
                 IndexMetaData.rootNodeId = newRootNode.getId();
+                IndexMetaData.write();
         }
 
         public static Node getRootNode()
         {
+                IndexMetaData.read();
                 return getNode(IndexMetaData.rootNodeId);
         }
 
         public static long getRootNodeId()
         {
+                IndexMetaData.read();
                 return IndexMetaData.rootNodeId;
         }
 

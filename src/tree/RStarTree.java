@@ -50,6 +50,7 @@ public class RStarTree {
     public RStarTree() {
         FileHandler.deleteIndexAndDataFile();
         FileHandler.loadDatafile();
+        IndexMetaData.write();
 
         rootLevel = 0;
 
