@@ -20,7 +20,6 @@ public class FileHandler {
         public static final int DIMENSIONS = 2;
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
 
-
         public static void print_tree()
         {
                 ArrayList<Node> new_nodes, nodes = new ArrayList<>();
@@ -74,7 +73,6 @@ public class FileHandler {
                 }
         }
 
-        // TODO: MIGHT NEED TO LINEAR SEARCH FOR THE RIGHT NODE ID
         public static Node getNode(long nodeId)
         {
                 byte[] nodeAsBytes = new byte[Node.BYTES];
