@@ -3,6 +3,7 @@ package tree;
 import tree.comparators.LowerValueComparator;
 import tree.comparators.UpperValueComparator;
 import utils.ByteConvertible;
+import utils.FileHandler;
 import utils.IndexMetaData;
 
 import java.util.ArrayList;
@@ -10,10 +11,8 @@ import java.util.List;
 
 
 public class Node extends ByteConvertible {
-    private static final int DIMENSIONS = 2; //TODO: Get number of dimensions from file handler.
-    private static final int MAX_ENTRIES = 3; //TODO: Get max entries per node from File Handler using FileHandler.getMaxEntriesInBlock();
     private static final double MIN_LOAD_FACTOR = 0.4;
-    private static final int MIN_ENTRIES = (int)Math.floor(MAX_ENTRIES * MIN_LOAD_FACTOR);
+    private static final int MIN_ENTRIES = (int)Math.floor(IndexMetaData.MAX_ENTRIES_IN_NODE * MIN_LOAD_FACTOR);
     // (NodeId, entriesSize, isLeafNode, entries, level)
     public static final int BYTES = Long.BYTES + Integer.BYTES + 1 + (IndexMetaData.MAX_ENTRIES_IN_NODE + 1) * Entry.BYTES + Integer.BYTES;
 
@@ -66,7 +65,7 @@ public class Node extends ByteConvertible {
     }
 
     public boolean isOverflowed() {
-        return entries.size() > MAX_ENTRIES;
+        return entries.size() > IndexMetaData.MAX_ENTRIES_IN_NODE;
     }
 
     public long getId() {
@@ -82,7 +81,7 @@ public class Node extends ByteConvertible {
      * @return an integer representing the maximum amount of entries that can be stored in a node.
      */
     public static int getMaxEntriesLimit() {
-        return MAX_ENTRIES;
+        return IndexMetaData.MAX_ENTRIES_IN_NODE;
     }
 
     /**
@@ -228,7 +227,7 @@ public class Node extends ByteConvertible {
         double minMarginSum = Double.MAX_VALUE;
         AxisDistributions minAxisDistributions = null;
 
-        for (int d = 0; d < DIMENSIONS; d++) {
+        for (int d = 0; d < FileHandler.DIMENSIONS; d++) {
             ArrayList<Entry> sortedByLowerValue = new ArrayList<>(entries);
             sortedByLowerValue.sort(new LowerValueComparator(d));
             ArrayList<Entry> sortedByUpperValue = new ArrayList<>(entries);
@@ -240,7 +239,7 @@ public class Node extends ByteConvertible {
 
             AxisDistributions axisDistributions = new AxisDistributions();
             for (ArrayList<Entry> sortedValueList : sortedValueLists) {
-                for (int k = 0; k < MAX_ENTRIES - 2 * MIN_ENTRIES + 2; k++) {
+                for (int k = 0; k < IndexMetaData.MAX_ENTRIES_IN_NODE - 2 * MIN_ENTRIES + 2; k++) {
                     List<Entry> groupA = sortedValueList.subList(0, MIN_ENTRIES - 1 + k + 1);
                     List<Entry> groupB = sortedValueList.subList(MIN_ENTRIES - 1 + k + 1, sortedValueList.size());
                     Distribution distribution = new Distribution(new ArrayList<>(groupA), new ArrayList<>(groupB));
