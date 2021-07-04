@@ -59,7 +59,7 @@ public abstract class ByteConvertible
 
         protected static byte[] entriesToBytes(ArrayList<Entry> entries)
         {
-                byte[] entriesAsBytes = new byte[Integer.BYTES + 1 + (FileHandler.maxEntriesInNode + 1) * Entry.BYTES];
+                byte[] entriesAsBytes = new byte[Integer.BYTES + 1 + (IndexMetaData.MAX_ENTRIES_IN_NODE + 1) * Entry.BYTES];
                 int destPos = 0;
 
                 // Number of entries

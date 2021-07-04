@@ -8,6 +8,9 @@ import tree.comparators.BBCenterDistanceComparator;
 import tree.comparators.OverlapEnlargementComparator;
 import utils.DataMetaData;
 import utils.FileHandler;
+import utils.IndexMetaData;
+
+import javax.xml.crypto.Data;
 import java.util.*;
 
 /**
@@ -46,7 +49,7 @@ public class RStarTree {
 
 
     public RStarTree() {
-        FileHandler.deleteIndexAndDataFile();
+        FileHandler.init();
         FileHandler.loadDatafile();
 
         rootLevel = 0;
@@ -69,8 +72,6 @@ public class RStarTree {
                 dRecordsCount ++;
             }
         }
-
-        System.out.println("Number of records inserted: " + dRecordsCount);
     }
 
     public static int getLeafLevel() {
@@ -213,7 +214,7 @@ public class RStarTree {
                 newRootEntries.add(new Entry(BoundingBox.calculateMBR(overflowedNode.getEntries()), overflowedNode.getId()));
                 newRootEntries.add(new Entry(BoundingBox.calculateMBR(splitNode.getEntries()), splitNode.getId()));
 
-                Node newRootNode = new Node(newRootEntries, ++rootLevel, FileHandler.getNextAvailableNodeId());
+                Node newRootNode = new Node(newRootEntries, ++rootLevel, IndexMetaData.getNextAvailableNodeId());
                 FileHandler.setRootNode(newRootNode);
             }
         }
