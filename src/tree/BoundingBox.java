@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
 

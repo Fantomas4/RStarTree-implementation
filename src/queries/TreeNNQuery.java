@@ -3,7 +3,6 @@ package queries;
 import tree.*;
 import utils.FileHandler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
