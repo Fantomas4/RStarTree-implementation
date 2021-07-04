@@ -20,36 +20,6 @@ public class FileHandler {
         public static final int DIMENSIONS = 2;
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
 
-        public static void print_tree()
-        {
-                ArrayList<Node> new_nodes, nodes = new ArrayList<>();
-                nodes.add(getNode(IndexMetaData.rootNodeId));
-
-                while (true)
-                {
-                        for (Node node : nodes)
-                        {
-                                System.out.println(node);
-                        }
-                        System.out.println("\n************************************************************************");
-
-                        if (nodes.get(0).getEntries().get(0) instanceof LeafEntry)
-                        {
-                                break;
-                        }
-
-                        new_nodes = new ArrayList<>();
-                        for (Node node : nodes)
-                        {
-                                for (Entry entry : node.getEntries())
-                                {
-                                        new_nodes.add(getNode(entry.getChildNodeId()));
-                                }
-                        }
-                        nodes = new_nodes;
-                }
-        }
-
 
         public static void init()
         {
@@ -61,8 +31,6 @@ public class FileHandler {
                 DataMetaData.write();
                 IndexMetaData.write();
         }
-
-
 
         public static void insertNode(Node newNode)
         {

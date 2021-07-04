@@ -17,7 +17,6 @@ public class CLI {
         String input;
         ArrayList<LocationQueryResult> queryResults;
         RStarTree rStarTree = new RStarTree();
-        FileHandler.print_tree();
         do {
             System.out.println("Options:");
             System.out.println("1) K - Nearest Neighbour Tree Query");

@@ -72,9 +72,6 @@ public class RStarTree {
                 dRecordsCount ++;
             }
         }
-
-        System.out.println("Number of records inserted: " + dRecordsCount);
-        System.out.println("Number of records inserted: " + DataMetaData.getNumberOfRecords());
     }
 
     public static int getLeafLevel() {

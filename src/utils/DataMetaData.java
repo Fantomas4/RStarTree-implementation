@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class DataMetaData {
-        public static final int MAX_RECORDS_IN_BLOCK = FileHandler.BLOCK_SIZE / Record.BYTES; // Dummy maximum number of records in a block
+        public static final int MAX_RECORDS_IN_BLOCK = FileHandler.BLOCK_SIZE / Record.BYTES;
 
         private static long numberOfBlocks = 1;
         private static long numberOfRecords = 0;
