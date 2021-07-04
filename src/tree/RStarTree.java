@@ -8,6 +8,8 @@ import tree.comparators.BBCenterDistanceComparator;
 import tree.comparators.OverlapEnlargementComparator;
 import utils.DataMetaData;
 import utils.FileHandler;
+import utils.IndexMetaData;
+
 import java.util.*;
 
 /**
@@ -213,7 +215,7 @@ public class RStarTree {
                 newRootEntries.add(new Entry(BoundingBox.calculateMBR(overflowedNode.getEntries()), overflowedNode.getId()));
                 newRootEntries.add(new Entry(BoundingBox.calculateMBR(splitNode.getEntries()), splitNode.getId()));
 
-                Node newRootNode = new Node(newRootEntries, ++rootLevel, FileHandler.getNextAvailableNodeId());
+                Node newRootNode = new Node(newRootEntries, ++rootLevel, IndexMetaData.getNextAvailableNodeId());
                 FileHandler.setRootNode(newRootNode);
             }
         }

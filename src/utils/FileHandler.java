@@ -2,7 +2,6 @@ package utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-//import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import tree.*;
@@ -23,19 +22,16 @@ public class FileHandler {
         public static final String DATAFILE_NAME = "datafile.dat";
         public static final String INDEXFILE_NAME = "indexfile.dat";
 
-        private static long rootNodeId = 1;
         public static final int DIMENSIONS = 2;
 
         private static String osmFilePath = "map.osm";
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
-        private static long nextAvailableNodeId = 2;
 
-        public static final int maxEntriesInNode = 3;
 
         public static void print_tree()
         {
                 ArrayList<Node> new_nodes, nodes = new ArrayList<>();
-                nodes.add(getNode(rootNodeId));
+                nodes.add(getNode(IndexMetaData.rootNodeId));
 
                 while (true)
                 {
@@ -83,10 +79,6 @@ public class FileHandler {
         }
 
 
-        public static long getNextAvailableNodeId()
-        {
-                return nextAvailableNodeId++;
-        }
 
         public static void insertNode(Node newNode)
         {
@@ -132,7 +124,7 @@ public class FileHandler {
                 Node node;
                 try {
                         RandomAccessFile raf = new RandomAccessFile(INDEXFILE_NAME, "r");
-                        for (long i = 0; i < nextAvailableNodeId; ++i)
+                        for (long i = 0; i < IndexMetaData.nextAvailableNodeId; ++i)
                         {
                                 raf.seek(i * Node.BYTES);
                                 raf.readFully(nodeAsBytes);
@@ -208,17 +200,17 @@ public class FileHandler {
                         System.out.println("Setting root node(" + newRootNode.getId() + ")");
                 }
                 insertNode(newRootNode);
-                rootNodeId = newRootNode.getId();
+                IndexMetaData.rootNodeId = newRootNode.getId();
         }
 
         public static Node getRootNode()
         {
-                return getNode(rootNodeId);
+                return getNode(IndexMetaData.rootNodeId);
         }
 
         public static long getRootNodeId()
         {
-                return rootNodeId;
+                return IndexMetaData.rootNodeId;
         }
 
 
