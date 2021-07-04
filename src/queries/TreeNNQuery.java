@@ -151,6 +151,9 @@ public class TreeNNQuery {
                     // simply added to the queue.
                     kClosestNeighborsQueue.add(new Neighbor(leafEntry.getBlockId(), leafEntry.getRecordId(), candidateDistance));
 
+                    if (kClosestNeighborsQueue.size() == k) {
+                        searchRadius = candidateDistance;
+                    }
 
                 } else {
                     // The priority queue already contains k neighbors, so the most distant neighbor inside
