@@ -20,15 +20,17 @@ public class CLI {
         FileHandler.print_tree();
         do {
             System.out.println("Options:");
-            System.out.println("1) K - Nearest Neighbour Query");
-            System.out.println("2) Range Query");
+            System.out.println("1) K - Nearest Neighbour Tree Query");
+            System.out.println("2) K - Nearest Neighbour Sequential Query");
+            System.out.println("3) Range Tree Query");
+            System.out.println("4) Range Sequential Query");
             System.out.println("0) Exit");
 
             System.out.print("Select option: ");
             input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
-            while (!input.equals("0") && !input.equals("1") && !input.equals("2"))
+            while (!input.equals("0") && !input.equals("1") && !input.equals("2") && !input.equals("3") && !input.equals("4"))
             {
-                System.out.println("Select one of the three available options: 0, 1 or 2");
+                System.out.println("Select one of the three available options: 0, 1, 2, 3 or 4");
                 System.out.print("Select option: ");
                 input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
             }
@@ -47,12 +49,14 @@ public class CLI {
             System.out.println("Your center point is: " + Arrays.toString(centerCoordinates));
 
             long startingTime, endingTime;
+            int k;
+            double r;
             switch (input)
             {
                 case "1":
                     System.out.println("K - Nearest Neighbour Query selected");
                     System.out.print("Enter k (number of nearest neighbours):");
-                    int k = scanner.nextInt();
+                    k = scanner.nextInt();
                     while (k <= 0)
                     {
                         System.out.println("K must be a positive integer");
@@ -69,7 +73,19 @@ public class CLI {
                     }
                     System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
 
-                    System.out.println("\n\n\nSequential");
+                    break;
+                case "2":
+                    System.out.println("K - Nearest Neighbour Query selected");
+                    System.out.print("Enter k (number of nearest neighbours):");
+                    k = scanner.nextInt();
+                    while (k <= 0)
+                    {
+                        System.out.println("K must be a positive integer");
+                        System.out.print("Enter k (number of nearest neighbours):");
+                        k = scanner.nextInt();
+                    }
+
+                    System.out.println("Sequential");
                     startingTime = System.nanoTime();
                     queryResults = new SequentialNNQuery(centerCoordinates, k).execute();
                     endingTime = System.nanoTime();
@@ -78,10 +94,10 @@ public class CLI {
                     }
                     System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms\n\n\n");
                     break;
-                case "2":
+                case "3":
                     System.out.println("Range Query selected");
                     System.out.print("Enter radius for range query:");
-                    double r = scanner.nextDouble();
+                    r = scanner.nextDouble();
                     while (r <= 0)
                     {
                         System.out.println("Radius must be a positive value");
@@ -98,7 +114,19 @@ public class CLI {
                     }
                     System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms");
 
-                    System.out.println("\n\n\nSequential");
+                    break;
+                case "4":
+                    System.out.println("Range Query selected");
+                    System.out.print("Enter radius for range query:");
+                    r = scanner.nextDouble();
+                    while (r <= 0)
+                    {
+                        System.out.println("Radius must be a positive value");
+                        System.out.print("Enter positive radius:");
+                        r = scanner.nextDouble();
+                    }
+
+                    System.out.println("Sequential");
                     startingTime = System.nanoTime();
                     queryResults = new SequentialRangeQuery(centerCoordinates, r).execute();
                     endingTime = System.nanoTime();
@@ -108,46 +136,14 @@ public class CLI {
                     System.out.println("Time taken: " + (double)(endingTime - startingTime) / 1000000 + "ms\n\n\nS");
                     break;
             }
-            scanner.nextLine(); // FLushing scanner buffer
+            scanner.nextLine(); // Flushing scanner buffer
         } while (true);
 
     }
 
     public static void main(String[] args) {
-        /*
-        RStarTree rStarTree = new RStarTree();
-
-        double[] testCoords = new double[2];
-        testCoords[0] = 0;
-        testCoords[1] = 0;
-
-        ArrayList<LocationQueryResult> queryResults;
-        // 49.261
-
-        queryResults = rStarTree.executeNNQuery(testCoords,36);
-//        queryResults = rStarTree.executeRangeQuery(testCoords, 49.27);
-
-//        queryResults = new SequentialNNQuery(testCoords, 40).execute();
-//        queryResults = new SequentialRangeQuery(testCoords, 49.27).execute();
-
-//        ArrayList<Record[]> datafile = FileHandler.getDummyDataFile();
-//        for (Record[] records : datafile) {
-//            for (int i = 0; i < DataMetaData.getMaxRecordsInBlock(); i++) {
-//                System.out.println(records[i]);
-//            }
-//        }
-//
-        System.out.println("*** Found " + queryResults.size() + " query results.");
-
-        for (LocationQueryResult result : queryResults) {
-            System.out.println(result);
-        }
-        */
         run();
         System.out.println("DONE!");
-
-
-
     }
 
 }

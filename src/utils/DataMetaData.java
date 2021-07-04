@@ -13,6 +13,11 @@ public class DataMetaData {
 
         public static final int BYTES = Long.BYTES + Long.BYTES;
 
+        public static long getNumberOfBlocks() { return numberOfBlocks; }
+        public static long getNumberOfRecords() { return numberOfRecords; }
+        public static void addOneBlock() { numberOfBlocks++; }
+        public static void addOneRecord() { numberOfRecords++; }
+
         public static void write()
         {
                 byte[] block = new byte[FileHandler.BLOCK_SIZE];
@@ -39,10 +44,6 @@ public class DataMetaData {
                 fromBytes(dataMetaDataAsBytes);
         }
 
-        public static long getNumberOfBlocks() { return numberOfBlocks; }
-        public static long getNumberOfRecords() { return numberOfRecords; }
-        public static void addOneBlock() { numberOfBlocks++; }
-        public static void addOneRecord() { numberOfRecords++; }
 
         public static byte[] toBytes()
         {
