@@ -26,6 +26,12 @@ public class CLI {
 
             System.out.print("Select option: ");
             input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
+            while (!input.equals("0") && !input.equals("1") && !input.equals("2"))
+            {
+                System.out.println("Select one of the three available options: 0, 1 or 2");
+                System.out.print("Select option: ");
+                input = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
+            }
             if (input.equals("0"))
             {
                 break;
