@@ -6,6 +6,9 @@ import tree.LeafEntry;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+/**
+ * Helper class for the serialisation of the objects that need to be written in the index and data files.
+ */
 public abstract class ByteConvertible
 {
         // https://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java

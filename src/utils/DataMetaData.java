@@ -5,6 +5,9 @@ import tree.Record;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+/**
+ * Contains the Meta Data of the data file
+ */
 public class DataMetaData {
         public static final int MAX_RECORDS_IN_BLOCK = FileHandler.BLOCK_SIZE / Record.BYTES;
 

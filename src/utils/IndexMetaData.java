@@ -5,6 +5,9 @@ import tree.Node;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+/**
+ * Contains the Meta Data of the index file
+ */
 public class IndexMetaData {
         private static int numOfNodes = 0;
         protected static long rootNodeId = 1;

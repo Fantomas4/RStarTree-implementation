@@ -12,6 +12,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Contains functionality for reading from and writing to ROM
+ */
 public class FileHandler {
 
         public static final String DATA_FILE_NAME = "datafile.dat";
@@ -20,7 +23,9 @@ public class FileHandler {
         public static final int DIMENSIONS = 2;
         public static final int BLOCK_SIZE = Integer.BYTES + 2 * Record.BYTES; // 32 * 1024
 
-
+        /**
+         * Initialises the .dat files
+         */
         public static void init()
         {
                 File indexfile = new File(INDEX_FILE_NAME),
@@ -32,6 +37,10 @@ public class FileHandler {
                 IndexMetaData.write();
         }
 
+        /**
+         * Writes a new Node to the index file
+         * @param newNode to be written
+         */
         public static void insertNode(Node newNode)
         {
                 try {
@@ -44,6 +53,11 @@ public class FileHandler {
                 IndexMetaData.write();
         }
 
+        /**
+         * Reads a Node from the index file
+         * @param nodeId of the Node to be read
+         * @return the node with id nodeId if present or null if it was not found
+         */
         public static Node getNode(long nodeId)
         {
                 IndexMetaData.read();
@@ -62,13 +76,16 @@ public class FileHandler {
                                         return node;
                                 }
                         }
-
                 } catch (IOException e) {
                         e.printStackTrace();
                 }
                 return null;
         }
 
+        /**
+         * Changes a nodes data in the index file
+         * @param updatedNode the updated version of the Node
+         */
         public static void updateNode(Node updatedNode)
         {
                 IndexMetaData.read();
@@ -94,6 +111,10 @@ public class FileHandler {
                 }
         }
 
+        /**
+         * Inserts a new root Node and updates its id in the index metadata
+         * @param newRootNode the new root Node
+         */
         public static void setRootNode(Node newRootNode)
         {
                 insertNode(newRootNode);
@@ -101,12 +122,20 @@ public class FileHandler {
                 IndexMetaData.write();
         }
 
+        /**
+         *
+         * @return the root Node
+         */
         public static Node getRootNode()
         {
                 IndexMetaData.read();
                 return getNode(IndexMetaData.rootNodeId);
         }
 
+        /**
+         *
+         * @return the root Nodes id
+         */
         public static long getRootNodeId()
         {
                 IndexMetaData.read();
@@ -114,9 +143,10 @@ public class FileHandler {
         }
 
 
-
-
-
+        /**
+         * Inserts given records into a block of memory and writes the block to the data file
+         * @param records to be written in the data file
+         */
         private static void writeDataBlock(ArrayList<Record> records)
         {
                 if (records.size() > DataMetaData.MAX_RECORDS_IN_BLOCK)
@@ -151,6 +181,11 @@ public class FileHandler {
                 }
         }
 
+        /**
+         *
+         * @param blockId of the block to be read
+         * @return list of records in the block with the given id
+         */
         public static ArrayList<Record> getDataBlock(long blockId)
         {
                 DataMetaData.read();
@@ -178,6 +213,12 @@ public class FileHandler {
                 return records;
         }
 
+        /**
+         * Reads a single Record in the data file
+         * @param blockId of the block containing the Record
+         * @param recordId of the Record
+         * @return the Record with the given record id
+         */
         public static Record getRecord(long blockId, long recordId)
         {
                 for (Record record : getDataBlock(blockId))
@@ -190,10 +231,10 @@ public class FileHandler {
                 return null;
         }
 
-        /*
-        Extracts Record data (id, name and coordinates) from Open Street Maps XML file and loads them into
-        the datafile
-        */
+        /**
+         * Parses the XML file and extracts Records containing an id, a name and lat, long attributes.
+         * The Records are written in the data file.
+         */
         public static void loadDatafile()
         {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

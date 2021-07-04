@@ -24,10 +24,6 @@ public class RStarTree {
     boolean[] levelOverflowCalled;
     Queue<RIEntry> reInsertQueue;
 
-    int dRecordsCount = 0;
-    long dId;
-
-
     private class RIEntry {
         private final Entry entry;
         private final int insertionLevel;
@@ -64,11 +60,7 @@ public class RStarTree {
         for (int i = 1; i < numBlocks; i++) {
             ArrayList<Record> blockRecords = FileHandler.getDataBlock(i);
             for (Record record : blockRecords) {
-                // DEBUG ONLY!
-                dId = record.getId();
-
                 insertRecord(record, i);
-                dRecordsCount ++;
             }
         }
     }

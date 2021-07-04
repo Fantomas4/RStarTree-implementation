@@ -9,27 +9,20 @@ import java.util.Arrays;
  * Class used to store the information of query results.
  */
 public class LocationQueryResult implements Comparable<LocationQueryResult> {
-    private final long recordId; // TEMP FOR DEBUGGING!
     private final String name;
     private final double[] coordinates;
     private final double distance;
 
-    public LocationQueryResult(long recordId, String name, double[] coordinates, double distance) {
-        this.recordId = recordId;
+    public LocationQueryResult(String name, double[] coordinates, double distance) {
         this.name = name;
         this.coordinates = coordinates;
         this.distance = distance;
     }
 
     public LocationQueryResult(Record record, double distance) {
-        this.recordId = record.getId();
         this.name = record.getName();
         this.coordinates = record.getCoordinates();
         this.distance = distance;
-    }
-
-    public long getRecordId() {
-        return recordId;
     }
 
     public String getName() {
@@ -57,14 +50,6 @@ public class LocationQueryResult implements Comparable<LocationQueryResult> {
 
     @Override
     public String toString() {
-        /*
-        return "LocationQueryResult{" +
-                "recordId=" + recordId +
-                ", name='" + name + '\'' +
-                ", coordinates=" + Arrays.toString(coordinates) +
-                ", distance=" + distance +
-                '}';
-        */
         return "-----------------------------------------\n" +
 //                "Record ID: " + recordId + "\n" +
                 "Name: " + name + "\n" +

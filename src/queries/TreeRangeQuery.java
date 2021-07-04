@@ -50,7 +50,7 @@ public class TreeRangeQuery {
                 if (entry.getBoundingBox().calculateMinPointDistance(targetPoint) <= range) {
                     // The target point overlaps the entry's bounding box,
                     // so we proceed to search inside the entry's child node.
-                    Node childNode = FileHandler.getNode(entry.getChildNodeId()); // TODO: Get child node from File Handler using entry.getChildNodeId(). CHECK!
+                    Node childNode = FileHandler.getNode(entry.getChildNodeId());
                     search(childNode);
                 }
             }
@@ -63,7 +63,7 @@ public class TreeRangeQuery {
                 if (candidateDistance <= range) {
                     // The distance between the leaf node's record and the target point is less than or equal to the
                     // specified range, so we proceed to add the leaf entry's record to the query results.
-                    Record record = FileHandler.getRecord(leafEntry.getBlockId(), leafEntry.getRecordId()); // TODO: Get the leaf entry's record from File Handler using leafEntry.getRecordId(). CHECK!
+                    Record record = FileHandler.getRecord(leafEntry.getBlockId(), leafEntry.getRecordId());
                     queryResults.add(new LocationQueryResult(record, candidateDistance));
                 }
             }

@@ -72,7 +72,7 @@ public class TreeNNQuery {
         // Prepare the Array List that contains the result Records
         Neighbor neighbor = kClosestNeighborsQueue.poll();
         while (neighbor != null) {
-            Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId()); // TODO: Get record from File Handler using neighbor.getRecordId(). CHECK!
+            Record record = FileHandler.getRecord(neighbor.getBlockId(), neighbor.getRecordId());
 
             // Add the record to the results list
             queryResults.add(new LocationQueryResult(record, neighbor.getDistance()));
