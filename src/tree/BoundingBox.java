@@ -139,6 +139,46 @@ public class BoundingBox extends ByteConvertible {
         return sqrt(sum);
     }
 
+    public double calculateMinMaxPointDistance(double[] targetPoint) {
+        double minValue = Double.MAX_VALUE;
+
+        for (int d = 0; d < dimensions; d++) {
+            double calculatedValue = 0;
+
+            double rm;
+            if (targetPoint[d] <= (lowerLeftPoint[d] + upperRightPoint[d]) / 2) {
+                rm = lowerLeftPoint[d];
+            } else {
+                rm = upperRightPoint[d];
+            }
+
+            calculatedValue += Math.pow(targetPoint[d] - rm, 2);
+
+            double sum = 0;
+            for (int d2 = 0; d2 < dimensions; d2++) {
+                if (d2 != d) {
+                    double rM;
+
+                    if (targetPoint[d2] >= (lowerLeftPoint[d2] + upperRightPoint[d2]) / 2) {
+                        rM = lowerLeftPoint[d2];
+                    } else {
+                        rM = upperRightPoint[d2];
+                    }
+
+                    sum += Math.pow(targetPoint[d2] - rM, 2);
+                }
+            }
+
+            calculatedValue += sum;
+
+            if (calculatedValue < minValue) {
+                minValue = calculatedValue;
+            }
+        }
+
+        return minValue;
+    }
+
     /**
      * Used to calculate the Minimum Bounding Rectangle (MBR) of a set of bounding boxes.
      * @param boundingBoxes the bounding boxes for which the MBR is to be calculated.

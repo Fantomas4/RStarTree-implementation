@@ -5,10 +5,10 @@ import tree.Entry;
 /**
  * Custom comparator used to compare two entries based on their bounding boxes' distances from a specified point.
  */
-public class DistanceToPointComparator implements java.util.Comparator<Entry> {
+public class MinPointDistanceComparator implements java.util.Comparator<Entry> {
     private final double[] targetPoint;
 
-    public DistanceToPointComparator(double[] targetPoint) {
+    public MinPointDistanceComparator(double[] targetPoint) {
         this.targetPoint = targetPoint;
     }
 

@@ -159,7 +159,7 @@ public class RStarTree {
         }
 
         if (currentNode.getLevel() == targetLevel) {
-            // The target level has been reached, so newEntry is inserted into currentNode.
+            // The target level has been reached, so newEntry is added to currentNode.
             currentNode.addEntry(newEntry);
         } else {
             // The target level has not been reached, so the optimal insertion path for the next lower tree level
@@ -186,8 +186,6 @@ public class RStarTree {
      * or splitting it into 2 new nodes.
      * @param overflowedNode the overflowed node that needs to be processed.
      * @param parentNode the parent node of the overflowed node.
-     * @return null if reinsertion was chosen to mitigate the overflowed node, or an ArrayList containing
-     * the 2 new nodes the overflowed node was split into.
      */
     private void overflowTreatment(Node overflowedNode, Node parentNode) {
         int overflowedNodeLevel = overflowedNode.getLevel();
@@ -204,13 +202,11 @@ public class RStarTree {
         } else {
             // Invoke splitNode() on the overflowed Node.
             Node splitNode = overflowedNode.splitNode();
-//            FileHandler.updateNode(overflowedNode);
             FileHandler.insertNode(splitNode);
 
             if (overflowedNode.getLevel() != rootLevel) {
                 // If the overflowed node is not the root, create a new entry in the parent node for the new split node.
                 parentNode.addEntry(new Entry(BoundingBox.calculateMBR(splitNode.getEntries()), splitNode.getId()));
-//                FileHandler.updateNode(parentNode);
             } else {
                 // If the overflowed node is the root, create a new root containing the two new split nodes of the old root.
                 ArrayList<Entry> newRootEntries = new ArrayList<>();
@@ -242,14 +238,6 @@ public class RStarTree {
         for (int i = 0; i < REINSERT_AMOUNT; i++) {
             removedEntries.add(overflowedNode.getEntries().remove(0));
         }
-
-//        FileHandler.updateNode(overflowedNode);// TODO: Update overflowedNode in IndexFile using FileHandler. CHECK!
-//
-//        // Adjust the parent entry of the updated formerly overflowed node
-//        parentEntry.adjustBoundingBox(overflowedNode);
-//
-//        // Update the parent entry's node (parent node) in IndexFile using FileHandler
-//        FileHandler.updateNode(parentNode);// TODO: Update the parent entry's node (parent node) in IndexFile using FileHandler. CHECK!
 
         // Starting with the minimum distance stated in the sorting step above (close reinsert), invoke insert() to
         // reinsert the entries.
