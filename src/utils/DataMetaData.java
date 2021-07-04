@@ -2,7 +2,6 @@ package utils;
 
 import tree.Record;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -14,7 +13,7 @@ public class DataMetaData {
         public static void init()
         {
                 try {
-                        RandomAccessFile raf = new RandomAccessFile(FileHandler.DATAFILE_NAME, "rw");
+                        RandomAccessFile raf = new RandomAccessFile(FileHandler.DATA_FILE_NAME, "rw");
                         raf.seek(0);
                         raf.write(toBytes());
                 } catch (IOException e) {
